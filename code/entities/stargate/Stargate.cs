@@ -195,7 +195,10 @@ public partial class Stargate : Prop, IUse
 		OnStopDialing();
 	}
 
-	public virtual void OnStopDialing() { }
+	public virtual void OnStopDialing()
+	{
+		Dialing = false;
+	}
 	public virtual void OnStargateOpen() { }
 	public virtual void OnStargateClose() { }
 
