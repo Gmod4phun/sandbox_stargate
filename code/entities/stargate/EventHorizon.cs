@@ -139,7 +139,7 @@ public partial class EventHorizon : AnimEntity
 		if ( !otherEH.IsValid() ) return;
 
 		var localVelNorm = this.Transform.NormalToLocal( ent.Velocity.Normal );
-		var otherVelNorm = otherEH.Transform.NormalToWorld( localVelNorm.WithX( -localVelNorm.x ) );
+		var otherVelNorm = otherEH.Transform.NormalToWorld( localVelNorm.WithX( -localVelNorm.x ).WithY( -localVelNorm.y ) );
 
 		var localPos = this.Transform.PointToLocal( ent.Position );
 		var otherPos = otherEH.Transform.PointToWorld( localPos.WithY( -localPos.y ) );
