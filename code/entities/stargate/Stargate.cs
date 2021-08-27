@@ -99,6 +99,7 @@ public partial class Stargate : Prop, IUse
 		EventHorizon = new EventHorizon();
 		EventHorizon.Position = Position;
 		EventHorizon.Rotation = Rotation;
+		EventHorizon.Scale = Scale;
 		EventHorizon.SetParent( this );
 		EventHorizon.Gate = this;
 	}
