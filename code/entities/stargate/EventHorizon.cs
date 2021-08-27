@@ -132,7 +132,7 @@ public partial class EventHorizon : AnimEntity
 
 	}
 
-	public void TeleportEntity(Entity ent)
+	public async void TeleportEntity(Entity ent)
 	{
 		var otherEH = Gate.OtherGate.EventHorizon;
 
@@ -147,14 +147,27 @@ public partial class EventHorizon : AnimEntity
 		var localRot = this.Transform.RotationToLocal( ent.Rotation );
 		var otherRot = otherEH.Transform.RotationToWorld( localRot.RotateAroundAxis(localRot.Up, 180f) );
 
+
 		if (ent is SandboxPlayer ply)
 		{
-			// player eye/body rotation todo
+			var oldController = ply.Controller;
+			using ( Prediction.Off() ) ply.Controller = new EventHorizonController();
 
+			var DeltaAngleEH = otherEH.Rotation.Angles() - Rotation.Angles();
+
+			ply.EyeRot = Rotation.From( ply.EyeRot.Angles() + new Angles( 0, DeltaAngleEH.yaw + 180, 0 ) );
+			ply.Rotation = ply.EyeRot;
+
+			await GameTask.NextPhysicsFrame();
+
+			using ( Prediction.Off() ) ply.Controller = oldController;
+		}
+		else
+		{
+			ent.Rotation = otherRot;
 		}
 
 		ent.Position = otherPos;
-		ent.Rotation = otherRot;
 		ent.ResetInterpolation();
 		ent.Velocity = otherVelNorm * ent.Velocity.Length;
 	}
