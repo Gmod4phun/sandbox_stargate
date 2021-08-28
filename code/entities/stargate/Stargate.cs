@@ -46,7 +46,7 @@ public partial class Stargate : Prop, IUse
 
 	public bool OnUse( Entity user )
 	{
-		// OpenGateMenu();
+		GuiController.OpenStargateMenu( this, user );
 		return false; // aka SIMPLE_USE, not continuously
 	}
 
@@ -146,6 +146,7 @@ public partial class Stargate : Prop, IUse
 
 	protected override void OnDestroy()
 	{
+		GuiController.CloseStargateMenu( this );
 		base.OnDestroy();
 
 		if ( IsServer && OtherGate.IsValid() )
@@ -238,9 +239,9 @@ public partial class Stargate : Prop, IUse
 		ResetGateVariablesToIdle();
 	}
 
-	//[Event( "server.tick" )]
-	//public void StargateTick()
-	//{
-
-	//}
+	[Event( "server.tick" )]
+	public void StargateTick()
+	{
+		GuiController.RangeCheckTick();
+	}
 }
