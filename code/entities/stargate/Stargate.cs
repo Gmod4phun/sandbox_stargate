@@ -113,8 +113,10 @@ public partial class Stargate : Prop, IUse
 		EventHorizon?.Delete();
 	}
 
-	public async Task EstablishEventHorizon()
+	public async Task EstablishEventHorizon(float delay = 0)
 	{
+		await GameTask.DelaySeconds( delay );
+
 		CreateEventHorizon();
 		EventHorizon.Establish();
 
@@ -122,7 +124,7 @@ public partial class Stargate : Prop, IUse
 		EventHorizon.IsFullyFormed = true;
 	}
 
-	public async Task CollapseEventHorizon( float sec )
+	public async Task CollapseEventHorizon( float sec = 0 )
 	{
 		await GameTask.DelaySeconds( sec );
 		EventHorizon.IsFullyFormed = false;
@@ -162,7 +164,7 @@ public partial class Stargate : Prop, IUse
 
 		OnStargateBeginOpen();
 
-		await EstablishEventHorizon();
+		await EstablishEventHorizon( 0.5f );
 
 		Busy = false;
 		OnStargateOpened();
@@ -186,12 +188,11 @@ public partial class Stargate : Prop, IUse
 	public virtual async void BeginDialSlow(string address) { }
 	public virtual void BeginDialInstant(string address) { } // instant gate open, with kawoosh
 	public virtual void BeginDialNox( string address ) { } // instant gate open without kawoosh - asgard/ancient/nox style 
-	public virtual async void BeginInbound( string address ) { }
+	public virtual async void BeginInboundFast( string address, int numChevs = 7 ) { }
+	public virtual async void BeginInboundSlow( string address, int numChevs = 7 ) { }
 
 	public async void StopDialing()
 	{
-		if ( !Dialing ) return;
-
 		OnStopDialingBegin();
 
 		await GameTask.DelaySeconds( 1.25f );
@@ -201,9 +202,14 @@ public partial class Stargate : Prop, IUse
 
 	public virtual void OnStopDialingBegin()
 	{
-		Log.Info( "stopdial begin" );
+		//Log.Info( "stopdial begin" );
 		Busy = true;
 		ShouldStopDialing = true; // can be used in ring/gate logic to to stop ring/gate rotation
+
+		//if (OtherGate.IsValid())
+		//{
+		//	OtherGate.StopDialing();
+		//}
 	}
 
 	public virtual void OnStopDialingFinish()
@@ -211,13 +217,26 @@ public partial class Stargate : Prop, IUse
 		Dialing = false; // must be set to false AFTER setting ShouldStopDialing to true
 		Busy = false;
 		ResetGateVariablesToIdle();
-		Log.Info( "stopdial done" );
+		//Log.Info( "stopdial done" );
 	}
 
-	public virtual void OnStargateBeginOpen() { Log.Info( "opening the gate" ); }
-	public virtual void OnStargateOpened() { Log.Info( "opened the gate" ); }
-	public virtual void OnStargateBeginClose() { Log.Info( "closing the gate" ); }
-	public virtual void OnStargateClosed() { Log.Info( "closed the gate" ); }
+	public virtual void OnStargateBeginOpen()
+	{
+		Busy = true;
+	}
+	public virtual void OnStargateOpened()
+	{
+		Busy = false;
+	}
+	public virtual void OnStargateBeginClose()
+	{
+		Busy = true;
+	}
+	public virtual void OnStargateClosed()
+	{
+		Busy = false;
+		ResetGateVariablesToIdle();
+	}
 
 	//[Event( "server.tick" )]
 	//public void StargateTick()

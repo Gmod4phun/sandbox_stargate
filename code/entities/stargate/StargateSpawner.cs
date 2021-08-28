@@ -1,6 +1,6 @@
 ﻿namespace Sandbox.Tools
 {
-	[Library( "tool_stargatespawner", Title = "Stargate", Description = "Use wormholes to transport matter", Group = "construction" )]
+	[Library( "tool_stargatespawner", Title = "Stargate", Description = "Use wormholes to transport matter\n\nMOUSE1 - Spawn gate\nR - copy gate address\nMOUSE2 - Close gate/Stop dialling/Fast dial copied address\nSHIFT + MOUSE2 - Slow dial copied address", Group = "construction" )]
 	public partial class StargateSpawnerTool : BaseTool
 	{
 		PreviewEntity previewModel;
@@ -91,7 +91,7 @@
 					gate.Rotation = new Angles( 0, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
 				}
 
-				if ( Input.Pressed( InputButton.Attack2 ) )
+				if ( Input.Pressed( InputButton.Reload ) )
 				{
 					var startPos = Owner.EyePos;
 					var dir = Owner.EyeRot.Forward;
@@ -115,7 +115,7 @@
 				}
 
 
-				if ( Input.Pressed( InputButton.Reload ) )
+				if ( Input.Pressed( InputButton.Attack2 ) )
 				{
 					var startPos = Owner.EyePos;
 					var dir = Owner.EyeRot.Forward;
@@ -132,7 +132,8 @@
 
 					if ( tr.Entity is StargateSG1 gate )
 					{
-						Log.Info( $"{gate.Open} | {gate.Dialing}" );
+						if ( gate.Busy ) return;
+
 						if (gate.Open)
 						{
 							gate.DoStargateClose(true);
@@ -141,7 +142,14 @@
 						{
 							if ( !gate.Dialing )
 							{
-								gate.BeginDialFast( address );
+								if (Input.Down(InputButton.Run))
+								{
+									gate.BeginDialSlow( address );
+								}
+								else
+								{
+									gate.BeginDialFast( address );
+								}
 							}
 							else
 							{
