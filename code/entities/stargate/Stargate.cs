@@ -25,6 +25,8 @@ public partial class Stargate : Prop, IUse
 	public bool ShouldStopDialing = false;
 	public bool Busy = false;
 
+	public Dhd Dhd { get; protected set; } = null;
+
 	// VARIABLE RESET
 	public void ResetGateVariablesToIdle()
 	{
@@ -55,6 +57,10 @@ public partial class Stargate : Prop, IUse
 	public override void Spawn()
 	{
 		base.Spawn();
+	}
+
+	public void SetDhd(Dhd ent) {
+		Dhd = ent;
 	}
 
 	// ADDRESS
@@ -224,6 +230,10 @@ public partial class Stargate : Prop, IUse
 	public virtual void OnStargateBeginOpen()
 	{
 		Busy = true;
+
+		if (Dhd != null) {
+			Dhd.EnableButton("DIAL");
+		}
 	}
 	public virtual void OnStargateOpened()
 	{
@@ -237,11 +247,37 @@ public partial class Stargate : Prop, IUse
 	{
 		Busy = false;
 		ResetGateVariablesToIdle();
+
+		if (Dhd != null) {
+			Dhd.DisableButtons();
+		}
 	}
 
 	[Event( "server.tick" )]
 	public void StargateTick()
 	{
 		GuiController.RangeCheckTick();
+	}
+
+	public Stargate FindClosestGate() {
+		return Stargate.FindClosestGate(this.Position, 0, new Entity[] { this });
+	}
+
+	public static Stargate FindClosestGate(Vector3 postition, float max_distance = 0, Entity[] exclude = null) {
+		Stargate current = null;
+		float distance = float.PositiveInfinity;
+
+		foreach ( Stargate gate in Entity.All.OfType<Stargate>() ) {
+			if (exclude != null && exclude.Contains(gate))
+				continue;
+
+			float currDist = gate.Position.Distance(postition);
+			if (distance > currDist && (max_distance > 0 && currDist <= max_distance)) {
+				distance = currDist;
+				current = gate;
+			}
+		}
+
+		return current;
 	}
 }
