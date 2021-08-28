@@ -9,6 +9,9 @@ public partial class EventHorizon : AnimEntity
 {
 	public Stargate Gate;
 	public bool IsFullyFormed = false;
+	protected Sound WormholeLoop;
+
+	// material VARIABLES - probably name this better one day
 
 	// establish material variables
 	float minFrame = 0f;
@@ -46,18 +49,29 @@ public partial class EventHorizon : AnimEntity
 		EnableTouch = true;
 	}
 
-	public void Establish()
+	// SERVER CONTROL
+
+	public async void Establish()
 	{
-		EH_Establish(); // clientside animation tuff
+		EstablishClientAnim(); // clientside animation tuff
+
+		await GameTask.DelaySeconds(1.5f);
+		WormholeLoop = Sound.FromEntity( "wormhole_loop", this );
 	}
 
-	public void Collapse()
+	public async void Collapse()
 	{
-		EH_Collapse(); // clientside animation tuff
+		CollapseClientAnim(); // clientside animation tuff
+
+		await GameTask.DelaySeconds( 1f );
+		WormholeLoop.Stop();
 	}
+	
+
+	// CLIENT ANIM CONTROL
 
 	[ClientRpc]
-	public void EH_Establish()
+	public void EstablishClientAnim()
 	{
 		curFrame = minFrame;
 		curBrightness = 0;
@@ -69,7 +83,7 @@ public partial class EventHorizon : AnimEntity
 	}
 
 	[ClientRpc]
-	public void EH_Collapse()
+	public void CollapseClientAnim()
 	{
 		curFrame = maxFrame;
 		curBrightness = 1;
@@ -80,6 +94,7 @@ public partial class EventHorizon : AnimEntity
 		EnableShadowCasting = true;
 	}
 
+	// CLIENT ANIM LOGIC
 	[Event( "client.tick" )]
 	public void EH_ClientTick()
 	{
@@ -132,8 +147,13 @@ public partial class EventHorizon : AnimEntity
 
 	}
 
+
+	// TELEPORT
+
 	public async void TeleportEntity(Entity ent)
 	{
+		if ( !Gate.IsValid() || !Gate.OtherGate.IsValid() ) return;
+
 		var otherEH = Gate.OtherGate.EventHorizon;
 
 		if ( !otherEH.IsValid() ) return;
@@ -197,34 +217,14 @@ public partial class EventHorizon : AnimEntity
 
 		if ( Gate.Inbound ) return;
 
-		if (other is Sandbox.Player || other is Prop)
-		{
-			Log.Info( $"I was touched by {other}" );
+		if (other is Sandbox.Player || other is Prop) TeleportEntity(other);
+	}
 
-			TeleportEntity(other);
-		}
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
 
-		
-
-		//if ( other != Stargate )
-		//{
-		//	if ( other is SandboxPlayer || other is Prop )
-		//	{
-		//		if ( IsServer )
-		//		{
-		//			if ( IsFullyFormed )
-		//			{
-		//				TeleportEntity( other );
-		//			}
-		//			else
-		//			{
-		//				DissolveEntity( other );
-		//			}
-
-		//		}
-		//	}
-
-		//}
+		WormholeLoop.Stop();
 	}
 
 }

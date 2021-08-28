@@ -15,23 +15,27 @@ public partial class Stargate : Prop, IUse
 	public EventHorizon EventHorizon;
 	public Stargate OtherGate;
 
-	[Net]
-	[Property( "Address", Group = "Stargate" )]
 	public string Address { get; protected set; } = "";
+	public string Group { get; protected set; } = "";
 
-	[Net]
-	[Property( "Active", Group = "Stargate" )]
 	public bool Active { get; protected set; } = false;
 	public bool Inbound = false;
-
-	[Net]
-	[Property( "Open", Group = "Stargate" )]
 	public bool Open { get; protected set; } = false;
-
 	public bool Dialing = false;
 	public bool ShouldStopDialing = false;
+	public bool Busy = false;
 
-	protected Sound WormholeLoop;
+	// VARIABLE RESET
+	public void ResetGateVariablesToIdle()
+	{
+		Active = false;
+		Open = false;
+		Inbound = false;
+		Dialing = false;
+		ShouldStopDialing = false;
+		Busy = false;
+		OtherGate = null;
+	}
 
 	// USABILITY
 
@@ -43,7 +47,7 @@ public partial class Stargate : Prop, IUse
 	public bool OnUse( Entity user )
 	{
 		// OpenGateMenu();
-		return false; // SIMPLE_USE, not continuously
+		return false; // aka SIMPLE_USE, not continuously
 	}
 
 	// SPAWN
@@ -109,25 +113,23 @@ public partial class Stargate : Prop, IUse
 		EventHorizon?.Delete();
 	}
 
-	public async void EstablishEventHorizon()
+	public async Task EstablishEventHorizon()
 	{
+		CreateEventHorizon();
 		EventHorizon.Establish();
 
 		await GameTask.DelaySeconds( 2f );
 		EventHorizon.IsFullyFormed = true;
 	}
 
-	public async void CollapseEventHorizon( float sec )
+	public async Task CollapseEventHorizon( float sec )
 	{
 		await GameTask.DelaySeconds( sec );
-		EventHorizon.EH_Collapse();
+		EventHorizon.IsFullyFormed = false;
+		EventHorizon.CollapseClientAnim();
 
 		await GameTask.DelaySeconds( sec + 2f );
 		DeleteEventHorizon();
-
-		Open = false;
-		Inbound = false;
-		OtherGate = null;
 	}
 
 	// STARGATE
@@ -135,72 +137,91 @@ public partial class Stargate : Prop, IUse
 	{
 		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
 		{
-			if ( gate != this && !gate.Active ) return gate;
+			if ( gate != this ) return gate;
 		}
 		return null;
 	}
 
-	public void StargateOpen()
+	protected override void OnDestroy()
 	{
+		base.OnDestroy();
+
+		if ( IsServer && OtherGate.IsValid() )
+		{
+			OtherGate.DoStargateClose();
+		}
+	}
+
+
+	// DIALING
+
+	public async void DoStargateOpen()
+	{
+		Busy = true;
 		Open = true;
-		Sound.FromEntity( "gate_open_sg1", this );
 
-		CreateEventHorizon();
-		EstablishEventHorizon();
+		OnStargateBeginOpen();
 
-		OnStargateOpen();
+		await EstablishEventHorizon();
+
+		Busy = false;
+		OnStargateOpened();
 	}
 
-	public void StargateClose(bool alsoCloseOther = false)
+	public async void DoStargateClose( bool alsoCloseOther = false )
 	{
-		Sound.FromEntity( "gate_close", this );
+		if ( alsoCloseOther && OtherGate.IsValid() ) OtherGate.DoStargateClose();
 
-		EventHorizon.IsFullyFormed = false;
-		CollapseEventHorizon(0.25f);
+		Busy = true;
 
-		OnStargateClose();
+		OnStargateBeginClose();
 
-		if (alsoCloseOther && OtherGate.IsValid()) OtherGate.StargateClose();
+		await CollapseEventHorizon( 0.25f );
+
+		ResetGateVariablesToIdle();
+		OnStargateClosed();
 	}
+
+	public virtual async void BeginDialFast(string address) { }
+	public virtual async void BeginDialSlow(string address) { }
+	public virtual void BeginDialInstant(string address) { } // instant gate open, with kawoosh
+	public virtual void BeginDialNox( string address ) { } // instant gate open without kawoosh - asgard/ancient/nox style 
+	public virtual async void BeginInbound( string address ) { }
+
+	public async void StopDialing()
+	{
+		if ( !Dialing ) return;
+
+		OnStopDialingBegin();
+
+		await GameTask.DelaySeconds( 1.25f );
+
+		OnStopDialingFinish();
+	}
+
+	public virtual void OnStopDialingBegin()
+	{
+		Log.Info( "stopdial begin" );
+		Busy = true;
+		ShouldStopDialing = true; // can be used in ring/gate logic to to stop ring/gate rotation
+	}
+
+	public virtual void OnStopDialingFinish()
+	{
+		Dialing = false; // must be set to false AFTER setting ShouldStopDialing to true
+		Busy = false;
+		ResetGateVariablesToIdle();
+		Log.Info( "stopdial done" );
+	}
+
+	public virtual void OnStargateBeginOpen() { Log.Info( "opening the gate" ); }
+	public virtual void OnStargateOpened() { Log.Info( "opened the gate" ); }
+	public virtual void OnStargateBeginClose() { Log.Info( "closing the gate" ); }
+	public virtual void OnStargateClosed() { Log.Info( "closed the gate" ); }
 
 	//[Event( "server.tick" )]
 	//public void StargateTick()
 	//{
 
 	//}
-
-	protected override void OnDestroy()
-	{
-		base.OnDestroy();
-
-		WormholeLoop.Stop();
-
-		if ( IsServer && OtherGate.IsValid() )
-		{
-			OtherGate.StargateClose();
-		}
-	}
-
-	// DIALING
-
-	public virtual void BeginDialFast(string address) { }
-	public virtual void BeginDialSlow(string address) { }
-
-	public void StopDialing()
-	{
-		if ( !Dialing ) return;
-
-		//Dialing = false;
-
-		ShouldStopDialing = true;
-		OnStopDialing();
-	}
-
-	public virtual void OnStopDialing()
-	{
-		Dialing = false;
-	}
-	public virtual void OnStargateOpen() { }
-	public virtual void OnStargateClose() { }
-
 }

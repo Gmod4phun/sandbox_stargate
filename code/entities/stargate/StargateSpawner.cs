@@ -135,14 +135,13 @@
 						Log.Info( $"{gate.Open} | {gate.Dialing}" );
 						if (gate.Open)
 						{
-							gate.StargateClose(true);
+							gate.DoStargateClose(true);
 						}
 						else
 						{
 							if ( !gate.Dialing )
 							{
-								gate.TestDial( address );
-								Log.Info( "testdial" );
+								gate.BeginDialFast( address );
 							}
 							else
 							{

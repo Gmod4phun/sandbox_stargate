@@ -95,46 +95,78 @@ public partial class StargateSG1 : Stargate
 
 	public async void SetChevronsGlowState( bool state, float delay = 0)
 	{
-		await GameTask.DelaySeconds( delay );
+		if (delay > 0) await GameTask.DelaySeconds( delay );
+
 		foreach ( Chevron chev in Chevrons ) chev.Glowing = state;
 	}
 
-	public override void OnStopDialing()
+	public override void OnStopDialingBegin()
 	{
-		base.OnStopDialing();
+		base.OnStopDialingBegin();
 
 		Sound.FromEntity( "dial_fail_sg1", this);
-		SetChevronsGlowState( false, 1.25f );
 	}
 
-	public override void OnStargateOpen()
+	public override void OnStopDialingFinish()
 	{
-		base.OnStargateOpen();
-		SetChevronsGlowState( true );
+		base.OnStopDialingFinish();
+
+		SetChevronsGlowState( false );
 	}
 
-	public override void OnStargateClose()
+	public override void OnStargateBeginOpen()
 	{
-		base.OnStargateClose();
-		SetChevronsGlowState( false, 2.5f );
+		base.OnStargateBeginOpen();
+
+		Sound.FromEntity( "gate_open_sg1", this );
+	}
+
+	public override void OnStargateOpened()
+	{
+		base.OnStargateOpened();
+	}
+
+	public override void OnStargateBeginClose()
+	{
+		base.OnStargateBeginClose();
+
+		Sound.FromEntity( "gate_close", this );
+	}
+
+	public override void OnStargateClosed()
+	{
+		base.OnStargateClosed();
+
+		SetChevronsGlowState( false );
 	}
 
 	// TEST STUFF
 
 	public async override void BeginDialFast(string address)
 	{
-		if ( !IsValidAddress( address ) ) return;
+		if ( !IsValidAddress( address ) )
+		{
+			StopDialing();
+			return;
+		}
 
 		var addrLen = address.Length;
 
+		Dialing = true;
 		Ring.StartRingRotation();
 
 		await GameTask.DelaySeconds( 0.5f );
 
 		Chevron chev = null;
 
-		for (var i = 1; i <= addrLen; i++ )
+		for (var i = 1; i < addrLen; i++ )
 		{
+			if (ShouldStopDialing)
+			{
+				Ring.StopRingRotation();
+				return;
+			}
+
 			chev = GetChevron( i );
 
 			if ( chev.IsValid() )
@@ -146,6 +178,7 @@ public partial class StargateSG1 : Stargate
 			await GameTask.DelaySeconds( 0.7f );
 		}
 
+		Ring.StopRingRotation();
 		await GameTask.DelaySeconds( 1f );
 
 		chev = GetChevron( 7 );
@@ -157,32 +190,32 @@ public partial class StargateSG1 : Stargate
 		}
 
 		await GameTask.DelaySeconds( 1.5f );
+		if ( !this.IsValid() ) return;
 
-		if (this.IsValid())
+		var targetGate = FindByAddress( address );
+		if ( targetGate.IsValid() && targetGate != this && !targetGate.Open )
 		{
-			StargateOpen();
-		}
-		
+			Dialing = false;
 
-		await GameTask.DelaySeconds( 1.5f );
-		if (this.IsValid())
+			targetGate.OtherGate = this;
+			OtherGate = targetGate;
+
+			targetGate.DoStargateOpen();
+			DoStargateOpen();
+
+			targetGate.Inbound = true;
+		}
+		else
 		{
-			WormholeLoop = Sound.FromEntity( "wormhole_loop", this );
-		}
+			await GameTask.DelaySeconds( 0.5f );
+			if ( !this.IsValid() ) return;
 
-		// close gate
-		await GameTask.DelaySeconds( 5f );
-		WormholeLoop.Stop();
-
-		if (this.IsValid())
-		{
-			StargateClose();
+			StopDialing();
 		}
-		
-		
 	}
 
-	public async void TestDial( string addr )
+	
+	public async override void BeginDialSlow( string addr )
 	{
 		String curAddr = "";
 
@@ -256,17 +289,10 @@ public partial class StargateSG1 : Stargate
 			targetGate.OtherGate = this;
 			OtherGate = targetGate;
 
-			targetGate.StargateOpen();
-			StargateOpen();
+			targetGate.DoStargateOpen();
+			DoStargateOpen();
 
 			targetGate.Inbound = true;
-
-			//Log.Info( $"Done, dialed sequence {curAddr}" );
-
-			//await GameTask.DelaySeconds( 15f );
-
-			//targetGate.StargateClose();
-			//StargateClose();
 		}
 		else
 		{
