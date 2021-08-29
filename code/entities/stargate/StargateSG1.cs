@@ -100,9 +100,9 @@ public partial class StargateSG1 : Stargate
 		foreach ( Chevron chev in Chevrons ) chev.Glowing = state;
 	}
 
-	public override void OnStopDialingBegin()
+	public override void OnStopDialingBegin(bool force = false)
 	{
-		base.OnStopDialingBegin();
+		base.OnStopDialingBegin(force);
 
 		Sound.FromEntity( "dial_fail_sg1", this);
 	}
@@ -278,13 +278,7 @@ public partial class StargateSG1 : Stargate
 		{
 			Dialing = false;
 
-			targetGate.OtherGate = this;
-			OtherGate = targetGate;
-
-			targetGate.DoStargateOpen();
-			DoStargateOpen();
-
-			targetGate.Inbound = true;
+			OpenGate(targetGate);
 		}
 		else
 		{
@@ -471,5 +465,35 @@ public partial class StargateSG1 : Stargate
 				Sound.FromEntity( "chevron_incoming", this );
 			}
 		}
+	}
+
+	private void EnableNeededChevrons( string address ) {
+		var addrLen = address.Length;
+
+		for (var i = 1; i < addrLen + 1; i++ )
+		{
+			var chev = GetChevronBasedOnAddressLength( i, addrLen );
+
+			if ( chev.IsValid() )
+			{
+				chev.Glowing = true;
+				Sound.FromEntity( "chevron_dhd", this );
+			}
+		}
+	}
+
+	public override void BeginDialInstant( string address )
+	{
+		base.BeginDialInstant( address );
+
+		EnableNeededChevrons( address );
+
+		OtherGate.BeginInboundInstant( Address );
+	}
+
+	public override void BeginInboundInstant( string address ) {
+		base.BeginInboundInstant( address );
+
+		EnableNeededChevrons( address );
 	}
 }
