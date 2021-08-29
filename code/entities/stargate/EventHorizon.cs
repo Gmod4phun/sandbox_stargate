@@ -190,6 +190,12 @@ public partial class EventHorizon : AnimEntity
 
 		ent.Position = otherPos;
 		ent.ResetInterpolation();
+		if ( Gate.OtherGate.Iris.IsValid() && Gate.OtherGate.Iris.Closed ) {
+			await GameTask.Delay(100);
+			DissolveEntity(ent);
+			Gate.OtherGate.Iris.MakeHitSound();
+			return;
+		}
 		ent.Velocity = otherVelNorm * ent.Velocity.Length;
 	}
 
@@ -199,6 +205,7 @@ public partial class EventHorizon : AnimEntity
 		{
 			ent.Health = 1;
 			var dmg = new DamageInfo();
+			dmg.Attacker = Gate;
 			dmg.Damage = 100;
 			ent.TakeDamage( dmg );
 		}

@@ -13,6 +13,7 @@ public partial class Stargate : Prop, IUse
 	protected string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
 
 	public EventHorizon EventHorizon;
+	public StargateIris Iris;
 	public Stargate OtherGate;
 
 	public string Address { get; protected set; } = "";

@@ -1,6 +1,6 @@
 ﻿namespace Sandbox.Tools
 {
-	[Library( "tool_stargatespawner", Title = "Stargate", Description = "Use wormholes to transport matter\n\nMOUSE1 - Spawn gate\nR - copy gate address\nMOUSE2 - Close gate/Stop dialling/Fast dial copied address\nSHIFT + MOUSE2 - Slow dial copied address", Group = "construction" )]
+	[Library( "tool_stargatespawner", Title = "Stargate", Description = "Use wormholes to transport matter\n\nMOUSE1 - Spawn gate\nR - copy gate address\nMOUSE2 - Close gate/Stop dialling/Fast dial copied address\nSHIFT + MOUSE2 - Slow dial copied address\nSHIFT + R - Add an Iris or Toggle it if the gate already have one", Group = "construction" )]
 	public partial class StargateSpawnerTool : BaseTool
 	{
 		PreviewEntity previewModel;
@@ -92,7 +92,7 @@
 				}
 
 				if ( Input.Pressed( InputButton.Reload ) )
-				{
+				{					
 					var startPos = Owner.EyePos;
 					var dir = Owner.EyeRot.Forward;
 
@@ -107,6 +107,20 @@
 
 					if ( tr.Entity is Stargate gate)
 					{
+
+						if (Input.Down(InputButton.Run)) {
+							if (gate.Iris != null) {
+								gate.Iris.Toggle();
+								return;
+							}
+							gate.Iris = new StargateIris();
+							gate.Iris.Position = gate.Position;
+							gate.Iris.Rotation = gate.Rotation;
+							gate.Iris.SetParent(gate);
+							gate.Iris.Close();
+							return;
+						}
+
 						address = gate.Address;
 						Log.Info( $"Copied this gates address: {address}" );
 						return;
