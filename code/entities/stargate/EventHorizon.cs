@@ -96,7 +96,7 @@ public partial class EventHorizon : AnimEntity
 
 	// CLIENT ANIM LOGIC
 	[Event( "client.tick" )]
-	public void EH_ClientTick()
+	public void EventHorizonClientTick()
 	{
 		if (shouldBeOn && !isOn)
 		{
@@ -111,7 +111,7 @@ public partial class EventHorizon : AnimEntity
 				SetMaterialGroup( 0 );
 				EnableShadowCasting = true;
 
-				//Particles.Create( "particles/water_squirt.vpcf", this, "center", true );
+				//Particles.Create( "particles/water_squirt.vpcf", this, "center", true ); // only test, kawoosh particle will be made at some point
 
 			}
 		}
@@ -190,12 +190,6 @@ public partial class EventHorizon : AnimEntity
 
 		ent.Position = otherPos;
 		ent.ResetInterpolation();
-		if ( Gate.OtherGate.Iris.IsValid() && Gate.OtherGate.Iris.Closed ) {
-			await GameTask.Delay(100);
-			DissolveEntity(ent);
-			Gate.OtherGate.Iris.MakeHitSound();
-			return;
-		}
 		ent.Velocity = otherVelNorm * ent.Velocity.Length;
 	}
 
@@ -224,7 +218,21 @@ public partial class EventHorizon : AnimEntity
 
 		if ( Gate.Inbound ) return;
 
-		if (other is Sandbox.Player || other is Prop) TeleportEntity(other);
+		if ( other is Sandbox.Player || other is Prop ) // for now only players and props get teleported
+		{
+			if ( !Gate.Iris.IsValid() || !Gate.Iris.Closed ) // try teleporting only if our iris is open
+			{
+				if ( Gate.OtherGate.Iris.IsValid() && Gate.OtherGate.Iris.Closed ) // if other iris is closed, dissolve
+				{
+					DissolveEntity( other );
+					Gate.OtherGate.Iris.MakeHitSound();
+				}
+				else // otherwise we are fine for teleportation
+				{
+					TeleportEntity( other );
+				}
+			}
+		}
 	}
 
 	protected override void OnDestroy()
@@ -234,4 +242,9 @@ public partial class EventHorizon : AnimEntity
 		WormholeLoop.Stop();
 	}
 
+	[Event( "server.tick" )]
+	public void EventHorizonTick()
+	{
+		if ( Gate.IsValid() && Scale != Gate.Scale ) Scale = Gate.Scale; // always keep the same scale as gate
+	}
 }
