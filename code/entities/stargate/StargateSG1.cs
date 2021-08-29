@@ -219,6 +219,10 @@ public partial class StargateSG1 : Stargate
 			{
 				chev.Glowing = true;
 				Sound.FromEntity( "chevron_dhd", this );
+
+				if (Dhd != null) {
+					Dhd.EnableButton((address[i]+"").ToUpper());
+				}
 			}
 
 			if (i == addrLen - 1) Ring.StopRingRotation(); // stop rotating ring when the last looped chevron locks
