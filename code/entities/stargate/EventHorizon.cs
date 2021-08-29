@@ -171,8 +171,8 @@ public partial class EventHorizon : AnimEntity
 
 		if (ent is SandboxPlayer ply)
 		{
-			var oldController = ply.Controller;
-			using ( Prediction.Off() ) ply.Controller = new EventHorizonController();
+			var oldController = ply.DevController;
+			using ( Prediction.Off() ) ply.DevController = new EventHorizonController();
 
 			var DeltaAngleEH = otherEH.Rotation.Angles() - Rotation.Angles();
 
@@ -181,7 +181,7 @@ public partial class EventHorizon : AnimEntity
 
 			await GameTask.NextPhysicsFrame();
 
-			using ( Prediction.Off() ) ply.Controller = oldController;
+			using ( Prediction.Off() ) ply.DevController = oldController;
 		}
 		else
 		{
@@ -191,6 +191,9 @@ public partial class EventHorizon : AnimEntity
 		ent.Position = otherPos;
 		ent.ResetInterpolation();
 		ent.Velocity = otherVelNorm * ent.Velocity.Length;
+
+		Sound.FromEntity("teleport", this);
+		Sound.FromEntity("teleport", otherEH);
 	}
 
 	public void DissolveEntity( Entity ent )
