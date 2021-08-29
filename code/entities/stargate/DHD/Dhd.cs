@@ -125,4 +125,13 @@ public abstract partial class Dhd : Prop {
 		this.ButtonPositions = pos;
 	}
 
+	public override void Touch(Entity ent) {
+		if (!(ent is Stargate) || ent == Gate)
+			return;
+
+		Gate.SetDhd(null);
+		Gate = ent as Stargate;
+		Gate.SetDhd(this);
+	}
+
 }
