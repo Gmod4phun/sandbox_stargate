@@ -31,6 +31,9 @@ public partial class SpawnMenu : Panel
 
 				var ents = body.AddChild<EntityList>();
 				tabs.AddButtonActive( "Entities", ( b ) => ents.SetClass( "active", b ) );
+
+				var stargate = body.AddChild<StargateList>();
+				tabs.AddButtonActive( "Stargate", ( b ) => stargate.SetClass( "active", b ) );
 			}
 		}
 
