@@ -27,16 +27,20 @@ public partial class StargateIris : AnimEntity
 	}
 
 	public void Close() {
+		if ( Closed ) return;
+
 		Closed = true;
 		EnableAllCollisions = true;
-		Sequence = "iris_close";
+		CurrentSequence.Name = "iris_close";
 		//Sound.FromEntity("iris_close", this);
 	}
 
 	public void Open() {
+		if ( !Closed ) return;
+
 		Closed = false;
 		EnableAllCollisions = false;
-		Sequence = "iris_open";
+		CurrentSequence.Name = "iris_open";
 		//Sound.FromEntity("iris_open", this);
 	}
 

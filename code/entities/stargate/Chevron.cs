@@ -19,17 +19,17 @@ public partial class Chevron : AnimEntity
 
 	public void ChevronLock()
 	{
-		Sequence = "idle_locked";
+		CurrentSequence.Name = "idle_locked";
 	}
 
 	public void ChevronUnlock()
 	{
-		Sequence = "idle";
+		CurrentSequence.Name = "idle";
 	}
 
 	public void ChevronLockUnlock()
 	{
-		Sequence = "lock_unlock_long";
+		CurrentSequence.Name = "lock_unlock_long";
 	}
 
 	[Event( "server.tick" )]
