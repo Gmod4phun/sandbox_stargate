@@ -129,9 +129,18 @@ public abstract partial class Dhd : Prop {
 		if (!(ent is Stargate) || ent == Gate)
 			return;
 
+		DisableButtons();
+
 		Gate.SetDhd(null);
 		Gate = ent as Stargate;
 		Gate.SetDhd(this);
+
+		if (Gate.Open) {
+			foreach (char c in Gate.Address) {
+				EnableButton(c.ToString().ToUpper());
+			}
+			EnableButton("DIAL");
+		}
 	}
 
 }
