@@ -38,6 +38,17 @@ public partial class Ring : AnimEntity
 		RingRotDir = -RingRotDir;
 	}
 
+	public void PlayRollSound()
+	{
+		StopRollSound();
+		RollSound = Sound.FromEntity( "gate_roll_long", this );
+	}
+
+	public void StopRollSound()
+	{
+		RollSound.Stop();
+	}
+
 	public void StartRingRotation() // start ring free spin rotation
 	{
 		FlipRingRotDir(); // swap the direction on each rotation call
@@ -47,7 +58,7 @@ public partial class Ring : AnimEntity
 		RingShouldAcc = true;
 		RingShouldDecc = false;
 
-		RollSound = Sound.FromEntity( "gate_roll_long", this );
+		PlayRollSound();
 	}
 
 	public void StopRingRotation() // stop ring free spin rotation
@@ -57,7 +68,7 @@ public partial class Ring : AnimEntity
 		RingShouldAcc = false;
 		RingShouldDecc = true;
 
-		RollSound.Stop();
+		StopRollSound();
 	}
 
 	public void RotateRingTo( float targetAng ) // gradually rotates the ring to a specific angle
@@ -70,7 +81,7 @@ public partial class Ring : AnimEntity
 		RingShouldAcc = true;
 		RingShouldDecc = false;
 
-		RollSound = Sound.FromEntity( "gate_roll_long", this );
+		PlayRollSound();
 	}
 
 	public void StopRingRotationInstant() // instantly stops the ring rotation
@@ -81,7 +92,7 @@ public partial class Ring : AnimEntity
 		RingShouldAcc = false;
 		RingShouldDecc = false;
 
-		RollSound.Stop();
+		StopRollSound();
 	}
 
 	public void ResetRingRotation() // stops rotation and resets the ring angle back to 0
@@ -250,7 +261,6 @@ public partial class Ring : AnimEntity
 	{
 		base.OnDestroy();
 
-		RollSound.Stop();
-
+		StopRollSound();
 	}
 }

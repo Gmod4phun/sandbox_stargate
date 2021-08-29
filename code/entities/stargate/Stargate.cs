@@ -117,21 +117,28 @@ public partial class Stargate : Prop, IUse
 	public async Task EstablishEventHorizon(float delay = 0)
 	{
 		await GameTask.DelaySeconds( delay );
+		if ( !this.IsValid() ) return;
 
 		CreateEventHorizon();
 		EventHorizon.Establish();
 
 		await GameTask.DelaySeconds( 2f );
+		if ( !this.IsValid() || !EventHorizon.IsValid() ) return;
+
 		EventHorizon.IsFullyFormed = true;
 	}
 
 	public async Task CollapseEventHorizon( float sec = 0 )
 	{
 		await GameTask.DelaySeconds( sec );
+		if ( !this.IsValid() || !EventHorizon.IsValid() ) return;
+
 		EventHorizon.IsFullyFormed = false;
 		EventHorizon.CollapseClientAnim();
 
 		await GameTask.DelaySeconds( sec + 2f );
+		if ( !this.IsValid() || !EventHorizon.IsValid() ) return;
+
 		DeleteEventHorizon();
 	}
 
@@ -208,10 +215,10 @@ public partial class Stargate : Prop, IUse
 		Busy = true;
 		ShouldStopDialing = true; // can be used in ring/gate logic to to stop ring/gate rotation
 
-		//if (OtherGate.IsValid())
-		//{
-		//	OtherGate.StopDialing();
-		//}
+		if ( OtherGate.IsValid() && OtherGate.Inbound && !OtherGate.ShouldStopDialing )
+		{
+			OtherGate.StopDialing();
+		}
 	}
 
 	public virtual void OnStopDialingFinish()

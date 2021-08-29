@@ -158,11 +158,17 @@ public partial class StargateSG1 : Stargate
 		var targetGate = FindByAddress( address );
 		if ( !targetGate.IsValid() ) return;
 
-		if (targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Inbound) targetGate.BeginInboundFast( this.Address, targetGate.Address.Length );
+		var wasTargetGateValidOnDialStart = false;
+		var wasDialStopped = false;
+
+		if (targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Inbound)
+		{
+			wasTargetGateValidOnDialStart = true;
+			targetGate.BeginInboundFast( this.Address, targetGate.Address.Length );
+			OtherGate = targetGate;
+		}
 
 		Dialing = true;
-
-		OtherGate = targetGate;
 
 		var timeStart = RealTime.Now; // dial start time
 
@@ -199,9 +205,11 @@ public partial class StargateSG1 : Stargate
 		
 		for (var i = 1; i < addrLen; i++ )
 		{
-			if (ShouldStopDialing) // check if we should stop dialing or not
+			if ( ShouldStopDialing && !wasDialStopped ) // check if we should stop dialing or not
 			{
 				Ring.StopRingRotation();
+				wasDialStopped = true;
+				StopDialing();
 				return;
 			}
 
@@ -219,28 +227,54 @@ public partial class StargateSG1 : Stargate
 			if ( !this.IsValid() ) return;
 		}
 
+		if ( ShouldStopDialing && !wasDialStopped ) // check if we should stop dialing at the end or not
+		{
+			wasDialStopped = true;
+			StopDialing();
+			return;
+		}
+
 		await GameTask.DelaySeconds( chevronBeforeLastDelay ); // wait before locking the last chevron
 		if ( !this.IsValid() ) return;
 
-		var topChev = GetChevron( 7 ); // lock last chevron
+		if ( ShouldStopDialing && !wasDialStopped ) // check if we should stop dialing at the end or not
+		{
+			wasDialStopped = true;
+			StopDialing();
+			return;
+		}
+
+		Busy = true; // so we cant stop dial at this point
+
+		var topChev = GetChevron( 7 ); // lock last (top) chevron
 		if ( topChev.IsValid())
 		{
-			if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing )
-			{
-				topChev.Glowing = true;
-			}
-			
-			topChev.ChevronLockUnlock();
-			Sound.FromEntity( "chevron_lock_sg1", this );
+			//if ( !shouldStopDialingAtEnd )
+			//{
+			if ( wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing )
+				{
+					topChev.Glowing = true;
+				}
+
+				topChev.ChevronLockUnlock();
+				Sound.FromEntity( "chevron_lock_sg1", this );
+			//}
 		}
 
 		await GameTask.DelaySeconds( chevronAfterLastDelay ); // wait after the last chevron, then open the gate or fail dial (if gate became invalid/was busy)
 		if ( !this.IsValid() ) return;
 
+		if ( ShouldStopDialing && !wasDialStopped ) // check if we should stop dialing at the end or not
+		{
+			wasDialStopped = true;
+			StopDialing();
+			return;
+		}
+
 		var timeEnd = RealTime.Now - timeStart;
 		Log.Info( $"Gate dial time: {timeEnd}" );
 
-		if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing ) // if valid, open both gates
+		if ( !wasDialStopped && wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing ) // if valid, open both gates
 		{
 			Dialing = false;
 
@@ -257,12 +291,17 @@ public partial class StargateSG1 : Stargate
 			await GameTask.DelaySeconds( 0.5f ); // if not valid, wait 0.5 sec, then fail and stop dialing
 			if ( !this.IsValid() ) return;
 
-			if (OtherGate.IsValid() && OtherGate != this && !OtherGate.Open && !OtherGate.Busy && !OtherGate.Dialing )
+			//if ( wasTargetGateValidOnDialStart && OtherGate.IsValid() && OtherGate != this && !OtherGate.Open && !OtherGate.Busy && !OtherGate.Dialing )
+			//{
+			//	OtherGate.StopDialing();
+			//}
+
+			if ( ShouldStopDialing && !wasDialStopped && Dialing) // check if we should stop dialing at the end or not
 			{
-				OtherGate.StopDialing();
+				wasDialStopped = true;
+				StopDialing();
+				return;
 			}
-			
-			StopDialing();
 		}
 	}
 
@@ -301,7 +340,8 @@ public partial class StargateSG1 : Stargate
 		{
 			if ( ShouldStopDialing ) // check if we should stop dialing or not
 			{
-				Ring.StopRingRotation();
+				//Ring.StopRingRotation();
+				//StopDialing();
 				return;
 			}
 
