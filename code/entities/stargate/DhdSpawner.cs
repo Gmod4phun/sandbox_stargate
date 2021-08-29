@@ -5,7 +5,7 @@
 	{
 		PreviewEntity previewModel;
 
-		private string Model => "models/markjaw/dhd_new/s2/dhd.vmdl";
+		private string Model => "models/gmod4phun/stargate/dhd/dhd.vmdl";
 		protected override bool IsPreviewTraceValid( TraceResult tr )
 		{
 			if ( !base.IsPreviewTraceValid( tr ) )
@@ -25,8 +25,8 @@
 				{
 					previewModel.RelativeToNormal = false;
 					previewModel.OffsetBounds = false;
-					previewModel.PositionOffset = new Vector3( 0, 0, -15 );
-					previewModel.RotationOffset = new Angles( 0, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
+					previewModel.PositionOffset = new Vector3( 0, 0, -5 );
+					previewModel.RotationOffset = new Angles( 15, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
 				}
 
 			}
@@ -75,8 +75,8 @@
 
 					CreateHitEffects( tr.EndPos );
 
-					var dhd = new DhdSg1();
-					dhd.Position = tr.EndPos + new Vector3(0, 0, -15);
+					var dhd = new DHD_SG1();
+					dhd.Position = tr.EndPos + new Vector3(0, 0, -5);
 					dhd.Rotation = new Angles( 15, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
 				}
 

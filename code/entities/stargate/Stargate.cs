@@ -26,7 +26,7 @@ public partial class Stargate : Prop, IUse
 	public bool ShouldStopDialing = false;
 	public bool Busy = false;
 
-	public Dhd Dhd { get; protected set; } = null;
+	public DHD Dhd { get; protected set; } = null;
 
 	// VARIABLE RESET
 	public void ResetGateVariablesToIdle()
@@ -60,7 +60,7 @@ public partial class Stargate : Prop, IUse
 		base.Spawn();
 	}
 
-	public void SetDhd(Dhd ent) {
+	public void SetDhd(DHD ent) {
 		Dhd = ent;
 	}
 
@@ -239,9 +239,7 @@ public partial class Stargate : Prop, IUse
 	{
 		Busy = true;
 
-		if (Dhd != null) {
-			Dhd.EnableButton("DIAL");
-		}
+		if ( Dhd.IsValid() && Inbound ) Dhd.EnableButton('.'); // this will probably be handled somewhere else
 	}
 	public virtual void OnStargateOpened()
 	{
@@ -257,7 +255,7 @@ public partial class Stargate : Prop, IUse
 		ResetGateVariablesToIdle();
 
 		if (Dhd != null) {
-			Dhd.DisableButtons();
+			Dhd.DisableAllButtons();
 		}
 	}
 

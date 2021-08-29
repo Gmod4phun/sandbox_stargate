@@ -2,59 +2,16 @@ using System;
 using System.Collections.Generic;
 using Sandbox;
 
-public abstract partial class Dhd : Prop {
-
+public abstract partial class DHD : Prop
+{
 	[Net]
 	[Property(Name = "Gate", Group = "Stargate")]
 	public Stargate Gate { get; protected set; }
 
-	protected List<DhdButton> Buttons = new();
+	protected readonly string ButtonsModel = "models/gmod4phun/stargate/dhd/dhd_buttons.vmdl";
+	protected readonly string ButtonsSymbols = "0123456789ABCDEFGHIJKLMNO#PQRSTUVWXYZ@.";
 
-	protected string[] ButtonModels { get; set; } = Array.Empty<string>();
-
-	protected readonly string[] ButtonsOrder = {
-		"0",
-		"1",
-		"2",
-		"3",
-		"4",
-		"5",
-		"6",
-		"7",
-		"8",
-		"9",
-		"A",
-		"B",
-		"C",
-		"D",
-		"E",
-		"F",
-		"G",
-		"H",
-		"I",
-		"J",
-		"K",
-		"L",
-		"M",
-		"N",
-		"O",
-		"#",
-		"P",
-		"Q",
-		"R",
-		"S",
-		"T",
-		"U",
-		"V",
-		"W",
-		"X",
-		"Y",
-		"Z",
-		"@",
-		"DIAL"
-	};
-
-	protected Vector3[] ButtonPositions { get; set; } = Array.Empty<Vector3>();
+	protected Dictionary<char, DHDButton> Buttons = new();
 
 	public override void Spawn()
 	{
@@ -79,68 +36,76 @@ public abstract partial class Dhd : Prop {
 		}
 	}
 
-	public virtual void CreateButtons() {
-		Log.Info(ButtonModels.Length);
-		int i = 0;
-		foreach (string mdl in ButtonModels) {
-			DhdButton but;
-			if (mdl == ButtonModels[ButtonModels.Length - 1])
-				but = new DialDhdButton();
-			else
-				but = new DhdButton();
-			but.SetModel(mdl);
-			but.SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
-			Vector3 offset = ButtonPositions[i];
-			but.Position = Position + offset;
-			but.Rotation = Rotation;
-			but.Scale = Scale;
-			but.SetParent(this);
+	public virtual void CreateButtons()
+	{
+		var i = 1;
+		foreach ( char symbol in ButtonsSymbols )
+		{
+			var button = symbol.Equals( '.' ) ? new DHDButtonDial() : new DHDButton();
+			button.SetModel( ButtonsModel );
+			button.SetBodyGroup( 0, i++ );
+			button.SetupPhysicsFromModel( PhysicsMotionType.Static, true );
+			button.Position = Position;
+			button.Rotation = Rotation;
+			button.Scale = Scale;
+			button.SetParent( this );
 
-			Buttons.Add(but);
-			i++;
-		}
-
-	}
-
-	public virtual void DisableButtons() {
-		foreach (DhdButton but in Buttons) {
-			but.On = false;
+			Buttons.Add( symbol, button );
 		}
 	}
 
-	public void EnableButton(string c) {
-		for (int i = 0; i < ButtonsOrder.Length; i++) {
-			if (ButtonsOrder[i] == c) {
-				Buttons[i].On = true;
-				break;
-			}
-		}
+	public void EnableButton( char symbol )
+	{
+		if ( !Buttons.ContainsKey(symbol) ) return;
+
+		var b = Buttons[symbol];
+		if ( b.IsValid() ) b.On = true;
 	}
 
-	protected void SetModels(string[] btnModels) {
-		this.ButtonModels = btnModels;
+	public void DisableButton( char symbol )
+	{
+		if ( !Buttons.ContainsKey( symbol ) ) return;
+
+		var b = Buttons[symbol];
+		if ( b.IsValid() ) b.On = false;
 	}
 
-	protected void SetPositions(Vector3[] pos) {
-		this.ButtonPositions = pos;
+	public void EnableButtons( string symbols )
+	{
+		foreach (char symbol in symbols) EnableButton( symbol );
 	}
 
-	public override void Touch(Entity ent) {
-		if (!(ent is Stargate) || ent == Gate)
-			return;
+	public virtual void DisableButtons( string symbols )
+	{
+		foreach ( char symbol in symbols ) DisableButton( symbol );
+	}
 
-		DisableButtons();
+	public void EnableAllButtons()
+	{
+		foreach ( char symbol in ButtonsSymbols ) EnableButton( symbol );
+	}
+
+	public virtual void DisableAllButtons()
+	{
+		foreach ( char symbol in ButtonsSymbols ) DisableButton( symbol );
+	}
+
+	public override void StartTouch(Entity ent)
+	{
+		if ( ent is not Stargate || ent == Gate ) return;
+
+		DisableAllButtons();
 
 		Gate.SetDhd(null);
 		Gate = ent as Stargate;
 		Gate.SetDhd(this);
 
-		if (Gate.Open) {
-			foreach (char c in Gate.Address) {
-				EnableButton(c.ToString().ToUpper());
-			}
-			EnableButton("DIAL");
+		if ( Gate.Open )
+		{
+			EnableButtons( Gate.OtherGate.Address );
+			EnableButton( '.' );
 		}
+			
 	}
 
 }
