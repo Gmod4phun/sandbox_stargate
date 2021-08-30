@@ -242,32 +242,43 @@ public partial class EventHorizon : AnimEntity
 
 		if ( !IsServer ) return;
 
+		if ( Gate.Inbound ) return; // TODO: this part here is only to stop constant entity teleports until I implement a check
+		// that does not immediately dissolve the entities when they come out of the inbound gate
+
 		if ( other is StargateIris ) return;
 
 		if ( other is Sandbox.Player || other is Prop ) // for now only players and props get teleported
 		{
 			PlayTeleportSound(); // event horizon always plays sound if something entered it
 
-			if ( IsEntityBehindEventHorizon(other) ) // if we entered from behind, dissolve
+			if ( Gate.Inbound ) // if we entered inbound gate from any direction, dissolve
 			{
 				DissolveEntity( other );
 			}
-			else // othwerwise we entered from the front, so now decide what happens
+			else // we entered a good gate
 			{
-				if ( !Gate.IsIrisClosed() ) // try teleporting only if our iris is open
+				if ( IsEntityBehindEventHorizon( other ) ) // check if we entered from the back and if yes, dissolve
 				{
-					if ( Gate.OtherGate.IsIrisClosed() ) // if other gate's iris is closed, dissolve
+					DissolveEntity( other );
+				}
+				else // othwerwise we entered from the front, so now decide what happens
+				{
+					if ( !Gate.IsIrisClosed() ) // try teleporting only if our iris is open
 					{
-						DissolveEntity( other );
-						Gate.OtherGate.Iris.PlayHitSound(); // iris goes boom
-					}
-					else // otherwise we are fine for teleportation
-					{
-						TeleportEntity( other );
-						Gate.OtherGate.EventHorizon.PlayTeleportSound(); // other EH plays sound now
+						if ( Gate.OtherGate.IsIrisClosed() ) // if other gate's iris is closed, dissolve
+						{
+							DissolveEntity( other );
+							Gate.OtherGate.Iris.PlayHitSound(); // iris goes boom
+						}
+						else // otherwise we are fine for teleportation
+						{
+							TeleportEntity( other );
+							Gate.OtherGate.EventHorizon.PlayTeleportSound(); // other EH plays sound now
+						}
 					}
 				}
 			}
+
 		}
 	}
 

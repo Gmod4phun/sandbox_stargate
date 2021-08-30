@@ -113,16 +113,6 @@ public partial class Stargate : Prop, IUse
 	{
 		return HasIris() && Iris.Closed;
 	}
-
-	// STARGATE
-	public Stargate FindRandomGate()
-	{
-		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
-		{
-			if ( gate != this ) return gate;
-		}
-		return null;
-	}
   
 	protected override void OnDestroy()
 	{
