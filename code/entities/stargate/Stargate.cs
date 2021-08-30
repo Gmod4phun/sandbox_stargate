@@ -150,7 +150,7 @@ public partial class Stargate : Prop, IUse
 
 	public bool IsIrisClosed()
 	{
-		return Iris.IsValid() && Iris.Closed;
+		return HasIris() && Iris.Closed;
 	}
 
 	// STARGATE
