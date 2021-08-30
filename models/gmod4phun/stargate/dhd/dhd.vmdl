@@ -80,16 +80,8 @@
 								to = "models/gmod4phun/stargate/dhd/dhd_bottom.vmat"
 							},
 							{
-								from = "buttons_sg1_off.vmat"
-								to = "models/gmod4phun/stargate/dhd/dhd_buttons_sg1_off.vmat"
-							},
-							{
 								from = "core.vmat"
 								to = "models/gmod4phun/stargate/dhd/dhd_core.vmat"
-							},
-							{
-								from = "dialorb_sg1_off.vmat"
-								to = "models/gmod4phun/stargate/dhd/dhd_dialorb_sg1_off.vmat"
 							},
 							{
 								from = "mid_sg1.vmat"

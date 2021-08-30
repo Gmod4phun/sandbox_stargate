@@ -8,8 +8,7 @@ public abstract partial class DHD : Prop
 	[Property(Name = "Gate", Group = "Stargate")]
 	public Stargate Gate { get; protected set; }
 
-	protected readonly string ButtonsModel = "models/gmod4phun/stargate/dhd/dhd_buttons.vmdl";
-	protected readonly string ButtonsSymbols = "0123456789ABCDEFGHIJKLMNO#PQRSTUVWXYZ@.";
+	protected readonly string ButtonsSymbols = "ABCDEFGHI0123456789STUVWXYZ@JKLMNO#PQR.";
 
 	protected Dictionary<char, DHDButton> Buttons = new();
 
@@ -42,8 +41,7 @@ public abstract partial class DHD : Prop
 		foreach ( char symbol in ButtonsSymbols )
 		{
 			var button = symbol.Equals( '.' ) ? new DHDButtonDial() : new DHDButton();
-			button.SetModel( ButtonsModel );
-			button.SetBodyGroup( 0, i++ );
+			button.SetModel( $"models/gmod4phun/stargate/dhd/dhd_button_{i++}.vmdl" );
 
 			button.SetupPhysicsFromModel( PhysicsMotionType.Static, true );
 			button.PhysicsBody.BodyType = PhysicsBodyType.Static;
@@ -55,6 +53,7 @@ public abstract partial class DHD : Prop
 			button.Rotation = Rotation;
 			button.Scale = Scale;
 			button.SetParent( this );
+			button.Symbol = symbol;
 
 			Buttons.Add( symbol, button );
 		}

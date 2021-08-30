@@ -6,6 +6,7 @@ public partial class DHDButton : AnimEntity, IUse
 	[Net]
 	[Property( Name = "On", Group = "Stargate" )]
 	public bool On { get; set; } = false;
+	public char Symbol;
 
 	public override void Spawn()
 	{
@@ -16,9 +17,18 @@ public partial class DHDButton : AnimEntity, IUse
 		On = false;
 	}
 
+	public void PlayPressAnim()
+	{
+		CurrentSequence.Name = "idle_pressed";
+	}
+
 	public virtual bool OnUse(Entity ent)
 	{
 		On = !On;
+
+		Log.Info(Symbol);
+		PlayPressAnim();
+
 		return false;
 	}
 
