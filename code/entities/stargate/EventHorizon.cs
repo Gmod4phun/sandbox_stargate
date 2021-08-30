@@ -11,6 +11,8 @@ public partial class EventHorizon : AnimEntity
 	public bool IsFullyFormed = false;
 	protected Sound WormholeLoop;
 
+	protected Entity CurrentTeleportingEntity;
+
 	// material VARIABLES - probably name this better one day
 
 	// establish material variables
@@ -242,14 +244,20 @@ public partial class EventHorizon : AnimEntity
 
 		if ( !IsServer ) return;
 
-		if ( Gate.Inbound ) return; // TODO: this part here is only to stop constant entity teleports until I implement a check
+		//if ( Gate.Inbound ) return; // TODO: this part here is only to stop constant entity teleports until I implement a check
 		// that does not immediately dissolve the entities when they come out of the inbound gate
+
+		if ( !IsFullyFormed ) return; // -- for some reason it crashes, I will look at it, keep it playable for now
 
 		if ( other is StargateIris ) return;
 
 		if ( other is Sandbox.Player || other is Prop ) // for now only players and props get teleported
 		{
+			if ( other == CurrentTeleportingEntity ) return;
+
 			PlayTeleportSound(); // event horizon always plays sound if something entered it
+
+			// if ( !IsFullyFormed ) DissolveEntity( other ); -- still crashes, hold on
 
 			if ( Gate.Inbound ) // if we entered inbound gate from any direction, dissolve
 			{
@@ -272,6 +280,9 @@ public partial class EventHorizon : AnimEntity
 						}
 						else // otherwise we are fine for teleportation
 						{
+							CurrentTeleportingEntity = other;
+							Gate.OtherGate.EventHorizon.CurrentTeleportingEntity = other;
+
 							TeleportEntity( other );
 							Gate.OtherGate.EventHorizon.PlayTeleportSound(); // other EH plays sound now
 						}
@@ -279,6 +290,19 @@ public partial class EventHorizon : AnimEntity
 				}
 			}
 
+		}
+	}
+
+	public override void EndTouch( Entity other )
+	{
+		base.EndTouch( other );
+
+		if ( !IsServer ) return;
+
+		if ( other == CurrentTeleportingEntity )
+		{
+			CurrentTeleportingEntity = null;
+			Gate.OtherGate.EventHorizon.CurrentTeleportingEntity = null;
 		}
 	}
 
