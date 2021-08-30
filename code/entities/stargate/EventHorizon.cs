@@ -68,7 +68,27 @@ public partial class EventHorizon : AnimEntity
 		await GameTask.DelaySeconds( 1f );
 		WormholeLoop.Stop();
 	}
-	
+
+
+	// UTILITY
+	public void PlayTeleportSound()
+	{
+		if ( lastSoundTime + 0.1f < Time.Now ) // delay for playing sounds to avoid constant spam
+		{
+			lastSoundTime = Time.Now;
+			Sound.FromEntity( "teleport", this );
+		}
+	}
+
+	public bool IsEntityBehindEventHorizon( Entity ent )
+	{
+		return (ent.Position - Position).Dot( Rotation.Forward ) < 0;
+	}
+
+	public bool IsPawnBehindEventHorizon( Entity pawn )
+	{
+		return (pawn.EyePos - Position).Dot( Rotation.Forward ) < 0;
+	}
 
 	// CLIENT ANIM CONTROL
 
@@ -81,7 +101,6 @@ public partial class EventHorizon : AnimEntity
 		shouldBeOff = false;
 
 		SetMaterialGroup( 1 );
-		EnableShadowCasting = false;
 	}
 
 	[ClientRpc]
@@ -93,14 +112,11 @@ public partial class EventHorizon : AnimEntity
 		shouldEstablish = false;
 
 		SetMaterialGroup( 0 );
-		EnableShadowCasting = true;
 	}
 
-	// CLIENT ANIM LOGIC
-	[Event( "client.tick" )]
-	public void EventHorizonClientTick()
+	public void ClientAnimLogic()
 	{
-		if (shouldBeOn && !isOn)
+		if ( shouldBeOn && !isOn )
 		{
 			curFrame = MathX.Approach( curFrame, maxFrame, Time.Delta * 30 );
 			SceneObject.SetValue( "frame", curFrame.FloorToInt() );
@@ -111,10 +127,8 @@ public partial class EventHorizon : AnimEntity
 				shouldEstablish = true;
 				curBrightness = maxBrightness;
 				SetMaterialGroup( 0 );
-				EnableShadowCasting = true;
 
 				//Particles.Create( "particles/water_squirt.vpcf", this, "center", true ); // only test, kawoosh particle will be made at some point
-
 			}
 		}
 
@@ -125,7 +139,7 @@ public partial class EventHorizon : AnimEntity
 			if ( curFrame == minFrame ) isOff = true;
 		}
 
-		if (shouldEstablish && !isEstablished)
+		if ( shouldEstablish && !isEstablished )
 		{
 			SceneObject.SetValue( "illumbrightness", curBrightness );
 			curBrightness = MathX.Approach( curBrightness, minBrightness, Time.Delta * 5 );
@@ -143,15 +157,26 @@ public partial class EventHorizon : AnimEntity
 				shouldBeOff = true;
 				curBrightness = minBrightness;
 				SetMaterialGroup( 1 );
-				EnableShadowCasting = false;
 			}
 		}
-
 	}
 
+	// CLIENT LOGIC
+	[Event( "client.tick" )]
+	public void EventHorizonClientTick()
+	{
+		ClientAnimLogic();
+	}
+
+	[Event.Frame]
+	public void ClientAlphaRenderLogic()
+	{
+		// draw the EH at 0.6 alpha when looking at it from behind -- doesnt work in thirdperson at the moment
+		var pawn = Local.Pawn;
+		if ( pawn.IsValid() ) RenderAlpha = IsPawnBehindEventHorizon(pawn) ? 0.6f : 1f;
+	}
 
 	// TELEPORT
-
 	public async void TeleportEntity(Entity ent)
 	{
 		if ( !Gate.IsValid() || !Gate.OtherGate.IsValid() ) return;
@@ -209,16 +234,6 @@ public partial class EventHorizon : AnimEntity
 		{
 			ent.Delete();
 		}
-
-	}
-
-	public void PlayTeleportSound()
-	{
-		if ( lastSoundTime + 0.1f < Time.Now ) // delay for playing sounds to avoid constant spam
-		{
-			lastSoundTime = Time.Now;
-			Sound.FromEntity( "teleport", this );
-		}
 	}
 
 	public override void StartTouch( Entity other )
@@ -227,26 +242,32 @@ public partial class EventHorizon : AnimEntity
 
 		if ( !IsServer ) return;
 
-		if ( Gate.Inbound ) return;
+		if ( other is StargateIris ) return;
 
 		if ( other is Sandbox.Player || other is Prop ) // for now only players and props get teleported
 		{
-			if ( !Gate.IsIrisClosed() ) // try teleporting only if our iris is open
-			{
-				PlayTeleportSound(); // event horizon always plays sound if something entered it
+			PlayTeleportSound(); // event horizon always plays sound if something entered it
 
-				if ( Gate.OtherGate.IsIrisClosed() ) // if other iris is closed, dissolve
+			if ( IsEntityBehindEventHorizon(other) ) // if we entered from behind, dissolve
+			{
+				DissolveEntity( other );
+			}
+			else // othwerwise we entered from the front, so now decide what happens
+			{
+				if ( !Gate.IsIrisClosed() ) // try teleporting only if our iris is open
 				{
-					DissolveEntity( other );
-					Gate.OtherGate.Iris.PlayHitSound(); // iris goes boom
-				}
-				else // otherwise we are fine for teleportation
-				{
-					TeleportEntity( other );
-					Gate.OtherGate.EventHorizon.PlayTeleportSound(); // other EH plays sound now
+					if ( Gate.OtherGate.IsIrisClosed() ) // if other gate's iris is closed, dissolve
+					{
+						DissolveEntity( other );
+						Gate.OtherGate.Iris.PlayHitSound(); // iris goes boom
+					}
+					else // otherwise we are fine for teleportation
+					{
+						TeleportEntity( other );
+						Gate.OtherGate.EventHorizon.PlayTeleportSound(); // other EH plays sound now
+					}
 				}
 			}
-
 		}
 	}
 
