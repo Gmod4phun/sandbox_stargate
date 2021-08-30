@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using System.Linq;
+using Sandbox;
 
 [Library( "sandbox", Title = "Sandbox" )]
 partial class SandboxGame : Game
@@ -44,6 +45,7 @@ partial class SandboxGame : Game
 		ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw, 0 ) ) * Rotation.FromAxis( Vector3.Up, 180 );
 		ent.SetModel( modelname );
 		ent.Position = tr.EndPos - Vector3.Up * ent.CollisionBounds.Mins.z;
+		ent.Owner = owner;
 	}
 
 	[ServerCmd( "spawn_entity" )]
@@ -74,6 +76,7 @@ partial class SandboxGame : Game
 
 		ent.Position = tr.EndPos;
 		ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw, 0 ) );
+		ent.Owner = owner;
 
 		//Log.Info( $"ent: {ent}" );
 	}
@@ -92,6 +95,22 @@ partial class SandboxGame : Game
 				Log.Info( "Noclip Mode On" );
 				basePlayer.DevController = new NoclipController();
 			}
+		}
+	}
+
+	[ServerCmd("undo")]
+	public static void OnUndoCommand()
+	{
+		Client caller = ConsoleSystem.Caller;
+
+		if ( !caller.IsValid() ) return;
+
+		Entity ent = Prop.All.LastOrDefault(x => x.Owner == caller.Pawn && (x is not BaseCarriable));
+
+		if ( ent.IsValid() )
+		{
+			ent.Owner.PlaySound( "balloon_pop_cute" );
+			ent.Delete();
 		}
 	}
 }

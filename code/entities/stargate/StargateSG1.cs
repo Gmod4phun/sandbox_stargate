@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
-[Library( "ent_stargate_sg1", Title = "Stargate SG-1", Spawnable = true )]
+[Library( "ent_stargate_sg1", Title = "Stargate SG-1", Spawnable = true, Group = "Stargate" )]
 public partial class StargateSG1 : Stargate
 {
 	public Ring Ring;
@@ -144,7 +144,7 @@ public partial class StargateSG1 : Stargate
 
 	public async override void BeginDialFast(string address)
 	{
-		if ( Busy || Inbound) return;
+		if ( Busy || Inbound || Dialing || Open) return;
 
 		if ( address.Equals( Address ) ) return;
 
@@ -156,7 +156,6 @@ public partial class StargateSG1 : Stargate
 		}
 
 		var targetGate = FindByAddress( address );
-		if ( !targetGate.IsValid() ) return;
 
 		var wasTargetGateValidOnDialStart = false;
 		var wasDialStopped = false;
@@ -296,7 +295,7 @@ public partial class StargateSG1 : Stargate
 			//	OtherGate.StopDialing();
 			//}
 
-			if ( ShouldStopDialing && !wasDialStopped && Dialing) // check if we should stop dialing at the end or not
+			if ( (ShouldStopDialing && !wasDialStopped && Dialing) || !wasTargetGateValidOnDialStart ) // check if we should stop dialing at the end or not
 			{
 				wasDialStopped = true;
 				StopDialing();
@@ -464,12 +463,57 @@ public partial class StargateSG1 : Stargate
 		for ( var i = 1; i <= numChevs; i++ )
 		{
 			var chev = GetChevronBasedOnAddressLength( i, numChevs );
-
 			if ( chev.IsValid() )
 			{
 				chev.Glowing = true;
-				Sound.FromEntity( "chevron_incoming", this );
 			}
 		}
+		Sound.FromEntity( "chevron_incoming", this ); // play once to avoid insta earrape
+	}
+
+	public async override void BeginDialInstant( string address )
+	{
+		if ( Busy || Inbound || Dialing || Open) return;
+
+		Dialing = true;
+
+		if ( !IsValidAddress( address ) )
+		{
+			StopDialing();
+			return;
+		}
+
+		var otherGate = FindByAddress( address );
+		if ( !otherGate.IsValid() || otherGate.Busy || otherGate.Open || otherGate.Inbound || otherGate.Dialing )
+		{
+			StopDialing();
+			return;
+		}
+
+		Busy = true;
+
+		OtherGate = otherGate;
+		otherGate.OtherGate = this;
+
+		OtherGate.Inbound = true;
+		OtherGate.Busy = true;
+
+		for ( var i = 1; i <= address.Length; i++ )
+		{
+			var chev = GetChevronBasedOnAddressLength( i, address.Length );
+			if ( chev.IsValid() )
+			{
+				chev.Glowing = true;
+			}
+		}
+		Sound.FromEntity( "chevron_incoming", this ); // play once to avoid insta earrape
+
+		otherGate.BeginInboundSlow( Address );
+
+		await GameTask.DelaySeconds( 0.5f );
+
+		DoStargateOpen();
+		OtherGate.DoStargateOpen();
+
 	}
 }

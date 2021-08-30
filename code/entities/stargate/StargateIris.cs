@@ -7,13 +7,6 @@ public partial class StargateIris : AnimEntity
 	public Stargate Gate;
 	public bool Closed = false;
 
-	public readonly string[] HitSounds = {
-		"hit_1",
-		"hit_2",
-		"hit_3",
-		"hit_4"
-	};
-
 	public override void Spawn()
 	{
 		base.Spawn();
@@ -32,7 +25,7 @@ public partial class StargateIris : AnimEntity
 		Closed = true;
 		EnableAllCollisions = true;
 		CurrentSequence.Name = "iris_close";
-		//Sound.FromEntity("iris_close", this);
+		Sound.FromEntity("iris_close", this);
 	}
 
 	public void Open() {
@@ -41,7 +34,7 @@ public partial class StargateIris : AnimEntity
 		Closed = false;
 		EnableAllCollisions = false;
 		CurrentSequence.Name = "iris_open";
-		//Sound.FromEntity("iris_open", this);
+		Sound.FromEntity("iris_open", this);
 	}
 
 	public void Toggle() {
@@ -51,9 +44,8 @@ public partial class StargateIris : AnimEntity
 			Close();
 	}
 
-	public void MakeHitSound() {
-		//string sound = RandomExtension.FromArray<string>(new Random(), HitSounds);
-		//Sound.FromEntity(sound, this);
+	public void PlayHitSound() {
+		Sound.FromEntity( "iris_hit", this );
 	}
 
 	protected override void OnDestroy()
