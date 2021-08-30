@@ -99,15 +99,17 @@ partial class SandboxGame : Game
 	}
 
 	[ServerCmd("undo")]
-	public static void OnUndoCommand() {
+	public static void OnUndoCommand()
+	{
 		Client caller = ConsoleSystem.Caller;
 
-		if (caller == null)
-			return;
+		if ( !caller.IsValid() ) return;
 
-		Entity ent = Prop.All.LastOrDefault(x => x.Owner == caller.Pawn && !(x is BaseCarriable));
+		Entity ent = Prop.All.LastOrDefault(x => x.Owner == caller.Pawn && (x is not BaseCarriable));
 
-		if (ent != null) {
+		if ( ent.IsValid() )
+		{
+			ent.Owner.PlaySound( "balloon_pop_cute" );
 			ent.Delete();
 		}
 	}

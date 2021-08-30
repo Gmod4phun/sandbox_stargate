@@ -89,6 +89,7 @@
 
 					gate.Position = tr.EndPos + gate.SpawnOffset;
 					gate.Rotation = new Angles( 0, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
+					gate.Owner = Owner;
 				}
 
 				if ( Input.Pressed( InputButton.Reload ) )
