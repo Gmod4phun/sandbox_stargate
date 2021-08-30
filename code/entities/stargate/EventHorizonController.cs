@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+// Controller needed to properly set player rotation and eye rotations on teleport
 public partial class EventHorizonController : BasePlayerController
 {
 	public override void BuildInput( InputBuilder input )
