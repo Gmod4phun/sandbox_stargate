@@ -164,7 +164,7 @@ public partial class Stargate : Prop, IUse
 	}
 
 
-	// DIALING
+	// DIALING -- please don't touch any of these, dialing is heavy WIP
 
 	public async void DoStargateOpen()
 	{
@@ -177,16 +177,6 @@ public partial class Stargate : Prop, IUse
 
 		Busy = false;
 		OnStargateOpened();
-	}
-
-	public void OpenGate(Stargate other) {
-		other.OtherGate = this;
-		OtherGate = other;
-
-		other.DoStargateOpen();
-		DoStargateOpen();
-
-		other.Inbound = true;
 	}
 
 	public async void DoStargateClose( bool alsoCloseOther = false )
@@ -205,49 +195,29 @@ public partial class Stargate : Prop, IUse
 
 	public virtual async void BeginDialFast(string address) { }
 	public virtual async void BeginDialSlow(string address) { }
-	public virtual void BeginDialInstant(string address) { // instant gate open, with kawoosh
-
-		if ( !IsValidAddress(address) )
-			return;
-
-		Busy = true;
-
-		Stargate otherGate = FindByAddress(address);
-		if ( otherGate == null || !otherGate.IsValid() || otherGate.Busy || otherGate.Open )
-			return;
-
-		if ( otherGate.Dialing )
-			otherGate.StopDialing();
-
-		otherGate.BeginInboundInstant( Address );
-
-		OpenGate(otherGate);
-		Busy = false;
-	}
+	public virtual void BeginDialInstant( string address ) { } // instant gate open, with kawoosh
 	public virtual void BeginDialNox( string address ) { } // instant gate open without kawoosh - asgard/ancient/nox style 
 	public virtual async void BeginInboundFast( string address, int numChevs = 7 ) { }
-	public virtual async void BeginInboundSlow( string address, int numChevs = 7 ) { }
+	public virtual async void BeginInboundSlow( string address, int numChevs = 7 ) { } // this can be used with Instant dial, too
 
-	public virtual void BeginInboundInstant( string address ) {}
-
-	public async void StopDialing(bool force = false)
+	public async void StopDialing()
 	{
-		OnStopDialingBegin(force);
+		OnStopDialingBegin();
 
 		await GameTask.DelaySeconds( 1.25f );
 
 		OnStopDialingFinish();
 	}
 
-	public virtual void OnStopDialingBegin(bool force)
+	public virtual void OnStopDialingBegin()
 	{
 		//Log.Info( "stopdial begin" );
 		Busy = true;
 		ShouldStopDialing = true; // can be used in ring/gate logic to to stop ring/gate rotation
 
-		if ( OtherGate.IsValid() && (force || OtherGate.Inbound) && !OtherGate.ShouldStopDialing )
+		if ( OtherGate.IsValid() && OtherGate.Inbound && !OtherGate.ShouldStopDialing )
 		{
-			OtherGate.StopDialing(force);
+			OtherGate.StopDialing();
 		}
 	}
 
