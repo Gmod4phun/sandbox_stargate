@@ -142,6 +142,17 @@ public partial class Stargate : Prop, IUse
 		DeleteEventHorizon();
 	}
 
+	// IRIS
+	public bool HasIris()
+	{
+		return Iris.IsValid();
+	}
+
+	public bool IsIrisClosed()
+	{
+		return Iris.IsValid() && Iris.Closed;
+	}
+
 	// STARGATE
 	public Stargate FindRandomGate()
 	{

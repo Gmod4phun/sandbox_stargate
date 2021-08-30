@@ -34,6 +34,8 @@ public partial class EventHorizon : AnimEntity
 	bool shouldCollapse = false;
 	bool isCollapsed = false;
 
+	float lastSoundTime = 0f;
+
 	public override void Spawn()
 	{
 		base.Spawn();
@@ -191,9 +193,6 @@ public partial class EventHorizon : AnimEntity
 		ent.Position = otherPos;
 		ent.ResetInterpolation();
 		ent.Velocity = otherVelNorm * ent.Velocity.Length;
-
-		Sound.FromEntity("teleport", this);
-		Sound.FromEntity("teleport", otherEH);
 	}
 
 	public void DissolveEntity( Entity ent )
@@ -213,6 +212,15 @@ public partial class EventHorizon : AnimEntity
 
 	}
 
+	public void PlayTeleportSound()
+	{
+		if ( lastSoundTime + 0.1f < Time.Now ) // delay for playing sounds to avoid constant spam
+		{
+			lastSoundTime = Time.Now;
+			Sound.FromEntity( "teleport", this );
+		}
+	}
+
 	public override void StartTouch( Entity other )
 	{
 		base.StartTouch( other );
@@ -223,18 +231,22 @@ public partial class EventHorizon : AnimEntity
 
 		if ( other is Sandbox.Player || other is Prop ) // for now only players and props get teleported
 		{
-			if ( !Gate.Iris.IsValid() || !Gate.Iris.Closed ) // try teleporting only if our iris is open
+			if ( !Gate.IsIrisClosed() ) // try teleporting only if our iris is open
 			{
-				if ( Gate.OtherGate.Iris.IsValid() && Gate.OtherGate.Iris.Closed ) // if other iris is closed, dissolve
+				PlayTeleportSound(); // event horizon always plays sound if something entered it
+
+				if ( Gate.OtherGate.IsIrisClosed() ) // if other iris is closed, dissolve
 				{
 					DissolveEntity( other );
-					Gate.OtherGate.Iris.MakeHitSound();
+					Gate.OtherGate.Iris.PlayHitSound(); // iris goes boom
 				}
 				else // otherwise we are fine for teleportation
 				{
 					TeleportEntity( other );
+					Gate.OtherGate.EventHorizon.PlayTeleportSound(); // other EH plays sound now
 				}
 			}
+
 		}
 	}
 

@@ -5,6 +5,18 @@
 		sounds = 
 		[
 			"sounds/gmod4phun/stargate/teleport.vsnd",
+			"sounds/gmod4phun/stargate/teleport_2.vsnd",
+			"sounds/gmod4phun/stargate/teleport_3.vsnd",
+			"sounds/gmod4phun/stargate/teleport_4.vsnd",
+			"sounds/gmod4phun/stargate/teleport_5.vsnd",
+			"sounds/gmod4phun/stargate/teleport_6.vsnd",
+			"sounds/gmod4phun/stargate/teleport_7.vsnd",
 		]
+		UI = false
+		Volume = 0.5
+		VolumeRandom = 0.0
+		Pitch = 1.0
+		PitchRandom = 0.0
+		DistanceMax = 1000.0
 	}
 }
