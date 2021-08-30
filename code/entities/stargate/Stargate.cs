@@ -9,8 +9,8 @@ public partial class Stargate : Prop, IUse
 {
 	public Vector3 SpawnOffset = new ( 0, 0, 90 );
 
-	protected string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";
-	protected string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
+	protected const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";
+	protected const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
 
 	public EventHorizon EventHorizon;
 	public StargateIris Iris;
@@ -58,45 +58,6 @@ public partial class Stargate : Prop, IUse
 		base.Spawn();
 	}
 
-	// ADDRESS
-	public string GenerateRandomAddress(int length = 7)
-	{
-		if ( length < 7 || length > 9 ) return "";
-
-		StringBuilder symbolsCopy = new( SymbolsNoOrigins );
-
-		string generatedAddress = "";
-		for ( int i = 1; i < length; i++ ) // pick random symbols without repeating
-		{
-			var randomIndex = new Random().Int( 0, symbolsCopy.Length - 1 );
-			generatedAddress += symbolsCopy[randomIndex];
-
-			symbolsCopy = symbolsCopy.Remove( randomIndex, 1 );
-		}
-		generatedAddress += '#'; // add a point of origin
-		return generatedAddress;
-	}
-
-	public bool IsValidAddress(string address) // a valid address has 7, 8, or 9 VALID characters and has no repeating symbols
-	{
-		if ( address.Length < 7 || address.Length > 9 ) return false; // only 7, 8 or 9 symbol addresses 
-		foreach (char sym in address)
-		{
-			if ( !Symbols.Contains(sym) ) return false; // only valid symbols
-			if ( address.Count( c => c == sym ) > 1 ) return false; // only one occurence
-		}
-		return true;
-	}
-
-	public Stargate FindByAddress(string address)
-	{
-		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
-		{
-			if ( gate.Address.Equals(address) ) return gate;
-		}
-		return null;
-	}
-
 	// EVENT HORIZON
 
 	public void CreateEventHorizon()
@@ -141,7 +102,7 @@ public partial class Stargate : Prop, IUse
 
 		DeleteEventHorizon();
 	}
-
+  
 	// IRIS
 	public bool HasIris()
 	{
@@ -162,7 +123,7 @@ public partial class Stargate : Prop, IUse
 		}
 		return null;
 	}
-
+  
 	protected override void OnDestroy()
 	{
 		GuiController.CloseStargateMenu( this );
