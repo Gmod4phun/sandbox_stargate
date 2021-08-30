@@ -187,6 +187,13 @@ public partial class EventHorizon : AnimEntity
 
 		if ( !otherEH.IsValid() ) return;
 
+		// at this point, we should be able to teleport just fine
+
+		CurrentTeleportingEntity = ent;
+		Gate.OtherGate.EventHorizon.CurrentTeleportingEntity = ent;
+
+		otherEH.PlayTeleportSound(); // other EH plays sound now
+
 		var localVelNorm = Transform.NormalToLocal( ent.Velocity.Normal );
 		var otherVelNorm = otherEH.Transform.NormalToWorld( localVelNorm.WithX( -localVelNorm.x ).WithY( -localVelNorm.y ) );
 
@@ -196,7 +203,6 @@ public partial class EventHorizon : AnimEntity
 
 		var localRot = Transform.RotationToLocal( ent.Rotation );
 		var otherRot = otherEH.Transform.RotationToWorld( localRot.RotateAroundAxis(localRot.Up, 180f) );
-
 
 		if (ent is SandboxPlayer ply)
 		{
@@ -244,11 +250,6 @@ public partial class EventHorizon : AnimEntity
 
 		if ( !IsServer ) return;
 
-		//if ( Gate.Inbound ) return; // TODO: this part here is only to stop constant entity teleports until I implement a check
-		// that does not immediately dissolve the entities when they come out of the inbound gate
-
-		if ( !IsFullyFormed ) return; // -- for some reason it crashes, I will look at it, keep it playable for now
-
 		if ( other is StargateIris ) return;
 
 		if ( other is Sandbox.Player || other is Prop ) // for now only players and props get teleported
@@ -278,13 +279,17 @@ public partial class EventHorizon : AnimEntity
 							DissolveEntity( other );
 							Gate.OtherGate.Iris.PlayHitSound(); // iris goes boom
 						}
-						else // otherwise we are fine for teleportation
+						else // otherwise we should fine for teleportation
 						{
-							CurrentTeleportingEntity = other;
-							Gate.OtherGate.EventHorizon.CurrentTeleportingEntity = other;
-
-							TeleportEntity( other );
-							Gate.OtherGate.EventHorizon.PlayTeleportSound(); // other EH plays sound now
+							if ( Gate.OtherGate.IsValid() && Gate.OtherGate.EventHorizon.IsValid() )
+							{
+								TeleportEntity( other );
+							}
+							else // if the other gate or EH is removed for some reason, dissolve
+							{
+								DissolveEntity( other );
+							}
+							
 						}
 					}
 				}
