@@ -127,7 +127,7 @@
 				[
 					{
 						_class = "PhysicsHullFromRender"
-						parent_bone = "dhd_body"
+						parent_bone = ""
 						surface_prop = "metal"
 						collision_prop = "default"
 						faceMergeAngle = 25.639999
@@ -172,6 +172,22 @@
 							exclude_by_default = false
 							exception_list = [  ]
 						}
+					},
+				]
+			},
+			{
+				_class = "PhysicsBodyMarkupList"
+				children = 
+				[
+					{
+						_class = "PhysicsBodyMarkup"
+						target_body = ""
+						mass_override = 50.0
+						inertia_scale = 1.0
+						linear_damping = 0.0
+						angular_damping = 0.0
+						use_mass_center_override = false
+						mass_center_override = [ 0.0, 0.0, 0.0 ]
 					},
 				]
 			},

@@ -44,7 +44,13 @@ public abstract partial class DHD : Prop
 			var button = symbol.Equals( '.' ) ? new DHDButtonDial() : new DHDButton();
 			button.SetModel( ButtonsModel );
 			button.SetBodyGroup( 0, i++ );
+
 			button.SetupPhysicsFromModel( PhysicsMotionType.Static, true );
+			button.PhysicsBody.BodyType = PhysicsBodyType.Static;
+
+			button.EnableAllCollisions = false;
+			button.EnableTraceAndQueries = true;
+
 			button.Position = Position;
 			button.Rotation = Rotation;
 			button.Scale = Scale;
