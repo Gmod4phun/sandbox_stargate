@@ -1,11 +1,11 @@
 ﻿namespace Sandbox.Tools
 {
-	[Library( "tool_stargatespawner", Title = "Stargate", Description = "Use wormholes to transport matter\n\nMOUSE1 - Spawn gate\nR - copy gate address\nMOUSE2 - Close gate/Stop dialling/Fast dial copied address\nSHIFT + MOUSE2 - Slow dial copied address\nSHIFT + R - Add an Iris or Toggle it if the gate already have one", Group = "construction" )]
+	[Library( "tool_stargatespawner", Title = "Stargate", Description = "Use wormholes to transport matter\n\nMOUSE1 - Spawn gate\nR - copy gate address\nMOUSE2 - Close gate/Stop dialling/Fast dial copied address\nSHIFT + MOUSE2 - Slow dial copied address\nCTRL + MOUSE2 - Instant dial copied address\nSHIFT + R - Add an Iris or Toggle it if the gate already have one", Group = "construction" )]
 	public partial class StargateSpawnerTool : BaseTool
 	{
 		PreviewEntity previewModel;
 
-		string address = "";
+		static string address = "";
 
 		private string Model => "models/gmod4phun/stargate/gate_sg1/gate_sg1.vmdl";
 
@@ -125,6 +125,7 @@
 						}
 
 						address = gate.Address;
+
 						Log.Info( $"Copied this gates address: {address}" );
 						return;
 					}
@@ -162,6 +163,10 @@
 								if (Input.Down(InputButton.Run))
 								{
 									gate.BeginDialSlow( address );
+								}
+								else if (Input.Down(InputButton.Duck))
+								{
+									gate.BeginDialInstant( address );
 								}
 								else
 								{

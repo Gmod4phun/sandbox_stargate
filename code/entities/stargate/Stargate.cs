@@ -164,7 +164,7 @@ public partial class Stargate : Prop, IUse
 	}
 
 
-	// DIALING
+	// DIALING -- please don't touch any of these, dialing is heavy WIP
 
 	public async void DoStargateOpen()
 	{
@@ -195,10 +195,10 @@ public partial class Stargate : Prop, IUse
 
 	public virtual async void BeginDialFast(string address) { }
 	public virtual async void BeginDialSlow(string address) { }
-	public virtual void BeginDialInstant(string address) { } // instant gate open, with kawoosh
+	public virtual void BeginDialInstant( string address ) { } // instant gate open, with kawoosh
 	public virtual void BeginDialNox( string address ) { } // instant gate open without kawoosh - asgard/ancient/nox style 
 	public virtual async void BeginInboundFast( string address, int numChevs = 7 ) { }
-	public virtual async void BeginInboundSlow( string address, int numChevs = 7 ) { }
+	public virtual async void BeginInboundSlow( string address, int numChevs = 7 ) { } // this can be used with Instant dial, too
 
 	public async void StopDialing()
 	{
