@@ -78,9 +78,12 @@ public partial class Stargate : Prop, IUse
 	/// <returns>A gate that matches the parameter.</returns>
 	public static Stargate FindRandomGate( Stargate ent )
 	{
-		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
+		foreach ( Stargate gate in Entity.All.OfType<Stargate>().ToList() )
 		{
-			if ( gate != ent ) return gate;
+			if (gate.IsValid() && ent != gate && !gate.Busy && !ent.Busy )
+			{
+				return gate;
+			}
 		}
 		return null;
 	}
@@ -93,6 +96,7 @@ public partial class Stargate : Prop, IUse
 	public static Stargate FindNearestGate( Entity ent )
 	{
 		var allGates = Entity.All.OfType<Stargate>().ToList();
+		if ( allGates.Count() is 0 ) return null;
 		var distanceAllGates = new int[allGates.Count()];
 
 		for ( int i = 0; i < allGates.Count(); i++ )
@@ -113,6 +117,7 @@ public partial class Stargate : Prop, IUse
 	public static Stargate FindfarthesttGate( Entity ent )
 	{
 		var allGates = Entity.All.OfType<Stargate>().ToList();
+		if ( allGates.Count() is 0 ) return null;
 		var distanceAllGates = new int[allGates.Count()];
 
 		for ( int i = 0; i < allGates.Count(); i++ )
@@ -123,5 +128,29 @@ public partial class Stargate : Prop, IUse
 		int minDistance = distanceAllGates.Max();
 		int indexInArray = distanceAllGates.ToList().IndexOf( minDistance );
 		return allGates[indexInArray];
+	}
+
+	public static StargateIris CreateIris(Stargate gate)
+	{
+		if ( gate.HasIris() is not true )
+		{
+			gate.Iris = new StargateIris();
+			gate.Iris.Position = gate.Position;
+			gate.Iris.Rotation = gate.Rotation;
+			gate.Iris.Scale = gate.Scale;
+			gate.Iris.SetParent( gate );
+			gate.Iris.Gate = gate;
+			gate.Iris.Close();
+		}
+		return gate.Iris;
+	}
+
+	public static Stargate RemoveIris(Stargate gate)
+	{
+		if ( gate.HasIris() is true )
+		{
+			gate.Iris.Delete();
+		}
+		return gate;
 	}
 }
