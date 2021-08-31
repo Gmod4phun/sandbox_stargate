@@ -1,0 +1,48 @@
+<div>
+    <div class="options">
+        <text class="panel-title">Gate Settings</text>
+
+        <div class="input inline">
+            <label class="input-label">Address :</label>
+            <textentry @value="GateAddress" style="text-transform: uppercase;"></textentry>
+        </div>
+
+        <div class="input inline">
+            <label class="input-label">Group :</label>
+            <select class="small">
+                <option value="0">M@</option>
+                <option value="1">P@</option>
+                <option value="2">I@</option>
+                <option value="3">O@</option>
+            </select>
+        </div>
+
+        <div class="input inline">
+            <label class="input-label">Name :</label>
+            <textentry @value="GateName"></textentry>
+        </div>
+
+        <div class="input inline">
+            <checkbox>Private</checkbox>
+        </div>
+
+        <div class="input inline">
+            <checkbox>Local</checkbox>
+        </div>
+
+        <div class="input inline">
+            <checkbox>Autoclose</checkbox>
+        </div>
+    </div>
+
+    <div class="dialing">
+        <text class="panel-title">Dialing</text>
+
+        <div class="input inline">
+            <label class="input-label">Address :</label>
+            <textentry @value="DialAddress"></textentry>
+            <icon class="can-click green" onclick="OpenGate()">reply</icon>
+            <icon class="can-click red" onclick="CloseGate()">cancel</icon>
+        </div>
+    </div>
+</div>
