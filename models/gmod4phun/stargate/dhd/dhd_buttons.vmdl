@@ -33,9 +33,13 @@
 				[
 					{
 						_class = "BodyGroup"
-						name = "button"
+						name = "buttons_all"
 						children = 
 						[
+							{
+								_class = "BodyGroupChoice"
+								meshes = [  ]
+							},
 							{
 								_class = "BodyGroupChoice"
 								meshes = 
@@ -43,6 +47,14 @@
 									"buttons",
 								]
 							},
+						]
+						hidden_in_tools = false
+					},
+					{
+						_class = "BodyGroup"
+						name = "button"
+						children = 
+						[
 							{
 								_class = "BodyGroupChoice"
 								meshes = 
@@ -1106,6 +1118,48 @@
 						end_frame = -1
 						framerate = -1.0
 						reverse = false
+					},
+					{
+						_class = "AnimFile"
+						name = "button_press"
+						children = 
+						[
+							{
+								_class = "AnimBlendLayer"
+								anim_name = "idle_pressed"
+								spline = false
+								xfade = false
+								no_blend = false
+								local_space = false
+								start_frame = 1
+								peak_frame = 2
+								tail_frame = 6
+								end_frame = 9
+							},
+						]
+						activity_name = ""
+						activity_weight = 1
+						weight_list_name = ""
+						fade_in_time = 0.2
+						fade_out_time = 0.2
+						looping = false
+						delta = false
+						worldSpace = false
+						hidden = false
+						anim_markup_ordered = false
+						disable_compression = false
+						source_filename = "models/gmod4phun/stargate/dhd/src/anims/idle.smd"
+						start_frame = -1
+						end_frame = -1
+						framerate = -1.0
+						reverse = false
+						anim_hold_list = 
+						[
+							{
+								frame = 0
+								frame_count = 10
+							},
+						]
 					},
 				]
 				default_root_bone_name = ""

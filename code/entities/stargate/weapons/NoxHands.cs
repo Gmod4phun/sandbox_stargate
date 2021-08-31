@@ -1,6 +1,6 @@
 ﻿using Sandbox;
 
-[Library( "weapon_stargate_noxhands", Title = "nox hands", Description = "Instant dialling of the gate, without kawoosh effect.", Spawnable = true, Group = "Stargate" )]
+[Library( "weapon_stargate_noxhands", Title = "Nox Hands", Description = "Instant dialling of the gate, without kawoosh effect.", Spawnable = true, Group = "Stargate" )]
 public partial class StargateNoxHands : Weapon
 {
 	//later add a hand model

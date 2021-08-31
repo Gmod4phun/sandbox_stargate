@@ -130,27 +130,37 @@ public partial class Stargate : Prop, IUse
 		return allGates[indexInArray];
 	}
 
-	public static StargateIris CreateIris(Stargate gate)
+	/// <summary>
+	/// Creates an Iris on the target Stargate if it does not have one yet.
+	/// </summary>
+	/// <returns>The just created, or already existing Iris.</returns>
+	public static StargateIris CreateIris(Stargate gate, Entity owner = null)
 	{
-		if ( gate.HasIris() is not true )
+		if ( !gate.HasIris() )
 		{
-			gate.Iris = new StargateIris();
-			gate.Iris.Position = gate.Position;
-			gate.Iris.Rotation = gate.Rotation;
-			gate.Iris.Scale = gate.Scale;
-			gate.Iris.SetParent( gate );
-			gate.Iris.Gate = gate;
-			gate.Iris.Close();
+			var iris = new StargateIris();
+			iris.Position = gate.Position;
+			iris.Rotation = gate.Rotation;
+			iris.Scale = gate.Scale;
+			iris.SetParent( gate );
+			iris.Gate = gate;
+			//iris.Owner = owner; -- why the fuck does this break iris anims
+			gate.Iris = iris;
 		}
 		return gate.Iris;
 	}
 
-	public static Stargate RemoveIris(Stargate gate)
+	/// <summary>
+	/// Removes the Iris from the target Stargate.
+	/// </summary>
+	/// <returns>Whether or not the Iris was removed succesfully.</returns>
+	public static bool RemoveIris(Stargate gate)
 	{
-		if ( gate.HasIris() is true )
+		if ( gate.HasIris() )
 		{
 			gate.Iris.Delete();
+			return true;
 		}
-		return gate;
+		return false;
 	}
 }

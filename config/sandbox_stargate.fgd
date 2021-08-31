@@ -374,42 +374,9 @@
 ]
 
 // 
-// DHDButton : Sandbox.AnimEntity 
+// DhdMilkyWay : Dhd 
 // 
-@PointClass = ent_dhd_button : ""
-[
-	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
-	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
-	on(boolean) [ group="Stargate" ] : "On" : 0 : ""
-=======
-// StargateNoxHands : Weapon 
-// 
-@PointClass = weapon_stargate_noxhands : "Instant dialling of the gate, without kawoosh effect."
-[
-	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
-	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
-	enable_shadows(boolean) [ group="Render Properties" ] : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
-
-	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
-]
-
-// 
-// DHDButtonDial : DHDButton 
-// 
-@PointClass = ent_dhd_dial_button : ""
-[
-	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
-	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
-	on(boolean) [ group="Stargate" ] : "On" : 0 : ""
-	enable_shadows(boolean) [ group="Render Properties" ] : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
-
-	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
-]
-
-// 
-// DHD_SG1 : DHD 
-// 
-@PointClass model() = ent_dhd_sg1 : ""
+@PointClass model() = ent_dhd_milkyway : ""
 [
 	model(studio) [report]: "World Model" : "" : "The model this entity should use."
 	skin(materialgroup) [ group="Render Properties" ] : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
@@ -433,3 +400,16 @@
 
 	output OnDamaged(void) : "Fired when the entity gets damaged"
 ]
+
+// 
+// StargateNoxHands : Weapon 
+// 
+@PointClass = weapon_stargate_noxhands : "Instant dialling of the gate, without kawoosh effect."
+[
+	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
+	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
+	enable_shadows(boolean) [ group="Render Properties" ] : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
+
+	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
+]
+

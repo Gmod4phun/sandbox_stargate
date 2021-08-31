@@ -13,7 +13,7 @@ public enum DialType
 	NOX = 3
 }
 
-public partial class Stargate : Prop, IUse
+public abstract partial class Stargate : Prop, IUse
 {
 	public Vector3 SpawnOffset = new ( 0, 0, 90 );
 
@@ -37,8 +37,6 @@ public partial class Stargate : Prop, IUse
 	public bool Dialing = false;
 	public bool ShouldStopDialing = false;
 	public bool Busy = false;
-
-	public DHD Dhd { get; protected set; } = null;
 
 	// VARIABLE RESET
 	public void ResetGateVariablesToIdle()
@@ -218,8 +216,6 @@ public partial class Stargate : Prop, IUse
 	public virtual void OnStargateBeginOpen()
 	{
 		Busy = true;
-
-		if ( Dhd.IsValid() && Inbound ) Dhd.EnableButton('.'); // this will probably be handled somewhere else
 	}
 	public virtual void OnStargateOpened()
 	{
@@ -233,10 +229,6 @@ public partial class Stargate : Prop, IUse
 	{
 		Busy = false;
 		ResetGateVariablesToIdle();
-
-		if (Dhd != null) {
-			Dhd.DisableAllButtons();
-		}
 	}
 
 

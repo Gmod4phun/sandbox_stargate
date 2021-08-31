@@ -1,50 +1,22 @@
 using Sandbox;
 
-[Library( "ent_dhd_button", Title = "DHD Button", Spawnable = false )]
-public partial class DHDButton : AnimEntity, IUse
+public partial class DhdButton : AnimEntity
 {
+	public string Action;
+	public DhdButtonTrigger Trigger;
+
 	[Net]
-	[Property( Name = "On", Group = "Stargate" )]
-	public bool On { get; set; } = false;
-	public char Symbol;
+	public bool Glowing { get; set; } = false;
 
 	public override void Spawn()
 	{
 		base.Spawn();
-
 		Transmit = TransmitType.Always;
-
-		On = false;
 	}
 
-	public void PlayPressAnim()
+	[Event.Frame]
+	public void ButtonGlowLogic()
 	{
-		CurrentSequence.Name = "idle_pressed";
+		SetMaterialGroup( Glowing ? 1 : 0 );
 	}
-
-	public virtual bool OnUse(Entity ent)
-	{
-		On = !On;
-
-		Log.Info(Symbol);
-		PlayPressAnim();
-
-		return false;
-	}
-
-	public virtual bool IsUsable(Entity ent)
-	{
-		return true;
-	}
-
-	[Event.Tick]
-	public void ButtonThink() // probably will use a different logic, I will need to think about this
-	{
-		if ( IsServer )
-		{
-			var group = On ? 1 : 0;
-			if ( GetMaterialGroup() != group ) SetMaterialGroup( group );
-		}
-	}
-
 }

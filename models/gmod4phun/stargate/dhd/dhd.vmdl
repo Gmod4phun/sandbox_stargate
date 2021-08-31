@@ -93,11 +93,11 @@
 							},
 							{
 								from = "crystal_yellow.vmat"
-								to = "models/gmod4phun/stargate/dhd/dhd_crystals.vmat"
+								to = "models/gmod4phun/stargate/dhd/dhd_crystal_yellow.vmat"
 							},
 							{
 								from = "crystal_red.vmat"
-								to = "models/gmod4phun/stargate/dhd/dhd_crystals.vmat"
+								to = "models/gmod4phun/stargate/dhd/dhd_crystal_red.vmat"
 							},
 							{
 								from = "crystal_main.vmat"
@@ -105,7 +105,7 @@
 							},
 							{
 								from = "crystal_blue.vmat"
-								to = "models/gmod4phun/stargate/dhd/dhd_crystals.vmat"
+								to = "models/gmod4phun/stargate/dhd/dhd_crystal_blue.vmat"
 							},
 						]
 						use_global_default = false

@@ -72,7 +72,7 @@ public partial class StargateSG1 : Stargate
 
 	public Chevron GetChevron( int num )
 	{
-		return Chevrons[num - 1];
+		return ( num <= Chevrons.Count ) ? Chevrons[num - 1] : null;
 	}
 
 	public Chevron GetChevronBasedOnAddressLength(int num, int len = 7)
@@ -218,8 +218,6 @@ public partial class StargateSG1 : Stargate
 			{
 				chev.Glowing = true;
 				Sound.FromEntity( "chevron_dhd", this );
-
-				if (Dhd.IsValid()) Dhd.EnableButton(address[i-1]);
 			}
 
 			if (i == addrLen - 1) Ring.StopRingRotation(); // stop rotating ring when the last looped chevron locks
@@ -254,7 +252,6 @@ public partial class StargateSG1 : Stargate
 			if ( wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing )
 			{
 				topChev.Glowing = true;
-				if ( Dhd.IsValid() ) Dhd.EnableButton( address[address.Length - 1] );
 			}
 
 			topChev.ChevronLockUnlock();
@@ -283,8 +280,6 @@ public partial class StargateSG1 : Stargate
 
 			targetGate.DoStargateOpen();
 			DoStargateOpen();
-
-			if ( Dhd.IsValid() ) Dhd.EnableButton( '.' );
 
 			targetGate.Inbound = true;
 		}
