@@ -218,6 +218,8 @@ public partial class StargateSG1 : Stargate
 			{
 				chev.Glowing = true;
 				Sound.FromEntity( "chevron_dhd", this );
+
+				if (Dhd.IsValid()) Dhd.EnableButton(address[i-1]);
 			}
 
 			if (i == addrLen - 1) Ring.StopRingRotation(); // stop rotating ring when the last looped chevron locks
@@ -248,16 +250,15 @@ public partial class StargateSG1 : Stargate
 		var topChev = GetChevron( 7 ); // lock last (top) chevron
 		if ( topChev.IsValid())
 		{
-			//if ( !shouldStopDialingAtEnd )
-			//{
-			if ( wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing )
-				{
-					topChev.Glowing = true;
-				}
 
-				topChev.ChevronLockUnlock();
-				Sound.FromEntity( "chevron_lock_sg1", this );
-			//}
+			if ( wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing )
+			{
+				topChev.Glowing = true;
+				if ( Dhd.IsValid() ) Dhd.EnableButton( address[address.Length - 1] );
+			}
+
+			topChev.ChevronLockUnlock();
+			Sound.FromEntity( "chevron_lock_sg1", this );
 		}
 
 		await GameTask.DelaySeconds( chevronAfterLastDelay ); // wait after the last chevron, then open the gate or fail dial (if gate became invalid/was busy)
@@ -282,6 +283,8 @@ public partial class StargateSG1 : Stargate
 
 			targetGate.DoStargateOpen();
 			DoStargateOpen();
+
+			if ( Dhd.IsValid() ) Dhd.EnableButton( '.' );
 
 			targetGate.Inbound = true;
 		}
