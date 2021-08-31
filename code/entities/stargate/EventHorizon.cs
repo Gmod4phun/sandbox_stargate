@@ -283,6 +283,9 @@ public partial class EventHorizon : AnimEntity
 						{
 							if ( Gate.OtherGate.IsValid() && Gate.OtherGate.EventHorizon.IsValid() )
 							{
+								if (other is Sandbox.Player && Gate.AutoClose)
+									Gate.AutoCloseTime = (Time.Now + Stargate.AutoCloseTimerDuration);
+
 								TeleportEntity( other );
 							}
 							else // if the other gate or EH is removed for some reason, dissolve
