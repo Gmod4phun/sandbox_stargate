@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
-public partial class Ring : AnimEntity
+public partial class StargateRing : AnimEntity
 {
 	// ring variables
 

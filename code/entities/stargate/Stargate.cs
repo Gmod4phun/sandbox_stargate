@@ -13,7 +13,7 @@ public enum DialType
 	NOX = 3
 }
 
-public partial class Stargate : Prop, IUse
+public abstract partial class Stargate : Prop, IUse
 {
 	public Vector3 SpawnOffset = new ( 0, 0, 90 );
 
@@ -304,5 +304,27 @@ public partial class Stargate : Prop, IUse
 
 			g.Name = name;
 		}
+	}
+
+	public Stargate FindClosestGate() {
+		return Stargate.FindClosestGate(this.Position, 0, new Entity[] { this });
+	}
+
+	public static Stargate FindClosestGate(Vector3 postition, float max_distance = 0, Entity[] exclude = null) {
+		Stargate current = null;
+		float distance = float.PositiveInfinity;
+
+		foreach ( Stargate gate in Entity.All.OfType<Stargate>() ) {
+			if (exclude != null && exclude.Contains(gate))
+				continue;
+
+			float currDist = gate.Position.Distance(postition);
+			if (distance > currDist && (max_distance > 0 && currDist <= max_distance)) {
+				distance = currDist;
+				current = gate;
+			}
+		}
+
+		return current;
 	}
 }

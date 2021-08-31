@@ -74,7 +74,7 @@
 
 					if ( tr.Entity is Stargate gate )
 					{
-						Stargate.CreateIris(gate);
+						Stargate.CreateIris(gate, Owner).Close();
 						CreateHitEffects( tr.EndPos );
 					}
 

@@ -72,7 +72,7 @@ public partial class StargateSG1 : Stargate
 
 	public Chevron GetChevron( int num )
 	{
-		return Chevrons[num - 1];
+		return ( num <= Chevrons.Count ) ? Chevrons[num - 1] : null;
 	}
 
 	public Chevron GetChevronBasedOnAddressLength(int num, int len = 7)
@@ -248,16 +248,14 @@ public partial class StargateSG1 : Stargate
 		var topChev = GetChevron( 7 ); // lock last (top) chevron
 		if ( topChev.IsValid())
 		{
-			//if ( !shouldStopDialingAtEnd )
-			//{
-			if ( wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing )
-				{
-					topChev.Glowing = true;
-				}
 
-				topChev.ChevronLockUnlock();
-				Sound.FromEntity( "chevron_lock_sg1", this );
-			//}
+			if ( wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing )
+			{
+				topChev.Glowing = true;
+			}
+
+			topChev.ChevronLockUnlock();
+			Sound.FromEntity( "chevron_lock_sg1", this );
 		}
 
 		await GameTask.DelaySeconds( chevronAfterLastDelay ); // wait after the last chevron, then open the gate or fail dial (if gate became invalid/was busy)
