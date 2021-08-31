@@ -10,6 +10,7 @@ public partial class DhdButtonTrigger : AnimEntity, IUse
 	{
 		base.Spawn();
 		Transmit = TransmitType.Always;
+		Health = 100;
 	}
 
 	public virtual bool OnUse(Entity ent)
@@ -27,10 +28,25 @@ public partial class DhdButtonTrigger : AnimEntity, IUse
 		return true;
 	}
 
+	public void DestroyTriggerAndButton()
+	{
+		if ( Button.IsValid() ) Button.Delete();
+		Delete();
+	}
+
 	protected override void OnDestroy()
 	{
 		base.OnDestroy();
 
-		if (DHD.IsValid()) DHD.Delete();
+		if ( Button.IsValid() ) Button.Delete();
+	}
+
+	public override void TakeDamage( DamageInfo info )
+	{
+		base.TakeDamage( info );
+
+		Log.Info( $"{info.Damage} {Health}" );
+
+		if ( Health <= 0 ) DestroyTriggerAndButton();
 	}
 }
