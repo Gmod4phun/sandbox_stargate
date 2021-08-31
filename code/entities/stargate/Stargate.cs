@@ -5,6 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
+public enum DialType {
+	SLOW = 0,
+	FAST,
+	INSTANT
+}
+
 public partial class Stargate : Prop, IUse
 {
 	public Vector3 SpawnOffset = new ( 0, 0, 90 );
@@ -16,8 +22,12 @@ public partial class Stargate : Prop, IUse
 	public StargateIris Iris;
 	public Stargate OtherGate;
 
+	[Net]
 	public string Address { get; protected set; } = "";
+	[Net]
 	public string Group { get; protected set; } = "";
+	[Net]
+	public string Name { get; protected set; } = "";
 
 	public bool Active { get; protected set; } = false;
 	public bool Inbound = false;
@@ -42,13 +52,18 @@ public partial class Stargate : Prop, IUse
 
 	public bool IsUsable( Entity user )
 	{
-		return true;
+		return user.Position.Distance(Position) < StargateMenu.AutoCloseMenuDistance;
 	}
 
 	public bool OnUse( Entity user )
 	{
-		GuiController.OpenStargateMenu( this, user );
+		OpenStargateMenu(To.Single( user ));
 		return false; // aka SIMPLE_USE, not continuously
+	}
+
+	[ClientRpc]
+	public void OpenStargateMenu() {
+		Local.Hud.AddChild<StargateMenuV2>().SetGate(this);
 	}
 
 	// SPAWN
@@ -154,7 +169,7 @@ public partial class Stargate : Prop, IUse
 
 	protected override void OnDestroy()
 	{
-		GuiController.CloseStargateMenu( this );
+		// GuiController.CloseStargateMenu( this );
 		base.OnDestroy();
 
 		if ( IsServer && OtherGate.IsValid() )
@@ -247,9 +262,75 @@ public partial class Stargate : Prop, IUse
 		ResetGateVariablesToIdle();
 	}
 
-	[Event( "server.tick" )]
-	public void StargateTick()
-	{
-		GuiController.RangeCheckTick();
+	[ClientRpc]
+	public void RefreshGateInformations() {
+		Event.Run("stargate.refreshgateinformations");
+	}
+
+	[ServerCmd]
+	public static void RequestDial(DialType type, string address, int gate) {
+		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+			switch ( type ) {
+				case DialType.FAST:
+					g.BeginDialFast( address );
+					break;
+
+				case DialType.SLOW:
+					g.BeginDialSlow( address );
+					break;
+
+				case DialType.INSTANT:
+					g.BeginDialInstant( address );
+					break;
+			}
+		}
+	}
+
+	[ServerCmd]
+	public static void RequestClose(int gate) {
+		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+			if ( g.Busy || ((g.Open || g.Active || g.Dialing) && g.Inbound) )
+				return;
+			if (g.Open)
+				g.DoStargateClose( true );
+			else if (g.Dialing)
+				g.StopDialing();
+		}
+	}
+
+	[ServerCmd]
+	public static void ToggleIris(int gate, int state) {
+		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+			if (g.Iris.IsValid()) {
+				if (state == -1)
+					g.Iris.Toggle();
+
+				if (state == 0)
+					g.Iris.Close();
+
+				if (state == 1)
+					g.Iris.Open();
+			}
+		}
+	}
+
+	[ServerCmd]
+	public static void RequestAddressChange(int gate, string address) {
+		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+			if (g.Address == address || !g.IsValidAddress( address ))
+				return;
+
+			g.Address = address;
+		}
+	}
+
+	[ServerCmd]
+	public static void RequestNameChange(int gate, string name) {
+		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+			if (g.Name == name)
+				return;
+
+			g.Name = name;
+		}
 	}
 }
