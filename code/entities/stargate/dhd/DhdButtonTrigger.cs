@@ -26,4 +26,11 @@ public partial class DhdButtonTrigger : AnimEntity, IUse
 	{
 		return true;
 	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+
+		if (DHD.IsValid()) DHD.Delete();
+	}
 }
