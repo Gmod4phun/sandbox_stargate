@@ -102,8 +102,6 @@ public abstract partial class Dhd : Prop
 		var button = GetButtonByAction( action );
 		PlayButtonPressAnim( button );
 		ToggleButton( button );
-
-		Log.Info( $"Pressed button: {action}" );
 	}
 
 	public void SetButtonState( string action, bool glowing )
