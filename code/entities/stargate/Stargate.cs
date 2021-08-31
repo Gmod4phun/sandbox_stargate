@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
-public enum DialType {
+public enum DialType
+{
 	SLOW = 0,
-	FAST,
-	INSTANT
+	FAST = 1,
+	INSTANT = 2,
+	NOX = 3
 }
 
 public partial class Stargate : Prop, IUse
@@ -52,7 +54,7 @@ public partial class Stargate : Prop, IUse
 
 	public bool IsUsable( Entity user )
 	{
-		return user.Position.Distance(Position) < StargateMenu.AutoCloseMenuDistance;
+		return true; // we should be always usable
 	}
 
 	public bool OnUse( Entity user )
@@ -62,8 +64,14 @@ public partial class Stargate : Prop, IUse
 	}
 
 	[ClientRpc]
-	public void OpenStargateMenu() {
-		Local.Hud.AddChild<StargateMenuV2>().SetGate(this);
+	public void OpenStargateMenu()
+	{
+		var hud = Local.Hud;
+		var count = 0;
+		foreach (StargateMenuV2 menu in hud.ChildrenOfType<StargateMenuV2>()) count++;
+
+		// this makes sure if we already have the menu open, we cant open it again
+		if (count == 0) hud.AddChild<StargateMenuV2>().SetGate( this );
 	}
 
 	// SPAWN
@@ -169,7 +177,6 @@ public partial class Stargate : Prop, IUse
 
 	protected override void OnDestroy()
 	{
-		// GuiController.CloseStargateMenu( this );
 		base.OnDestroy();
 
 		if ( IsServer && OtherGate.IsValid() )
@@ -262,14 +269,17 @@ public partial class Stargate : Prop, IUse
 		ResetGateVariablesToIdle();
 	}
 
+
+	// UI Related stuff
+
 	[ClientRpc]
 	public void RefreshGateInformations() {
-		Event.Run("stargate.refreshgateinformations");
+		Event.Run("stargate.refreshgateinformation");
 	}
 
 	[ServerCmd]
 	public static void RequestDial(DialType type, string address, int gate) {
-		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+		if (FindByIndex( gate ) is Stargate g && g.IsValid()) {
 			switch ( type ) {
 				case DialType.FAST:
 					g.BeginDialFast( address );
@@ -287,8 +297,8 @@ public partial class Stargate : Prop, IUse
 	}
 
 	[ServerCmd]
-	public static void RequestClose(int gate) {
-		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+	public static void RequestClose(int gateID) {
+		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
 			if ( g.Busy || ((g.Open || g.Active || g.Dialing) && g.Inbound) )
 				return;
 			if (g.Open)
@@ -299,8 +309,8 @@ public partial class Stargate : Prop, IUse
 	}
 
 	[ServerCmd]
-	public static void ToggleIris(int gate, int state) {
-		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+	public static void ToggleIris(int gateID, int state) {
+		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
 			if (g.Iris.IsValid()) {
 				if (state == -1)
 					g.Iris.Toggle();
@@ -315,8 +325,8 @@ public partial class Stargate : Prop, IUse
 	}
 
 	[ServerCmd]
-	public static void RequestAddressChange(int gate, string address) {
-		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+	public static void RequestAddressChange(int gateID, string address) {
+		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
 			if (g.Address == address || !g.IsValidAddress( address ))
 				return;
 
@@ -325,8 +335,8 @@ public partial class Stargate : Prop, IUse
 	}
 
 	[ServerCmd]
-	public static void RequestNameChange(int gate, string name) {
-		if (Entity.FindByIndex( gate ) is Stargate g && g.IsValid()) {
+	public static void RequestNameChange(int gateID, string name) {
+		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
 			if (g.Name == name)
 				return;
 

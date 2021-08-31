@@ -54,13 +54,22 @@ public class StargateMenuV2 : Panel {
 		menuBar.SetCloseButton( true, "×", () => this.Delete() );
 	}
 
-	public void SetGate(Stargate gate) {
-		this.Gate = gate;
-		RefreshGateInformations();
+	public override void Tick()
+	{
+		base.Tick();
+		
+		// closes menu if player goes too far -- in the future we will want to freeze player's input
+		var dist = Local.Pawn.Position.Distance( Gate.Position );
+		if ( dist > 220 * Gate.Scale ) Delete();
 	}
 
-	[Event("stargate.refreshgateinformations")]
-	private void RefreshGateInformations() {
+	public void SetGate(Stargate gate) {
+		this.Gate = gate;
+		RefreshGateInformation();
+	}
+
+	[Event("stargate.refreshgateinformation")]
+	private void RefreshGateInformation() {
 		GateAddress = Gate.Address;
 		GateName = Gate.Name;
 		GateGroup = Gate.Group;
@@ -71,7 +80,7 @@ public class StargateMenuV2 : Panel {
 	}
 
 	public void CloseGate() {
-		Stargate.RequestClose(this.Gate.NetworkIdent);
+		Stargate.RequestClose(Gate.NetworkIdent);
 	}
 
 }
