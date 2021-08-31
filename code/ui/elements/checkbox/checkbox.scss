@@ -1,0 +1,54 @@
+﻿
+$primary: rgb(255, 255, 255) !default;
+$primary-alt: white !default;
+$form-control-height: 15px !default;
+
+.checkbox
+{
+	cursor: pointer;
+	color: rgba( $primary-alt, 0.6 );
+	align-items: center;
+
+	label
+	{
+		pointer-events: none;
+	}
+
+	> .checkmark
+	{
+		padding: 1px;
+		font-size: 16px;
+		border: 3px solid $primary;
+		border-radius: 4px;
+		text-align: center;
+		justify-content: center;
+		align-items: center;
+		color: transparent;
+		min-height: $form-control-height;
+		margin-right: 10px;
+		pointer-events: none;
+		font-family: MaterialIcons;
+		background-color: $primary;
+	}
+
+	&.checked
+	{
+		> .checkmark
+		{
+			color: green;
+			background-color: $primary;
+		}
+	}
+
+	&:active
+	{
+		// transform: scale( 0.9 );
+		// transform-origin: 20px 50%;
+		color: $primary-alt;
+	}
+
+	&:hover
+	{
+		color: $primary-alt;
+	}
+}

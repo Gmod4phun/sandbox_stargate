@@ -1,0 +1,106 @@
+stargatemenuv2 {
+    width: 700px;
+    height: 350px;
+    background-color: rgba(0, 0, 0, 0.95);
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    pointer-events: all;
+    display: flex;
+    flex-direction: row;
+
+    .panel-title {
+        color: white;
+        margin-top: 5px;
+    }
+
+    .input {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 10px;
+
+        label.input-label {
+            color: lightgray;
+        }
+
+        textentry {
+            background-color: white;
+            height: 20px;
+            color: black;
+            align-items: center;
+            text-align: center;
+            font-weight: bold;
+            cursor: text;
+        }
+
+        select {
+            background-color: white;
+            height: 20px;
+            width: 100px;
+            color: black;
+            cursor: pointer;            
+
+            &.open {
+                background-color: lightgray;
+                color: black;
+            }
+        }
+
+        icon {
+            color: white;
+            font-family: MaterialIcons;
+            font-size: 22px;
+
+            &.red {
+                color: red;
+            }
+
+            &.green {
+                color: green;
+            }
+
+            &.can-click {
+                cursor: pointer;
+
+                &.active {
+                    transform: scale(1.02);
+                }
+            }
+        }
+
+        &.inline {
+            flex-direction: row;
+
+            textentry {
+                width: 100px;
+            }
+        }
+    }
+
+    .options {
+        height: 100%;
+        width: 30%;
+        margin-right: 5%;
+        display: flex;
+        flex-direction: column;
+        padding: 5px;
+
+        .panel-title {
+            margin-bottom: 10px;
+        }
+    }
+
+    .dialing {
+        height: 100%;
+        width: 65%;
+
+        display: flex;
+        flex-direction: column;
+        padding: 5px;
+
+        .panel-title {
+            margin-bottom: 20px;
+        }
+    }
+}
