@@ -8,7 +8,7 @@ using Sandbox;
 [Library( "ent_stargate_sg1", Title = "Stargate SG-1", Spawnable = true, Group = "Stargate" )]
 public partial class StargateSG1 : Stargate
 {
-	public Ring Ring;
+	public StargateRing Ring;
 	public List<Chevron> Chevrons = new ();
 	private List<int> ChevronAngles = new ( new int[] { 40, 80, 120, 240, 280, 320, 0, 160, 200 } );
 
@@ -35,7 +35,7 @@ public partial class StargateSG1 : Stargate
 
 	public void CreateRing()
 	{
-		Ring = new Ring();
+		Ring = new StargateRing();
 		Ring.Position = Position;
 		Ring.Rotation = Rotation;
 		Ring.SetParent( this );
