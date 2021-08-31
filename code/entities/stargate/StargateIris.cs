@@ -3,9 +3,11 @@ using Sandbox;
 
 public partial class StargateIris : AnimEntity
 {
-
 	public Stargate Gate;
 	public bool Closed = false;
+	public bool Busy = false;
+
+	private float OpenCloseDleay = 3f;
 
 	public override void Spawn()
 	{
@@ -19,29 +21,39 @@ public partial class StargateIris : AnimEntity
 		Transmit = TransmitType.Always;
 	}
 
-	public void Close() {
-		if ( Closed ) return;
+	public async void Close() {
+		if ( Busy || Closed ) return;
+
+		Busy = true;
 
 		Closed = true;
 		EnableAllCollisions = true;
 		CurrentSequence.Name = "iris_close";
 		Sound.FromEntity("iris_close", this);
+
+		await GameTask.DelaySeconds( OpenCloseDleay );
+		Busy = false;
 	}
 
-	public void Open() {
-		if ( !Closed ) return;
+	public async void Open() {
+		if ( Busy || !Closed ) return;
+
+		Busy = true;
 
 		Closed = false;
 		EnableAllCollisions = false;
 		CurrentSequence.Name = "iris_open";
 		Sound.FromEntity("iris_open", this);
+
+		await GameTask.DelaySeconds( OpenCloseDleay );
+		Busy = false;
 	}
 
 	public void Toggle() {
-		if (Closed)
-			Open();
-		else
-			Close();
+		if ( Busy ) return;
+
+		if (Closed) Open();
+		else Close();
 	}
 
 	public void PlayHitSound() {
