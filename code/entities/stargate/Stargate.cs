@@ -289,7 +289,7 @@ public partial class Stargate : Prop, IUse
 	[ServerCmd]
 	public static void RequestAddressChange(int gateID, string address) {
 		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
-			if (g.Address == address || !g.IsValidAddress( address ))
+			if (g.Address == address || !IsValidAddress( address ))
 				return;
 
 			g.Address = address;
