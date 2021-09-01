@@ -1,3 +1,25 @@
+.stargate-font {
+
+    font-size: 18px;
+
+    &.sg1 {
+        font-family: stargate_sg1;
+    }
+
+    &.concept {
+        font-family: stargate_concept;
+    }
+
+    &.sga {
+        font-family: stargate_atlantis;
+    }
+
+    &.sgu {
+        font-family: stargate_universe;
+    }
+
+}
+
 stargatemenuv2 {
     width: 700px;
     height: 350px;
@@ -101,6 +123,79 @@ stargatemenuv2 {
 
         .panel-title {
             margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            height: 100%;
+            background-color: lightgray;
+            display: flex;
+            flex-direction: column-reverse;
+        
+            .table-head {
+                // position: sticky;
+                top: 0;
+                width: 100%;
+                height: 25px;
+                background-color: lightgray;
+                display: flex;
+                flex-direction: row;
+                border-bottom: 1px solid black;
+        
+                .head-column {
+                    background-color: gray;
+                    color: black;
+                    width: 150px;
+                    height: 25px;
+                    justify-content: center;
+                    align-items: center;
+                    font-weight: 800;
+                    border-right: 1px solid black;
+                    cursor: pointer;
+        
+                    &:last-child {
+                        border: 0;
+                    }
+        
+                    &:hover {
+                        background-color: darkgray;
+                    }
+                }
+            }
+        
+            .table-rows {
+                width: 100%;
+                height: 100%;
+                overflow: scroll;
+        
+                .row {
+                    border-bottom: 1px solid black;
+                    width: 100%;
+                    height: 30px;
+                    display: flex;
+                    flex-direction: row;
+                    flex-grow: 0;
+                    cursor: pointer;
+                    font-size: 16px;
+        
+                    .td {
+                        width: 148.3px;
+                        height: 100%;
+                        border-right: 1px solid black;
+                        align-items: center;
+                        justify-content: center;
+                        text-align: center;
+        
+                        &:last-child {
+                            border-right: 0;
+                        }
+                    }
+        
+                    &:hover {
+                        background-color:rgba(0, 0, 0, 0.1);
+                    }
+                }
+            }
         }
     }
 }

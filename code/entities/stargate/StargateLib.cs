@@ -114,7 +114,7 @@ public partial class Stargate : Prop, IUse
 	/// </summary>
 	/// <param name="ent">The entity that will be the first point of remoteness.</param>
 	/// <returns>A gate that matches the parameter.</returns>
-	public static Stargate FindfarthesttGate( Entity ent )
+	public static Stargate FindFarthestGate( Entity ent )
 	{
 		var allGates = Entity.All.OfType<Stargate>().ToList();
 		if ( allGates.Count() is 0 ) return null;
@@ -131,10 +131,10 @@ public partial class Stargate : Prop, IUse
 	}
 
 	/// <summary>
-	/// Creates an Iris on the target Stargate if it does not have one yet.
+	/// Adds an Iris on the target Stargate if it does not have one yet.
 	/// </summary>
 	/// <returns>The just created, or already existing Iris.</returns>
-	public static StargateIris CreateIris(Stargate gate, Entity owner = null)
+	public static StargateIris AddIris(Stargate gate, Entity owner = null)
 	{
 		if ( !gate.HasIris() )
 		{
@@ -151,7 +151,7 @@ public partial class Stargate : Prop, IUse
 	}
 
 	/// <summary>
-	/// Removes the Iris from the target Stargate.
+	/// Attempts to remove the Iris from the target Stargate.
 	/// </summary>
 	/// <returns>Whether or not the Iris was removed succesfully.</returns>
 	public static bool RemoveIris(Stargate gate)

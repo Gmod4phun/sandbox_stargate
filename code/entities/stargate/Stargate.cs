@@ -20,6 +20,9 @@ public abstract partial class Stargate : Prop, IUse
 	protected const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";
 	protected const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
 
+	public readonly static int AutoCloseTimerDuration = 5;
+	public float AutoCloseTime = -1;
+
 	public EventHorizon EventHorizon;
 	public StargateIris Iris;
 	public Stargate OtherGate;
@@ -30,6 +33,10 @@ public abstract partial class Stargate : Prop, IUse
 	public string Group { get; protected set; } = "";
 	[Net]
 	public string Name { get; protected set; } = "";
+	[Net]
+	public bool AutoClose { get; protected set; } = true;
+	[Net]
+	public bool Private { get; protected set; } = false;
 
 	public bool Active { get; protected set; } = false;
 	public bool Inbound = false;
@@ -62,6 +69,7 @@ public abstract partial class Stargate : Prop, IUse
 		OpenStargateMenu(To.Single( user ));
 		return false; // aka SIMPLE_USE, not continuously
 	}
+
 
 	[ClientRpc]
 	public void OpenStargateMenu()
@@ -165,7 +173,7 @@ public abstract partial class Stargate : Prop, IUse
 
 	public async void DoStargateClose( bool alsoCloseOther = false )
 	{
-		if ( alsoCloseOther && OtherGate.IsValid() ) OtherGate.DoStargateClose();
+		if ( alsoCloseOther && OtherGate.IsValid() && OtherGate.Open ) OtherGate.DoStargateClose();
 
 		Busy = true;
 
@@ -231,11 +239,26 @@ public abstract partial class Stargate : Prop, IUse
 		ResetGateVariablesToIdle();
 	}
 
+	public void AutoCloseThink()
+	{
+		if ( AutoCloseTime != -1 && AutoCloseTime <= Time.Now )
+		{
+			DoStargateClose( true );
+			AutoCloseTime = -1;
+		}
+	}
+
+	[Event( "server.tick" )]
+	public void StargateTick()
+	{
+		AutoCloseThink();
+	}
+
 
 	// UI Related stuff
 
 	[ClientRpc]
-	public void RefreshGateInformations() {
+	public void RefreshGateInformation() {
 		Event.Run("stargate.refreshgateinformation");
 	}
 
@@ -293,6 +316,8 @@ public abstract partial class Stargate : Prop, IUse
 				return;
 
 			g.Address = address;
+
+			g.RefreshGateInformation();
 		}
 	}
 
@@ -303,6 +328,32 @@ public abstract partial class Stargate : Prop, IUse
 				return;
 
 			g.Name = name;
+
+			g.RefreshGateInformation();
+		}
+	}
+
+	[ServerCmd]
+	public static void SetAutoClose(int gateID, bool state) {
+		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
+			if (g.AutoClose == state)
+				return;
+
+			g.AutoClose = state;
+
+			g.RefreshGateInformation();
+		}
+	}
+
+	[ServerCmd]
+	public static void SetPrivacy(int gateID, bool state) {
+		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
+			if (g.Private == state)
+				return;
+
+			g.Private = state;
+
+			g.RefreshGateInformation();
 		}
 	}
 
