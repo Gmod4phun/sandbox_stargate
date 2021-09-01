@@ -451,7 +451,7 @@ public partial class StargateMilkyWay : Stargate
 		}
 	}
 
-	public async override void BeginInboundSlow( string address, int numChevs = 7 )
+	public override void BeginInboundSlow( string address, int numChevs = 7 )
 	{
 		Inbound = true;
 

@@ -15,6 +15,8 @@ public partial class Stargate : Prop, IUse
 	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";
 	public const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
 
+	public readonly int[] ChevronAngles = { 40, 80, 120, 240, 280, 320, 0, 160, 200 };
+
 	public const int AutoCloseTimerDuration = 5;
 
 	/// <summary>
