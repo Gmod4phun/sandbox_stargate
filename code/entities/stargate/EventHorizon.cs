@@ -226,6 +226,9 @@ public partial class EventHorizon : AnimEntity
 		ent.Position = otherPos;
 		ent.ResetInterpolation();
 		ent.Velocity = otherVelNorm * ent.Velocity.Length;
+
+		// after any successful teleport, start autoclose timer if gate should autoclose
+		if ( Gate.AutoClose ) Gate.AutoCloseTime = Time.Now + Stargate.AutoCloseTimerDuration;
 	}
 
 	public void DissolveEntity( Entity ent )
@@ -283,9 +286,6 @@ public partial class EventHorizon : AnimEntity
 						{
 							if ( Gate.OtherGate.IsValid() && Gate.OtherGate.EventHorizon.IsValid() )
 							{
-								if (other is Sandbox.Player && Gate.AutoClose)
-									Gate.AutoCloseTime = (Time.Now + Stargate.AutoCloseTimerDuration);
-
 								TeleportEntity( other );
 							}
 							else // if the other gate or EH is removed for some reason, dissolve
