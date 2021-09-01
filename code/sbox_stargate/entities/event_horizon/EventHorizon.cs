@@ -57,17 +57,17 @@ public partial class EventHorizon : AnimEntity
 
 	public async void Establish()
 	{
-		EstablishClientAnim(); // clientside animation tuff
+		EstablishClientAnim(); // clientside animation stuff
 
-		await GameTask.DelaySeconds(1.5f);
+		await Task.DelaySeconds(1.5f);
 		WormholeLoop = Sound.FromEntity( "wormhole_loop", this );
 	}
 
 	public async void Collapse()
 	{
-		CollapseClientAnim(); // clientside animation tuff
+		CollapseClientAnim(); // clientside animation stuff
 
-		await GameTask.DelaySeconds( 1f );
+		await Task.DelaySeconds( 1f );
 		WormholeLoop.Stop();
 	}
 
@@ -214,7 +214,7 @@ public partial class EventHorizon : AnimEntity
 			ply.EyeRot = Rotation.From( ply.EyeRot.Angles() + new Angles( 0, DeltaAngleEH.yaw + 180, 0 ) );
 			ply.Rotation = ply.EyeRot;
 
-			await GameTask.NextPhysicsFrame();
+			await Task.NextPhysicsFrame();
 
 			using ( Prediction.Off() ) ply.DevController = oldController;
 		}

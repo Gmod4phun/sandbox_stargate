@@ -7,7 +7,7 @@ using Sandbox;
 
 public partial class Chevron : AnimEntity
 {
-	public bool Glowing;
+	public bool On;
 	public PointLightEntity Light;
 
 	public override void Spawn()
@@ -32,31 +32,74 @@ public partial class Chevron : AnimEntity
 		Light.SetLightColor( Color.Parse( "#FF6A00" ).GetValueOrDefault() );
 		Light.Brightness = 0.25f;
 		Light.Range = 8f;
-		Light.Enabled = false;
+		Light.Enabled = On;
+	}
+
+	public void ChevronAnim(string name)
+	{
+		CurrentSequence.Name = name;
+	}
+
+	public void ChevronSound(string name)
+	{
+		Sound.FromEntity( name, this );
 	}
 
 	public void ChevronLock()
 	{
-		CurrentSequence.Name = "idle_locked";
+		ChevronAnim( "lock" );
 	}
 
 	public void ChevronUnlock()
 	{
-		CurrentSequence.Name = "idle";
+		ChevronAnim( "unlock" );
 	}
 
 	public void ChevronLockUnlock()
 	{
-		CurrentSequence.Name = "lock_unlock_long";
+		ChevronAnim( "lock_unlock" );
 	}
+
+	public void ChevronLockUnlockLong()
+	{
+		ChevronAnim( "lock_unlock_long" );
+	}
+
+	public void ChevronLockUnlockMovie()
+	{
+		ChevronAnim( "lock_unlock_movie" );
+	}
+
+	public async void TurnOn(float delay = 0)
+	{
+		if ( delay > 0 )
+		{
+			await Task.DelaySeconds( delay );
+			if ( !this.IsValid() ) return;
+		}
+		
+		On = true;
+	}
+
+	public async void TurnOff(float delay = 0)
+	{
+		if ( delay > 0 )
+		{
+			await Task.DelaySeconds( delay );
+			if ( !this.IsValid() ) return;
+		}
+
+		On = false;
+	}
+
 
 	[Event( "server.tick" )]
 	public void ChevronThink( )
 	{
-		var group = Glowing ? 1 : 0;
+		var group = On ? 1 : 0;
 		if ( GetMaterialGroup() != group ) SetMaterialGroup( group );
 
-		if ( Light.IsValid() ) Light.Enabled = Glowing;
+		if ( Light.IsValid() ) Light.Enabled = On;
 	}
 
 	protected override void OnDestroy()
