@@ -34,7 +34,7 @@ public class Titlebar : MouseDragPanel
 	protected Button Title = null;
 
 	public Titlebar() {
-		StyleSheet.Load("/ui/elements/titlebar/titlebar.scss");
+		StyleSheet.Load( "sbox_stargate/ui/elements/titlebar/titlebar.scss" );
 	}
 
 	public void SetCloseButton(bool value, string text = "", Action onClicked = null) {

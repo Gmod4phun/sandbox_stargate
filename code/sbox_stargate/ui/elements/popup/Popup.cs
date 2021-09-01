@@ -30,7 +30,7 @@ namespace Sandbox.UI
 			Position = position;
 			PopupSourceOffset = offset;
 
-			StyleSheet.Load("/ui/elements/popup/popup.scss");
+			StyleSheet.Load( "sbox_stargate/ui/elements/popup/popup.scss" );
 
 			AllPopups.Add( this );
 			AddClass( "popup-panel" );

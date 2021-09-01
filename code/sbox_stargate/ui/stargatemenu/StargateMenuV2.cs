@@ -76,7 +76,7 @@ public class StargateMenuV2 : Panel {
 
 	public StargateMenuV2() {
 
-		StyleSheet.Load( "ui/stargate/stargatemenu/StargateMenuV2.scss" );
+		StyleSheet.Load( "sbox_stargate/ui/stargatemenu/StargateMenuV2.scss" );
 
 		menuBar = AddChild<Titlebar>();
 		menuBar.SetTitle(true, "Stargate");
