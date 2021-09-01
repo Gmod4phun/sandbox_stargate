@@ -1,5 +1,8 @@
+using System.Linq;
 using Sandbox;
+using Sandbox.Html;
 using Sandbox.UI;
+using Sandbox.UI.Tests;
 
 [UseTemplate]
 public class StargateMenuV2 : Panel {
@@ -35,11 +38,37 @@ public class StargateMenuV2 : Panel {
 
 	public string GateGroup { get; set; }
 
-	public bool IsPrivate;
+	private bool _isPrivate = false;
+	public bool IsPrivate {
+		get {
+			return _isPrivate;
+		}
+		set {
+			if (_isPrivate == value)
+				return;
+
+			_isPrivate = value;
+
+			Stargate.SetPrivacy(Gate.NetworkIdent, _isPrivate);
+		}
+	}
 
 	public bool IsLocal;
 
-	public bool Autoclose;
+	private bool _autoClose = true;
+	public bool AutoClose {
+		get {
+			return _autoClose;
+		}
+		set {
+			if (_autoClose == value)
+				return;
+
+			_autoClose = value;
+
+			Stargate.SetAutoClose(Gate.NetworkIdent, _autoClose);
+		}
+	}
 
 	public string DialAddress { get; set; }
 
@@ -65,6 +94,7 @@ public class StargateMenuV2 : Panel {
 
 	public void SetGate(Stargate gate) {
 		this.Gate = gate;
+		FillGates();
 		RefreshGateInformation();
 	}
 
@@ -73,6 +103,54 @@ public class StargateMenuV2 : Panel {
 		GateAddress = Gate.Address;
 		GateName = Gate.Name;
 		GateGroup = Gate.Group;
+		AutoClose = Gate.AutoClose;
+		IsPrivate = Gate.Private;
+	}
+
+	private Table GetTable() {
+		Table table = null;
+		foreach (Panel c in Children) {
+			var tables = c.ChildrenOfType<Table>();
+			if ( tables.Any() ) {
+				table = tables.First();
+				break;
+			}
+		}
+
+		return table;
+	}
+
+	public void FillGates() {
+		Table table = GetTable();
+		table.Rows.DeleteChildren(true);
+		table.Rows.Layout.Columns = 1;
+		table.Rows.Layout.ItemSize = new Vector2(-1, 30);
+		table.Rows.OnCreateCell = ( cell, data ) =>
+		{
+			var gate = (Stargate)data;
+			var panel = cell.Add.Panel( "row" );
+			panel.AllowChildSelection = true;
+			var td = panel.Add.Panel( "td stargate-font sg1" );
+			td.AddChild<Label>().Text = gate.Address;
+			td = panel.Add.Panel( "td" );
+			td.AddChild<Label>().Text = gate.Address;
+			td = panel.Add.Panel( "td" );
+			td.AddChild<Label>().Text = gate.Name;
+
+			panel.AddEventListener( "onclick", () => {
+				DialAddress = gate.Address;
+			});
+
+			panel.AddEventListener( "ondoubleclick", () => {
+				Stargate.RequestDial(DialType.FAST, gate.Address, Gate.NetworkIdent);
+			});
+		};
+
+		Stargate[] gates = Entity.All.OfType<Stargate>().Where(x => x.Address != Gate.Address && !x.Private).ToArray();
+
+		foreach (Stargate gate in gates) {
+			table.Rows.AddItem(gate);
+		}
 	}
 
 	public void OpenGate() {
