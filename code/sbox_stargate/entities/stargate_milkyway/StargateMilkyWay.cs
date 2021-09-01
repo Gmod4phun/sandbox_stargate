@@ -8,9 +8,6 @@ using Sandbox;
 [Library( "ent_stargate_sg1", Title = "Stargate SG-1", Spawnable = true, Group = "Stargate" )]
 public partial class StargateMilkyWay : Stargate
 {
-	public StargateRing Ring;
-	public List<Chevron> Chevrons = new ();
-	private List<int> ChevronAngles = new ( new int[] { 40, 80, 120, 240, 280, 320, 0, 160, 200 } );
 
 	// SPAWN
 

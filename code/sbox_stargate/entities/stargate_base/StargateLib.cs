@@ -2,9 +2,21 @@
 using System;
 using System.Linq;
 using System.Text;
-
 public partial class Stargate : Prop, IUse
 {
+	public enum DialType
+	{
+		SLOW = 0,
+		FAST = 1,
+		INSTANT = 2,
+		NOX = 3
+	}
+
+	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";
+	public const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
+
+	public const int AutoCloseTimerDuration = 5;
+
 	/// <summary>
 	/// Generates a random address.
 	/// </summary>

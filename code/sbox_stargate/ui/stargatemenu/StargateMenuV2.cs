@@ -142,7 +142,7 @@ public class StargateMenuV2 : Panel {
 			});
 
 			panel.AddEventListener( "ondoubleclick", () => {
-				Stargate.RequestDial(DialType.FAST, gate.Address, Gate.NetworkIdent);
+				Stargate.RequestDial(Stargate.DialType.FAST, gate.Address, Gate.NetworkIdent);
 			});
 		};
 
@@ -154,7 +154,7 @@ public class StargateMenuV2 : Panel {
 	}
 
 	public void OpenGate() {
-		Stargate.RequestDial(DialType.FAST, DialAddress, Gate.NetworkIdent);
+		Stargate.RequestDial(Stargate.DialType.FAST, DialAddress, Gate.NetworkIdent);
 	}
 
 	public void CloseGate() {

@@ -5,23 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
-public enum DialType
-{
-	SLOW = 0,
-	FAST = 1,
-	INSTANT = 2,
-	NOX = 3
-}
-
 public abstract partial class Stargate : Prop, IUse
 {
 	public Vector3 SpawnOffset = new ( 0, 0, 90 );
 
-	protected const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";
-	protected const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
-
-	public readonly static int AutoCloseTimerDuration = 5;
 	public float AutoCloseTime = -1;
+
+	public StargateRing Ring;
+	public List<Chevron> Chevrons = new();
+	public List<int> ChevronAngles = new( new int[] { 40, 80, 120, 240, 280, 320, 0, 160, 200 } );
 
 	public EventHorizon EventHorizon;
 	public StargateIris Iris;
