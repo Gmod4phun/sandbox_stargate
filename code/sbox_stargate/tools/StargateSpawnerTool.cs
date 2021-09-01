@@ -85,7 +85,7 @@
 						return;
 					}
 
-					var gate = new StargateSG1();
+					var gate = new StargateMilkyWay();
 
 					gate.Position = tr.EndPos + gate.SpawnOffset;
 					gate.Rotation = new Angles( 0, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
@@ -131,7 +131,7 @@
 					CreateHitEffects( tr.EndPos );
 
 
-					if ( tr.Entity is StargateSG1 gate )
+					if ( tr.Entity is StargateMilkyWay gate )
 					{
 						if ( gate.Busy ) return;
 

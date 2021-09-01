@@ -67,7 +67,7 @@ namespace Sandbox.UI
 
 		public Checkbox()
 		{
-			StyleSheet.Load("/ui/elements/checkbox/checkbox.scss");
+			StyleSheet.Load( "sbox_stargate/ui/elements/checkbox/checkbox.scss" );
 			AddClass( "checkbox" );
 			CheckMark = Add.Icon( "check", "checkmark" );
 		}

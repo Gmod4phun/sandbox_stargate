@@ -24,7 +24,7 @@ namespace Sandbox.UI
 
 		public DropDown()
 		{
-			StyleSheet.Load("/ui/elements/dropdown/dropdown.scss");
+			StyleSheet.Load("sbox_stargate/ui/elements/dropdown/dropdown.scss");
 			AddClass( "dropdown" );
 			DropdownIndicator = Add.Icon( "expand_more", "dropdown_indicator" );
 		}

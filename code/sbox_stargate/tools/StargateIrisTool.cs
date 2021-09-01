@@ -110,7 +110,7 @@
 						return;
 
 
-					if ( tr.Entity is StargateSG1 gate )
+					if ( tr.Entity is Stargate gate )
 					{
 						Stargate.RemoveIris( gate );
 						CreateHitEffects( tr.EndPos );
