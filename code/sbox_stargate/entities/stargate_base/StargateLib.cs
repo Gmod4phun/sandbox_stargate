@@ -12,6 +12,15 @@ public partial class Stargate : Prop, IUse
 		NOX = 3
 	}
 
+	public enum GateState
+	{
+		IDLE = 0,
+		ACTIVE = 1,
+		OPENING = 2,
+		OPEN = 3,
+		CLOSING = 4
+	}
+
 	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";
 	public const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
 

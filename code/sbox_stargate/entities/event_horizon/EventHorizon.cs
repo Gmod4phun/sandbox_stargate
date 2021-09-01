@@ -261,8 +261,6 @@ public partial class EventHorizon : AnimEntity
 
 			PlayTeleportSound(); // event horizon always plays sound if something entered it
 
-			// if ( !IsFullyFormed ) DissolveEntity( other ); -- still crashes, hold on
-
 			if ( Gate.Inbound || !IsFullyFormed ) // if we entered inbound gate from any direction, dissolve
 			{
 				DissolveEntity( other );

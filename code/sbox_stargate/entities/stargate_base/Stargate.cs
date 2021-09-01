@@ -36,6 +36,8 @@ public abstract partial class Stargate : Prop, IUse
 	public bool ShouldStopDialing = false;
 	public bool Busy = false;
 
+	public GateState CurState = GateState.IDLE;
+
 	// VARIABLE RESET
 	public void ResetGateVariablesToIdle()
 	{
@@ -46,6 +48,8 @@ public abstract partial class Stargate : Prop, IUse
 		ShouldStopDialing = false;
 		Busy = false;
 		OtherGate = null;
+
+		CurState = GateState.IDLE;
 	}
 
 	// USABILITY
