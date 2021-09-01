@@ -263,7 +263,7 @@ public partial class EventHorizon : AnimEntity
 
 			// if ( !IsFullyFormed ) DissolveEntity( other ); -- still crashes, hold on
 
-			if ( Gate.Inbound ) // if we entered inbound gate from any direction, dissolve
+			if ( Gate.Inbound || !IsFullyFormed ) // if we entered inbound gate from any direction, dissolve
 			{
 				DissolveEntity( other );
 			}
