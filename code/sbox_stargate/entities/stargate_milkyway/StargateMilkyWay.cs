@@ -293,7 +293,7 @@ public partial class StargateMilkyWay : Stargate
 			//	OtherGate.StopDialing();
 			//}
 
-			if ( (ShouldStopDialing && !wasDialStopped && Dialing) || !wasTargetGateValidOnDialStart ) // check if we should stop dialing at the end or not
+			if ( (ShouldStopDialing && !wasDialStopped && Dialing) || !wasTargetGateValidOnDialStart || !targetGate.IsValid() ) // check if we should stop dialing at the end or not
 			{
 				wasDialStopped = true;
 				StopDialing();
