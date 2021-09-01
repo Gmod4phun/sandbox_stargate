@@ -34,6 +34,8 @@ public abstract partial class Stargate : Prop, IUse
 	public string Name { get; protected set; } = "";
 	[Net]
 	public bool AutoClose { get; protected set; } = true;
+	[Net]
+	public bool Private { get; protected set; } = false;
 	public float AutoCloseTime = -1;
 
 	public bool Active { get; protected set; } = false;
@@ -332,6 +334,18 @@ public abstract partial class Stargate : Prop, IUse
 				return;
 
 			g.AutoClose = state;
+
+			g.RefreshGateInformations();
+		}
+	}
+
+	[ServerCmd]
+	public static void SetPrivacy(int gateID, bool state) {
+		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
+			if (g.Private == state)
+				return;
+
+			g.Private = state;
 
 			g.RefreshGateInformations();
 		}
