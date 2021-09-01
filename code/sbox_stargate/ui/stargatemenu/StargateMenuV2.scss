@@ -1,23 +1,21 @@
 .stargate-font {
-
     font-size: 18px;
 
     &.sg1 {
-        font-family: stargate_sg1;
+        font-family: sbox_stargate/stargate_sg1;
     }
 
     &.concept {
-        font-family: stargate_concept;
+        font-family: sbox_stargate/stargate_concept;
     }
 
     &.sga {
-        font-family: stargate_atlantis;
+        font-family: sbox_stargate/stargate_atlantis;
     }
 
     &.sgu {
-        font-family: stargate_universe;
+        font-family: sbox_stargate/stargate_universe;
     }
-
 }
 
 stargatemenuv2 {
