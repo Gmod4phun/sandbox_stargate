@@ -29,26 +29,28 @@ public abstract partial class Stargate : Prop, IUse
 	[Net]
 	public bool Private { get; protected set; } = false;
 
-	public bool Active { get; protected set; } = false;
+	public GateState CurState = GateState.IDLE;
+	public bool Active = false;
 	public bool Inbound = false;
-	public bool Open { get; protected set; } = false;
 	public bool Dialing = false;
 	public bool ShouldStopDialing = false;
 	public bool Busy = false;
 
-	public GateState CurState = GateState.IDLE;
+	// some useful accessors
+	public bool Idle { get => !Active; }
+	public bool Opening { get => CurState == GateState.OPENING; }
+	public bool Open { get => CurState == GateState.OPEN; }
+	public bool Closing { get => CurState == GateState.CLOSING; }
 
 	// VARIABLE RESET
 	public void ResetGateVariablesToIdle()
 	{
+		OtherGate = null;
 		Active = false;
-		Open = false;
 		Inbound = false;
 		Dialing = false;
 		ShouldStopDialing = false;
 		Busy = false;
-		OtherGate = null;
-
 		CurState = GateState.IDLE;
 	}
 
@@ -153,30 +155,45 @@ public abstract partial class Stargate : Prop, IUse
 
 	// DIALING -- please don't touch any of these, dialing is heavy WIP
 
+	public bool CanStargateOpen()
+	{
+		if ( Busy ) return false;
+
+		var s = CurState;
+		if ( s is GateState.OPENING || s is GateState.OPEN || s is GateState.CLOSING ) return false;
+		return true;
+	}
+
+	public bool CanStargateClose()
+	{
+		if ( Busy ) return false;
+
+		var s = CurState;
+		if ( s is GateState.OPEN ) return true;
+		return false;
+	}
+
 	public async void DoStargateOpen()
 	{
-		Busy = true;
-		Open = true;
+		if ( !CanStargateOpen() ) return;
 
 		OnStargateBeginOpen();
 
 		await EstablishEventHorizon( 0.5f );
 
-		Busy = false;
 		OnStargateOpened();
 	}
 
 	public async void DoStargateClose( bool alsoCloseOther = false )
 	{
-		if ( alsoCloseOther && OtherGate.IsValid() && OtherGate.Open ) OtherGate.DoStargateClose();
+		if ( !CanStargateClose() ) return;
 
-		Busy = true;
+		if ( alsoCloseOther && OtherGate.IsValid() && OtherGate.Open ) OtherGate.DoStargateClose();
 
 		OnStargateBeginClose();
 
 		await CollapseEventHorizon( 0.25f );
 
-		ResetGateVariablesToIdle();
 		OnStargateClosed();
 	}
 
@@ -198,7 +215,6 @@ public abstract partial class Stargate : Prop, IUse
 
 	public virtual void OnStopDialingBegin()
 	{
-		//Log.Info( "stopdial begin" );
 		Busy = true;
 		ShouldStopDialing = true; // can be used in ring/gate logic to to stop ring/gate rotation
 
@@ -213,23 +229,26 @@ public abstract partial class Stargate : Prop, IUse
 		Dialing = false; // must be set to false AFTER setting ShouldStopDialing to true
 		Busy = false;
 		ResetGateVariablesToIdle();
-		//Log.Info( "stopdial done" );
 	}
 
 	public virtual void OnStargateBeginOpen()
 	{
+		CurState = GateState.OPENING;
 		Busy = true;
 	}
 	public virtual void OnStargateOpened()
 	{
+		CurState = GateState.OPEN;
 		Busy = false;
 	}
 	public virtual void OnStargateBeginClose()
 	{
+		CurState = GateState.CLOSING;
 		Busy = true;
 	}
 	public virtual void OnStargateClosed()
 	{
+		CurState = GateState.IDLE;
 		Busy = false;
 		ResetGateVariablesToIdle();
 	}

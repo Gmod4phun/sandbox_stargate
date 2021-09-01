@@ -268,6 +268,8 @@ public partial class StargateMilkyWay : Stargate
 		var timeEnd = RealTime.Now - timeStart;
 		Log.Info( $"Gate dial time: {timeEnd}" );
 
+		Busy = false;
+
 		if ( !wasDialStopped && wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing ) // if valid, open both gates
 		{
 			Dialing = false;
@@ -432,6 +434,8 @@ public partial class StargateMilkyWay : Stargate
 
 			chevNum++;
 		}
+
+		Busy = false;
 
 		if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy ) // if valid, open both gates
 		{
