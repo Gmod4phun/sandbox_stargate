@@ -59,7 +59,9 @@ public partial class EventHorizon : AnimEntity
 	{
 		EstablishClientAnim(); // clientside animation stuff
 
-		await Task.DelaySeconds(1.5f);
+		await Task.DelaySeconds( 1.5f );
+		if ( !this.IsValid() ) return;
+
 		WormholeLoop = Sound.FromEntity( "wormhole_loop", this );
 	}
 
@@ -68,6 +70,8 @@ public partial class EventHorizon : AnimEntity
 		CollapseClientAnim(); // clientside animation stuff
 
 		await Task.DelaySeconds( 1f );
+		if ( !this.IsValid() ) return;
+
 		WormholeLoop.Stop();
 	}
 
