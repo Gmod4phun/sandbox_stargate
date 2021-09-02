@@ -241,8 +241,6 @@ public abstract partial class Stargate : Prop, IUse
 
 	public virtual void OnStopDialingFinish()
 	{
-		CurGateState = GateState.IDLE;
-		Busy = false;
 		ResetGateVariablesToIdle();
 	}
 
@@ -263,8 +261,6 @@ public abstract partial class Stargate : Prop, IUse
 	}
 	public virtual void OnStargateClosed()
 	{
-		CurGateState = GateState.IDLE;
-		Busy = false;
 		ResetGateVariablesToIdle();
 	}
 
@@ -282,19 +278,10 @@ public abstract partial class Stargate : Prop, IUse
 		}
 	}
 
-	public void DialStopThink()
-	{
-		if (ShouldStopDialing)
-		{
-
-		}
-	}
-
 	[Event( "server.tick" )]
 	public void StargateTick()
 	{
 		AutoCloseThink();
-		//DialStopThink();
 	}
 
 
