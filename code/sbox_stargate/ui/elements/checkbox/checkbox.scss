@@ -50,5 +50,20 @@ $form-control-height: 15px !default;
 	&:hover
 	{
 		color: $primary-alt;
+
+		.tooltip {
+			display: block;
+		}
+	}
+
+	.tooltip {
+		display: none;
+		position: absolute;
+		transform: translateX(-33%) translateY(-100%);
+		border-radius: 5px;
+		padding: 5px;
+		background-color: lightgray;
+		color: black;
+		font-size: 18px;
 	}
 }

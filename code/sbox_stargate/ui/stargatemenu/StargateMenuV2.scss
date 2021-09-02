@@ -123,6 +123,15 @@ stargatemenuv2 {
             margin-bottom: 20px;
         }
 
+        .dial {
+            position: absolute;
+            right: 0;
+
+            checkbox {
+                margin-left: 5px;
+            }
+        }
+
         .table {
             width: 100%;
             height: 100%;

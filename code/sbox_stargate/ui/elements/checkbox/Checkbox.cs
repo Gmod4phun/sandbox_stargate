@@ -1,4 +1,5 @@
-﻿using Sandbox.UI.Construct;
+﻿using Sandbox.Html;
+using Sandbox.UI.Construct;
 using System;
 using System.Linq;
 
@@ -15,6 +16,9 @@ namespace Sandbox.UI
 		protected bool isChecked = false;
 
 		protected bool isDisabled = false;
+
+		protected Panel _tooltip;
+		protected string tooltip;
 
 		/// <summary>
 		/// Returns true if this checkbox is checked
@@ -46,6 +50,23 @@ namespace Sandbox.UI
 					AddClass("disabled");
 				else
 					RemoveClass("disabled");
+			}
+		}
+
+		public string Tooltip {
+			get => tooltip;
+			set {
+				tooltip = value;
+
+				if (_tooltip != null)
+					_tooltip.Delete(true);
+
+				_tooltip = Add.Panel("tooltip");
+				// _tooltip.Style.Position = PositionMode.Absolute;
+				// _tooltip.Style.Top = (Length)(Style.Top.Value.Value + 5);
+				// _tooltip.Style.Left = Style.Left;
+				// _tooltip.Style.Dirty();
+				_tooltip.AddChild<Label>().Text = value;
 			}
 		}
 
@@ -117,6 +138,17 @@ namespace Sandbox.UI
 				CreateValueEvent( "value", Checked );
 			}
 			e.StopPropagation();
+		}
+
+		public override bool OnTemplateElement(INode element) {
+			base.OnTemplateElement(element);
+
+			var tlp = element.GetAttribute("tooltip", null);
+			if (tlp != null) {
+				Tooltip = tlp;
+			}
+
+			return true;
 		}
 	}
 }
