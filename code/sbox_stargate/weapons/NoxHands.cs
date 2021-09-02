@@ -1,4 +1,5 @@
 ﻿using Sandbox;
+using System.Linq;
 
 [Library( "weapon_stargate_noxhands", Title = "Nox Hands", Description = "Instant dialling of the gate, without kawoosh effect.", Spawnable = true, Group = "Stargate" )]
 public partial class StargateNoxHands : Weapon
@@ -7,6 +8,10 @@ public partial class StargateNoxHands : Weapon
 	//public override string ViewModelPath => "hand model";
 	public override float PrimaryRate => 1.0f;
 	public override float SecondaryRate => 1.0f;
+	/// <summary>
+	/// in the future when all settings are globalized, there is this value so that the gate opening distance can be adjusted.
+	/// </summary>
+	public static float MaxDistance = 1500;
 
 	public override void Spawn()
 	{
@@ -21,27 +26,15 @@ public partial class StargateNoxHands : Weapon
 
 	public override void AttackPrimary()
 	{
-		// when the instant dial and gui menu is functional, it will be replaced by them
-		// mouse 1 => find nearest gate ==> dial to random gate.
-		// mouse 2 => close nearest gate
-
 		TimeSincePrimaryAttack = 0;
 
-		var gate = Stargate.FindNearestGate( Owner );
-		if ( gate is null ) return;
-		if ( gate.Busy || gate.Open ) return;
-
-		if ( !gate.Dialing )
+		var gate = Stargate.FindClosestGate( Owner.Position, MaxDistance );
+		if ( gate is not null )
 		{
-			var secondGate = Stargate.FindRandomGate( gate );
-			if ( secondGate is not null )
+			if ( gate.IsValid() )
 			{
-				gate.BeginDialInstant( secondGate.Address );
+				gate.OpenStargateMenu();
 			}
-		}
-		else
-		{
-			gate.StopDialing();
 		}
 
 	}
@@ -49,8 +42,19 @@ public partial class StargateNoxHands : Weapon
 	public override void AttackSecondary()
 	{
 		TimeSinceSecondaryAttack = 0;
-		var gate = Stargate.FindNearestGate( Owner );
-		if ( gate is null ) return;
-		gate.DoStargateClose( true );
+
+		//var gate = Stargate.FindClosestGate( Owner.Position, MaxDistance );
+		//if ( gate is not null )
+		//{
+		//	if ( gate.IsValid() )
+		//	{
+		//		var _Hud = Local.Hud.ChildrenOfType<StargateMenuV2>().ToArray();
+
+		//		if ( _Hud[0] is not null )
+		//		{
+		//			_Hud[0].Delete();
+		//		}
+		//	}
+		//}
 	}
 }
