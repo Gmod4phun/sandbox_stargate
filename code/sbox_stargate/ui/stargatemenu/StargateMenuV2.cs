@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using Sandbox;
 using Sandbox.Html;
 using Sandbox.UI;
 using Sandbox.UI.Tests;
+using static Stargate;
 
 [UseTemplate]
 public class StargateMenuV2 : Panel {
@@ -70,7 +72,22 @@ public class StargateMenuV2 : Panel {
 		}
 	}
 
+	public bool FastDial { get; set; } = true;
+
 	public string DialAddress { get; set; }
+
+	private string _searchFilter = "";
+	public string SearchFilter {
+		get => _searchFilter;
+		set {
+			if (_searchFilter == value)
+				return;
+
+			_searchFilter = value;
+
+			FillGates("true");
+		}
+	}
 
 	private Titlebar menuBar;
 
@@ -94,7 +111,7 @@ public class StargateMenuV2 : Panel {
 
 	public void SetGate(Stargate gate) {
 		this.Gate = gate;
-		FillGates();
+		FillGates(false);
 		RefreshGateInformation();
 	}
 
@@ -120,41 +137,55 @@ public class StargateMenuV2 : Panel {
 		return table;
 	}
 
-	public void FillGates() {
+	public void FillGates(bool refresh = false) {
 		Table table = GetTable();
-		table.Rows.DeleteChildren(true);
-		table.Rows.Layout.Columns = 1;
-		table.Rows.Layout.ItemSize = new Vector2(-1, 30);
-		table.Rows.OnCreateCell = ( cell, data ) =>
-		{
-			var gate = (Stargate)data;
-			var panel = cell.Add.Panel( "row" );
-			panel.AllowChildSelection = true;
-			var td = panel.Add.Panel( "td stargate-font sg1" );
-			td.AddChild<Label>().Text = gate.Address;
-			td = panel.Add.Panel( "td" );
-			td.AddChild<Label>().Text = gate.Address;
-			td = panel.Add.Panel( "td" );
-			td.AddChild<Label>().Text = gate.Name;
+		// table.Rows.DeleteChildren(true);
+		if (refresh)
+			table.Rows.Clear();
+		else {
+			table.Rows.Layout.Columns = 1;
+			table.Rows.Layout.ItemSize = new Vector2(-1, 30);
+			table.Rows.OnCreateCell = ( cell, data ) =>
+			{
+				var gate = (Stargate)data;
+				var panel = cell.Add.Panel( "row" );
+				panel.AllowChildSelection = true;
+				var td = panel.Add.Panel( "td stargate-font concept" );
+				td.AddChild<Label>().Text = gate.Address;
+				td = panel.Add.Panel( "td" );
+				td.AddChild<Label>().Text = gate.Address;
+				td = panel.Add.Panel( "td" );
+				td.AddChild<Label>().Text = gate.Name;
 
-			panel.AddEventListener( "onclick", () => {
-				DialAddress = gate.Address;
-			});
+				panel.AddEventListener( "onclick", () => {
+					DialAddress = gate.Address;
+				});
 
-			panel.AddEventListener( "ondoubleclick", () => {
-				Stargate.RequestDial(Stargate.DialType.FAST, gate.Address, Gate.NetworkIdent);
-			});
-		};
+				panel.AddEventListener( "ondoubleclick", () => {
+					DialAddress = gate.Address;
+					OpenGate();
+				});
+			};
+		}
 
-		Stargate[] gates = Entity.All.OfType<Stargate>().Where(x => x.Address != Gate.Address && !x.Private).ToArray();
+		List<Stargate> gates = Entity.All.OfType<Stargate>().Where(x => x.Address != Gate.Address && !x.Private).ToList();
+
+		if (SearchFilter != null && SearchFilter != "") {
+			gates = gates.Where( x => x.Address.Contains(SearchFilter) || (x.Name != null && x.Name != "" && x.Name.Contains(SearchFilter)) ).ToList();
+		}
 
 		foreach (Stargate gate in gates) {
 			table.Rows.AddItem(gate);
 		}
 	}
 
+	// Needed for HTML Template
+	public void FillGates(string refresh = "false") {
+		FillGates(refresh == "true");
+	}
+
 	public void OpenGate() {
-		Stargate.RequestDial(Stargate.DialType.FAST, DialAddress, Gate.NetworkIdent);
+		Stargate.RequestDial(FastDial ? DialType.FAST : DialType.SLOW, DialAddress, Gate.NetworkIdent);
 	}
 
 	public void CloseGate() {

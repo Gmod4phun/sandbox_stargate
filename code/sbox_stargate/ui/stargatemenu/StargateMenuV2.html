@@ -38,11 +38,20 @@
     <div class="dialing">
         <text class="panel-title">Dialing</text>
 
-        <div class="input inline">
-            <label class="input-label">Address :</label>
-            <textentry @value="DialAddress"></textentry>
-            <icon class="can-click green" onclick="OpenGate()">reply</icon>
-            <icon class="can-click red" onclick="CloseGate()">cancel</icon>
+        <div class="controls">
+            <div class="input inline">
+                <label class="input-label">Search :</label>
+                <textentry @value="SearchFilter"></textentry>
+                <icon class="can-click green" onclick="FillGates('true')">autorenew</icon>
+            </div>
+
+            <div class="input inline dial">
+                <label class="input-label">Address :</label>
+                <textentry @value="DialAddress"></textentry>
+                <checkbox @checked="FastDial" tooltip="Fast Dial"></checkbox>
+                <icon class="can-click green" onclick="OpenGate()">reply</icon>
+                <icon class="can-click red" onclick="CloseGate()">cancel</icon>
+            </div>
         </div>
 
         <table>
