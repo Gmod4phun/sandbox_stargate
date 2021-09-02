@@ -187,12 +187,7 @@ public partial class StargateMilkyWay : Stargate
 			// lets encode each chevron but the last
 			for ( var i = 1; i < addrLen; i++ )
 			{
-				if ( ShouldStopDialing ) // check if we should stop dialing
-				{
-					Ring.StopRingRotation();
-					StopDialing();
-					return;
-				}
+				if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
 
 				var chev = GetChevronBasedOnAddressLength( i, addrLen );
 				if ( chev.IsValid() )
@@ -230,16 +225,11 @@ public partial class StargateMilkyWay : Stargate
 
 			if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) // if valid, open both gates
 			{
-				target.OtherGate = this;
-				OtherGate = target;
-
-				target.DoStargateOpen();
-				DoStargateOpen();
+				EstablishWormholeTo( target );
 			}
 			else
 			{
-				await Task.DelaySeconds( 0.5f ); // otherwise, wait 0.5 sec, then fail and stop dialing
-
+				await Task.DelaySeconds( 0.25f ); // otherwise wait a bit, fail and stop dialing
 				StopDialing();
 			}
 		}
@@ -253,10 +243,10 @@ public partial class StargateMilkyWay : Stargate
 	{
 		if ( !IsStargateReadyForInboundFast() ) return;
 
-		if ( Dialing ) await DoStargateReset();
-
 		try
 		{
+			if ( Dialing ) await DoStargateReset();
+
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
@@ -313,8 +303,9 @@ public partial class StargateMilkyWay : Stargate
 				return;
 			}
 
-			Stargate targetGate = null;
+			Stargate target = null;
 
+			var readyForOpen = false;
 			var chevNum = 1;
 			foreach ( var sym in address )
 			{
@@ -343,30 +334,24 @@ public partial class StargateMilkyWay : Stargate
 
 				}
 
-				if ( chevNum == address.Length ) targetGate = FindByAddress( address );
+				if ( chevNum == address.Length ) target = FindByAddress( address );
 
 				var chev = GetChevronBasedOnAddressLength( chevNum, address.Length );
 				if ( chev.IsValid() )
 				{
 					await Task.DelaySeconds( 0.5f );
-					if ( chevNum == address.Length )
+					if ( ( chevNum == address.Length && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() ) || chevNum != address.Length )
 					{
-						if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy )
-						{
-							chev.TurnOn();
-						}
-					}
-					else
-					{
-						chev.TurnOn(); // glow current chevron after a small delay
+						chev.TurnOn();
 					}
 				}
 
 				if ( chevNum == address.Length )
 				{
-					if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy )
+					if ( chevNum == address.Length && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() )
 					{
-						targetGate.BeginInboundSlow( address, address.Length );
+						target.BeginInboundSlow( address, address.Length );
+						readyForOpen = true;
 					}
 				}
 
@@ -377,15 +362,9 @@ public partial class StargateMilkyWay : Stargate
 
 			Busy = false;
 
-			if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy ) // if valid, open both gates
+			if ( target.IsValid() && target != this && readyForOpen )
 			{
-				targetGate.OtherGate = this;
-				OtherGate = targetGate;
-
-				targetGate.DoStargateOpen();
-				DoStargateOpen();
-
-				targetGate.Inbound = true;
+				EstablishWormholeTo( target );
 			}
 			else
 			{
@@ -398,12 +377,14 @@ public partial class StargateMilkyWay : Stargate
 		}
 	}
 
-	public override void BeginInboundSlow( string address, int numChevs = 7 )
+	public async override void BeginInboundSlow( string address, int numChevs = 7 )
 	{
-		if ( !IsStargateReadyForInboundSlow() ) return;
+		if ( !IsStargateReadyForInboundInstantSlow() ) return;
 
 		try
 		{
+			if ( Dialing ) await DoStargateReset();
+
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
@@ -413,9 +394,10 @@ public partial class StargateMilkyWay : Stargate
 				if ( chev.IsValid() )
 				{
 					chev.TurnOn();
+					if ( i == 1 ) chev.ChevronSound( "chevron_incoming" ); // play once to avoid insta earrape
 				}
+				
 			}
-			Sound.FromEntity( "chevron_incoming", this ); // play once to avoid insta earrape
 		}
 		catch ( Exception )
 		{
@@ -423,47 +405,47 @@ public partial class StargateMilkyWay : Stargate
 		}
 	}
 
-	public async override void BeginDialInstant( string address ) // TODO RECODE THIS @Gmod4phun
+	public async override void BeginDialInstant( string address )
 	{
 		if ( !CanStargateStartDial() ) return;
 
-		CurGateState = GateState.DIALING;
-		CurDialType = DialType.INSTANT;
-
-		if ( !IsValidAddress( address ) )
+		try
 		{
-			StopDialing();
-			return;
-		}
+			CurGateState = GateState.DIALING;
+			CurDialType = DialType.INSTANT;
 
-		var otherGate = FindByAddress( address );
-		if ( !otherGate.IsValid() || otherGate == this || !otherGate.IsStargateReadyForInboundSlow() )
+			if ( !IsValidAddress( address ) )
+			{
+				StopDialing();
+				return;
+			}
+
+			var otherGate = FindByAddress( address );
+			if ( !otherGate.IsValid() || otherGate == this || !otherGate.IsStargateReadyForInboundInstantSlow() )
+			{
+				StopDialing();
+				return;
+			}
+
+			otherGate.BeginInboundSlow( Address );
+
+			for ( var i = 1; i <= address.Length; i++ )
+			{
+				var chev = GetChevronBasedOnAddressLength( i, address.Length );
+				if ( chev.IsValid() )
+				{
+					chev.TurnOn();
+					if ( i == 1 ) chev.ChevronSound( "chevron_incoming" ); // play once to avoid insta earrape
+				}
+			}
+
+			await Task.DelaySeconds( 0.5f );
+
+			EstablishWormholeTo( otherGate );
+		}
+		catch ( Exception )
 		{
-			StopDialing();
-			return;
+			if ( this.IsValid() ) StopDialing();
 		}
-
-		otherGate.BeginInboundSlow( Address );
-
-		OtherGate = otherGate;
-		otherGate.OtherGate = this;
-
-		OtherGate.Inbound = true;
-		OtherGate.Busy = true;
-
-		for ( var i = 1; i <= address.Length; i++ )
-		{
-			var chev = GetChevronBasedOnAddressLength( i, address.Length );
-			if ( chev.IsValid() ) chev.TurnOn();
-		}
-		Sound.FromEntity( "chevron_incoming", this ); // play once to avoid insta earrape
-
-		await Task.DelaySeconds( 0.5f );
-
-		Busy = false;
-		OtherGate.Busy = false;
-
-		OtherGate.DoStargateOpen();
-		DoStargateOpen();
 	}
 }

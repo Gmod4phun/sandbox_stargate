@@ -188,7 +188,7 @@ public abstract partial class Stargate : Prop, IUse
 		OnStargateClosed();
 	}
 
-	public bool IsStargateReadyForInboundFast()
+	public bool IsStargateReadyForInboundFast() // checks if the gate is ready to do a inbound anim for fast dial
 	{
 		if ( !Dialing )
 		{
@@ -200,12 +200,12 @@ public abstract partial class Stargate : Prop, IUse
 		}
 	}
 
-	public bool IsStargateReadyForInboundFastEnd()
+	public bool IsStargateReadyForInboundFastEnd() // checks if the gate is ready to open when finishing fast dial?
 	{
 		return ( !Busy && !Open && !Dialing && Inbound );
 	}
 
-	public bool IsStargateReadyForInboundSlow()
+	public bool IsStargateReadyForInboundInstantSlow() // checks if the gate is ready to do inbound for instant or slow dial
 	{
 		return ( !Busy && !Open && !Inbound );
 	}
@@ -267,6 +267,17 @@ public abstract partial class Stargate : Prop, IUse
 	public async virtual Task DoStargateReset()
 	{
 		ResetGateVariablesToIdle();
+	}
+
+	public virtual void EstablishWormholeTo(Stargate target)
+	{
+		target.OtherGate = this;
+		OtherGate = target;
+
+		target.Inbound = true;
+
+		target.DoStargateOpen();
+		DoStargateOpen();
 	}
 
 	public void AutoCloseThink()
