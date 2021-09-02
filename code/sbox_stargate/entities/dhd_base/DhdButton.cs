@@ -2,11 +2,12 @@ using Sandbox;
 
 public partial class DhdButton : AnimEntity
 {
-	public string Action;
+	[Net]
+	public string Action { get; set; } = "";
 	public DhdButtonTrigger Trigger;
 
 	[Net]
-	public bool Glowing { get; set; } = false;
+	public bool On { get; set; } = false;
 
 	public override void Spawn()
 	{
@@ -17,6 +18,6 @@ public partial class DhdButton : AnimEntity
 	[Event.Frame]
 	public void ButtonGlowLogic()
 	{
-		SetMaterialGroup( Glowing ? 1 : 0 );
+		SetMaterialGroup( On ? 1 : 0 );
 	}
 }

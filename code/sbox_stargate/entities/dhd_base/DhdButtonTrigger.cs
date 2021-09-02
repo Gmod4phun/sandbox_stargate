@@ -2,7 +2,8 @@ using Sandbox;
 
 public partial class DhdButtonTrigger : AnimEntity, IUse
 {
-	public string Action;
+	[Net]
+	public string Action { get; set; } = "";
 	public Dhd DHD;
 	public DhdButton Button;
 
@@ -48,5 +49,20 @@ public partial class DhdButtonTrigger : AnimEntity, IUse
 		Log.Info( $"{info.Damage} {Health}" );
 
 		if ( Health <= 0 ) DestroyTriggerAndButton();
+	}
+
+	public void DrawSymbols()
+	{
+		if ( Action.Length > 0 )
+		{
+			var pos = Transform.PointToWorld( GetModel().RenderBounds.Center );
+			DebugOverlay.Text( pos, Action, Color.White );
+		}
+	}
+
+	[Event.Frame]
+	public void DhdButtonTriggerThink()
+	{
+		if ( Local.Pawn.IsValid() && Local.Pawn.Position.Distance(Position) < 580) DrawSymbols();
 	}
 }

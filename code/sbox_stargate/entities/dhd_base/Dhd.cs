@@ -10,8 +10,8 @@ public abstract partial class Dhd : Prop
 
 	protected readonly string ButtonSymbols = "ABCDEFGHI0123456789STUVWXYZ@JKLMNO#PQR";
 
-	protected Dictionary<string, DhdButtonTrigger> ButtonTriggers = new();
-	protected Dictionary<string, DhdButton> Buttons = new();
+	public Dictionary<string, DhdButtonTrigger> ButtonTriggers { get; protected set; } = new();
+	public Dictionary<string, DhdButton> Buttons { get; protected set; } = new();
 
 	public float lastPressTime = 0;
 	public float pressDelay = 0.5f;
@@ -107,22 +107,22 @@ public abstract partial class Dhd : Prop
 	public void SetButtonState( string action, bool glowing )
 	{
 		var b = GetButtonByAction( action );
-		if ( b.IsValid() ) b.Glowing = glowing;
+		if ( b.IsValid() ) b.On = glowing;
 	}
 
 	public void SetButtonState( DhdButton b, bool glowing )
 	{
-		if ( b.IsValid() ) b.Glowing = glowing;
+		if ( b.IsValid() ) b.On = glowing;
 	}
 
 	public void ToggleButton( string action )
 	{
 		var b = GetButtonByAction( action );
-		if ( b.IsValid() ) SetButtonState( b, !b.Glowing);
+		if ( b.IsValid() ) SetButtonState( b, !b.On);
 	}
 	public void ToggleButton( DhdButton b )
 	{
-		if ( b.IsValid() ) SetButtonState( b, !b.Glowing );
+		if ( b.IsValid() ) SetButtonState( b, !b.On );
 	}
 
 	public void EnableAllButtons()
