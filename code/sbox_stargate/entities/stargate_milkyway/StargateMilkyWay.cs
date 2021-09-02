@@ -143,8 +143,8 @@ public partial class StargateMilkyWay : Stargate
 			ShouldStopDialing = true;
 			await Task.DelaySeconds( 0.2f ); // give the ring logic a chance to catch up (checks at 0.1 second intervals)
 		}
-		
-		ResetGateVariablesToIdle();
+
+		base.DoStargateReset();
 		SetChevronsGlowState( false );
 	}
 

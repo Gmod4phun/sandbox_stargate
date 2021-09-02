@@ -218,7 +218,7 @@ public partial class EventHorizon : AnimEntity
 			ply.EyeRot = Rotation.From( ply.EyeRot.Angles() + new Angles( 0, DeltaAngleEH.yaw + 180, 0 ) );
 			ply.Rotation = ply.EyeRot;
 
-			await Task.NextPhysicsFrame();
+			await GameTask.NextPhysicsFrame();
 
 			using ( Prediction.Off() ) ply.DevController = oldController;
 		}
