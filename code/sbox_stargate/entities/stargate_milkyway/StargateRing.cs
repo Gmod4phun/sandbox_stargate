@@ -14,7 +14,7 @@ public partial class StargateRing : AnimEntity
 	public float TargetRingAngle { get; private set; } = 0.0f;
 	public float RingRotSpeed { get; private set; } = 0.0f;
 	private float RingRotMinSpeed = 0.5f;
-	private float RingRotMaxSpeed = 7f;
+	private float RingRotMaxSpeed = 10f;
 	public int RingRotDir { get; private set; } = 1;
 	public bool RingShouldRotate { get; private set; } = false;
 	private bool RingShouldAcc = false;
@@ -217,33 +217,19 @@ public partial class StargateRing : AnimEntity
 		RotateRingToSymbol( sym, angOffset ); // rotate ring to the desired position
 
 		var rotStartTime = Time.Now;
-		Log.Info( rotStartTime );
 
 		while ( RingAngle != TargetRingAngle ) // wait until its rotated
 		{
-			await GameTask.DelaySeconds( 0.1f ); // we need to delay this otherwise the game hangs
+			await Task.DelaySeconds( 0.1f ); // we need to delay this otherwise the game hangs
 
-			//Log.Info( "rotating ring..." );
+			if ( Time.Now > rotStartTime + 30 ) return false;
 
-			if ( Time.Now > rotStartTime + 30 )
-			{
-				//Log.Info( "30 seconds passed, stopping" );
-				return false;
-			}
-
-			if ( !this.IsValid() || !Gate.IsValid() )
-			{
-				//Log.Info( "not valid anymore, stopping" );
-				return false;
-			}
+			if ( !this.IsValid() || !Gate.IsValid() ) return false;
 
 			if (Gate.Dialing && Gate.ShouldStopDialing)
 			{
-				//Log.Info( "gate should stop dialing, stopping" );
 				Gate.ShouldStopDialing = false;
-
 				StopRingRotation();
-
 				return false;
 			}
 		}

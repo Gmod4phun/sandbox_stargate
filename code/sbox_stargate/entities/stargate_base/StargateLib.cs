@@ -6,19 +6,20 @@ public partial class Stargate : Prop, IUse
 {
 	public enum DialType
 	{
-		SLOW = 0,
-		FAST = 1,
-		INSTANT = 2,
-		NOX = 3
+		SLOW,
+		FAST,
+		INSTANT,
+		NOX
 	}
 
 	public enum GateState
 	{
-		IDLE = 0,
-		ACTIVE = 1,
-		OPENING = 2,
-		OPEN = 3,
-		CLOSING = 4
+		IDLE,
+		ACTIVE,
+		DIALING,
+		OPENING,
+		OPEN,
+		CLOSING
 	}
 
 	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";

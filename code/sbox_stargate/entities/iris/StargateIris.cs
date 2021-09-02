@@ -31,7 +31,7 @@ public partial class StargateIris : AnimEntity
 		CurrentSequence.Name = "iris_close";
 		Sound.FromEntity("iris_close", this);
 
-		await GameTask.DelaySeconds( OpenCloseDleay );
+		await Task.DelaySeconds( OpenCloseDleay );
 		Busy = false;
 	}
 
@@ -45,7 +45,7 @@ public partial class StargateIris : AnimEntity
 		CurrentSequence.Name = "iris_open";
 		Sound.FromEntity("iris_open", this);
 
-		await GameTask.DelaySeconds( OpenCloseDleay );
+		await Task.DelaySeconds( OpenCloseDleay );
 		Busy = false;
 	}
 

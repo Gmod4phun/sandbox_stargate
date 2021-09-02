@@ -7,9 +7,7 @@ using Sandbox;
 
 public abstract partial class Stargate : Prop, IUse
 {
-	public Vector3 SpawnOffset = new ( 0, 0, 90 );
-
-	public float AutoCloseTime = -1;
+	public Vector3 SpawnOffset = new( 0, 0, 90 );
 
 	public StargateRing Ring;
 	public List<Chevron> Chevrons = new();
@@ -18,44 +16,45 @@ public abstract partial class Stargate : Prop, IUse
 	public StargateIris Iris;
 	public Stargate OtherGate;
 
-	[Net]
-	public string Address { get; protected set; } = "";
-	[Net]
-	public string Group { get; protected set; } = "";
-	[Net]
-	public string Name { get; protected set; } = "";
-	[Net]
-	public bool AutoClose { get; protected set; } = true;
-	[Net]
-	public bool Private { get; protected set; } = false;
+	public float AutoCloseTime = -1;
 
-	public GateState CurState = GateState.IDLE;
-	public bool Active = false;
-	public bool Inbound = false;
-	public bool Dialing = false;
+	[Net]
+	public string Address { get; set; } = "";
+	[Net]
+	public string Group { get; set; } = "";
+	[Net]
+	public string Name { get; set; } = "";
+	[Net]
+	public bool AutoClose { get; set; } = true;
+	[Net]
+	public bool Private { get; set; } = false;
+
+	public bool Busy { get; set; } = false; // this is pretty much used anytime the gate is busy to do anything (usually during animations/transitions)
+	public bool Inbound { get; set; } = false;
 	public bool ShouldStopDialing = false;
-	public bool Busy = false;
+	public GateState CurGateState { get; set; } = GateState.IDLE;
+	public DialType CurDialType { get; set; } = DialType.FAST;
 
-	// some useful accessors
-	public bool Idle { get => !Active; }
-	public bool Opening { get => CurState == GateState.OPENING; }
-	public bool Open { get => CurState == GateState.OPEN; }
-	public bool Closing { get => CurState == GateState.CLOSING; }
+	// gate state accessors
+	public bool Idle { get => CurGateState is GateState.IDLE; }
+	public bool Active { get => CurGateState is GateState.ACTIVE; }
+	public bool Dialing { get => CurGateState is GateState.DIALING; }
+	public bool Opening { get => CurGateState is GateState.OPENING; }
+	public bool Open { get => CurGateState is GateState.OPEN; }
+	public bool Closing { get => CurGateState is GateState.CLOSING; }
 
 	// VARIABLE RESET
 	public void ResetGateVariablesToIdle()
 	{
-		OtherGate = null;
-		Active = false;
-		Inbound = false;
-		Dialing = false;
 		ShouldStopDialing = false;
+		OtherGate = null;
+		Inbound = false;
 		Busy = false;
-		CurState = GateState.IDLE;
+		CurGateState = GateState.IDLE;
+		CurDialType = DialType.FAST;
 	}
 
 	// USABILITY
-
 	public bool IsUsable( Entity user )
 	{
 		return true; // we should be always usable
@@ -65,18 +64,6 @@ public abstract partial class Stargate : Prop, IUse
 	{
 		OpenStargateMenu(To.Single( user ));
 		return false; // aka SIMPLE_USE, not continuously
-	}
-
-
-	[ClientRpc]
-	public void OpenStargateMenu()
-	{
-		var hud = Local.Hud;
-		var count = 0;
-		foreach (StargateMenuV2 menu in hud.ChildrenOfType<StargateMenuV2>()) count++;
-
-		// this makes sure if we already have the menu open, we cant open it again
-		if (count == 0) hud.AddChild<StargateMenuV2>().SetGate( this );
 	}
 
 	// SPAWN
@@ -105,13 +92,13 @@ public abstract partial class Stargate : Prop, IUse
 
 	public async Task EstablishEventHorizon(float delay = 0)
 	{
-		await GameTask.DelaySeconds( delay );
+		await Task.DelaySeconds( delay );
 		if ( !this.IsValid() ) return;
 
 		CreateEventHorizon();
 		EventHorizon.Establish();
 
-		await GameTask.DelaySeconds( 2f );
+		await Task.DelaySeconds( 2f );
 		if ( !this.IsValid() || !EventHorizon.IsValid() ) return;
 
 		EventHorizon.IsFullyFormed = true;
@@ -119,13 +106,13 @@ public abstract partial class Stargate : Prop, IUse
 
 	public async Task CollapseEventHorizon( float sec = 0 )
 	{
-		await GameTask.DelaySeconds( sec );
+		await Task.DelaySeconds( sec );
 		if ( !this.IsValid() || !EventHorizon.IsValid() ) return;
 
 		EventHorizon.IsFullyFormed = false;
 		EventHorizon.CollapseClientAnim();
 
-		await GameTask.DelaySeconds( sec + 2f );
+		await Task.DelaySeconds( sec + 2f );
 		if ( !this.IsValid() || !EventHorizon.IsValid() ) return;
 
 		DeleteEventHorizon();
@@ -157,20 +144,24 @@ public abstract partial class Stargate : Prop, IUse
 
 	public bool CanStargateOpen()
 	{
-		if ( Busy ) return false;
-
-		var s = CurState;
-		if ( s is GateState.OPENING || s is GateState.OPEN || s is GateState.CLOSING ) return false;
-		return true;
+		return ( !Busy && !Opening && !Open && !Closing );
 	}
 
 	public bool CanStargateClose()
 	{
-		if ( Busy ) return false;
+		return ( !Busy && Open);
+	}
 
-		var s = CurState;
-		if ( s is GateState.OPEN ) return true;
-		return false;
+	public bool CanStargateStartDial()
+	{
+		return ( Idle && !Busy && !Dialing && !Inbound );
+	}
+
+	public bool CanStargateStopDial()
+	{
+		if (!Inbound) return (!Busy && Dialing);
+
+		return ( !Busy && Active );
 	}
 
 	public async void DoStargateOpen()
@@ -179,7 +170,7 @@ public abstract partial class Stargate : Prop, IUse
 
 		OnStargateBeginOpen();
 
-		await EstablishEventHorizon( 0.5f );
+		await EstablishEventHorizon( 0.5f ); // TODO - fix EH crash when gate gets removed during opening
 
 		OnStargateOpened();
 	}
@@ -197,6 +188,28 @@ public abstract partial class Stargate : Prop, IUse
 		OnStargateClosed();
 	}
 
+	public bool IsStargateReadyForInboundFast() // checks if the gate is ready to do a inbound anim for fast dial
+	{
+		if ( !Dialing )
+		{
+			return (!Busy && !Open && !Inbound);
+		}
+		else
+		{
+			return (!Busy && !Open && !Inbound && CurDialType == DialType.SLOW);
+		}
+	}
+
+	public bool IsStargateReadyForInboundFastEnd() // checks if the gate is ready to open when finishing fast dial?
+	{
+		return ( !Busy && !Open && !Dialing && Inbound );
+	}
+
+	public bool IsStargateReadyForInboundInstantSlow() // checks if the gate is ready to do inbound for instant or slow dial
+	{
+		return ( !Busy && !Open && !Inbound );
+	}
+
 	public virtual void BeginDialFast(string address) { }
 	public virtual void BeginDialSlow(string address) { }
 	public virtual void BeginDialInstant( string address ) { } // instant gate open, with kawoosh
@@ -206,9 +219,11 @@ public abstract partial class Stargate : Prop, IUse
 
 	public async void StopDialing()
 	{
+		if ( !CanStargateStopDial() ) return;
+
 		OnStopDialingBegin();
 
-		await GameTask.DelaySeconds( 1.25f );
+		await Task.DelaySeconds( 1.25f );
 
 		OnStopDialingFinish();
 	}
@@ -226,39 +241,51 @@ public abstract partial class Stargate : Prop, IUse
 
 	public virtual void OnStopDialingFinish()
 	{
-		Dialing = false; // must be set to false AFTER setting ShouldStopDialing to true
-		Busy = false;
 		ResetGateVariablesToIdle();
 	}
 
 	public virtual void OnStargateBeginOpen()
 	{
-		CurState = GateState.OPENING;
+		CurGateState = GateState.OPENING;
 		Busy = true;
 	}
 	public virtual void OnStargateOpened()
 	{
-		CurState = GateState.OPEN;
+		CurGateState = GateState.OPEN;
 		Busy = false;
 	}
 	public virtual void OnStargateBeginClose()
 	{
-		CurState = GateState.CLOSING;
+		CurGateState = GateState.CLOSING;
 		Busy = true;
 	}
 	public virtual void OnStargateClosed()
 	{
-		CurState = GateState.IDLE;
-		Busy = false;
 		ResetGateVariablesToIdle();
+	}
+
+	public async virtual Task DoStargateReset()
+	{
+		ResetGateVariablesToIdle();
+	}
+
+	public virtual void EstablishWormholeTo(Stargate target)
+	{
+		target.OtherGate = this;
+		OtherGate = target;
+
+		target.Inbound = true;
+
+		target.DoStargateOpen();
+		DoStargateOpen();
 	}
 
 	public void AutoCloseThink()
 	{
-		if ( AutoCloseTime != -1 && AutoCloseTime <= Time.Now )
+		if ( AutoCloseTime != -1 && AutoCloseTime <= Time.Now && CanStargateClose() )
 		{
-			DoStargateClose( true );
 			AutoCloseTime = -1;
+			DoStargateClose( true );
 		}
 	}
 
@@ -270,6 +297,17 @@ public abstract partial class Stargate : Prop, IUse
 
 
 	// UI Related stuff
+
+	[ClientRpc]
+	public void OpenStargateMenu()
+	{
+		var hud = Local.Hud;
+		var count = 0;
+		foreach ( StargateMenuV2 menu in hud.ChildrenOfType<StargateMenuV2>() ) count++;
+
+		// this makes sure if we already have the menu open, we cant open it again
+		if ( count == 0 ) hud.AddChild<StargateMenuV2>().SetGate( this );
+	}
 
 	[ClientRpc]
 	public void RefreshGateInformation() {

@@ -57,17 +57,21 @@ public partial class EventHorizon : AnimEntity
 
 	public async void Establish()
 	{
-		EstablishClientAnim(); // clientside animation tuff
+		EstablishClientAnim(); // clientside animation stuff
 
-		await GameTask.DelaySeconds(1.5f);
+		await Task.DelaySeconds( 1.5f );
+		if ( !this.IsValid() ) return;
+
 		WormholeLoop = Sound.FromEntity( "wormhole_loop", this );
 	}
 
 	public async void Collapse()
 	{
-		CollapseClientAnim(); // clientside animation tuff
+		CollapseClientAnim(); // clientside animation stuff
 
-		await GameTask.DelaySeconds( 1f );
+		await Task.DelaySeconds( 1f );
+		if ( !this.IsValid() ) return;
+
 		WormholeLoop.Stop();
 	}
 
@@ -164,7 +168,7 @@ public partial class EventHorizon : AnimEntity
 	}
 
 	// CLIENT LOGIC
-	[Event( "client.tick" )]
+	[Event.Frame]
 	public void EventHorizonClientTick()
 	{
 		ClientAnimLogic();
@@ -231,15 +235,23 @@ public partial class EventHorizon : AnimEntity
 		if ( Gate.AutoClose ) Gate.AutoCloseTime = Time.Now + Stargate.AutoCloseTimerDuration;
 	}
 
+	[ClientRpc]
+	public void RemoveDeathRagdoll(Player ply)
+	{
+		ply.Corpse?.Delete();
+	}
+
 	public void DissolveEntity( Entity ent )
 	{
-		if ( ent is SandboxPlayer )
+		if ( ent is SandboxPlayer ply )
 		{
-			ent.Health = 1;
+			ply.Health = 1;
 			var dmg = new DamageInfo();
 			dmg.Attacker = Gate;
 			dmg.Damage = 100;
-			ent.TakeDamage( dmg );
+			ply.TakeDamage( dmg );
+
+			RemoveDeathRagdoll( To.Single( ply ), ply);
 		}
 		else
 		{

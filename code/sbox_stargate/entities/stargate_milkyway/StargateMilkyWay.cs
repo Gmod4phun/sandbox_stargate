@@ -24,8 +24,6 @@ public partial class StargateMilkyWay : Stargate
 		CreateAllChevrons();
 
 		Address = GenerateRandomAddress(7);
-
-		Log.Info( Address );
 	}
 
 	// RING
@@ -42,8 +40,7 @@ public partial class StargateMilkyWay : Stargate
 
 	public async Task<bool> RotateRingToSymbol( char sym, int angOffset = 0 )
 	{
-		var success = await Ring.RotateRingToSymbolAsync( sym, angOffset );
-		return success;
+		return await Ring.RotateRingToSymbolAsync( sym, angOffset );
 	}
 
 	// CHEVRONS
@@ -92,9 +89,9 @@ public partial class StargateMilkyWay : Stargate
 
 	public async void SetChevronsGlowState( bool state, float delay = 0)
 	{
-		if (delay > 0) await GameTask.DelaySeconds( delay );
+		if (delay > 0) await Task.DelaySeconds( delay );
 
-		foreach ( Chevron chev in Chevrons ) chev.Glowing = state;
+		foreach ( Chevron chev in Chevrons ) chev.On = state;
 	}
 
 	public override void OnStopDialingBegin()
@@ -102,6 +99,8 @@ public partial class StargateMilkyWay : Stargate
 		base.OnStopDialingBegin();
 
 		Sound.FromEntity( "dial_fail_sg1", this);
+
+		if ( Ring.IsValid() && Ring.RingRotSpeed != 0 ) Ring.StopRingRotation();
 	}
 
 	public override void OnStopDialingFinish()
@@ -137,382 +136,316 @@ public partial class StargateMilkyWay : Stargate
 		SetChevronsGlowState( false );
 	}
 
-	// TEST STUFF
+	public async override Task DoStargateReset()
+	{
+		if ( Dialing )
+		{
+			ShouldStopDialing = true;
+			await Task.DelaySeconds( 0.2f ); // give the ring logic a chance to catch up (checks at 0.1 second intervals)
+		}
 
+		base.DoStargateReset();
+		SetChevronsGlowState( false );
+	}
+
+	// INDIVIDUAL DIAL TYPES
 	public async override void BeginDialFast(string address)
 	{
-		if ( Busy || Inbound || Dialing || Open) return;
+		if ( !CanStargateStartDial() ) return;
 
-		if ( address.Equals( Address ) ) return;
-
-		if ( !IsValidAddress( address ) )
+		try
 		{
-			Dialing = true;
-			StopDialing();
-			return;
-		}
+			CurGateState = GateState.DIALING;
+			CurDialType = DialType.FAST;
 
-		var targetGate = FindByAddress( address );
+			if ( !IsValidAddress( address ) ) { StopDialing(); return; }
 
-		var wasTargetGateValidOnDialStart = false;
-		var wasDialStopped = false;
+			var target = FindByAddress( address );
+			var wasTargetReadyOnStart = false; // if target gate was not available on dial start, dont bother doing anything at the end
 
-		if (targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Inbound)
-		{
-			wasTargetGateValidOnDialStart = true;
-			targetGate.BeginInboundFast( this.Address, targetGate.Address.Length );
-			OtherGate = targetGate;
-		}
-
-		Dialing = true;
-
-		var timeStart = RealTime.Now; // dial start time
-
-		// start rotating ring
-		Ring.StartRingRotation();
-
-		var addrLen = address.Length;
-
-		// duration of the dial until the gate starts opening - let's stick to 7 seconds for total (just like GMod stargates)
-		// default values are for 7 chevron sequence
-		var chevronsStartDelay = 0.7f;
-		var chevronsLoopDuration = 3.9f;
-		var chevronBeforeLastDelay = 1.05f;
-		var chevronAfterLastDelay = 1.35f;
-
-		if ( addrLen == 8 )
-		{
-			chevronsStartDelay = 0.7f;
-			chevronsLoopDuration = 4.25f;
-			chevronBeforeLastDelay = 0.8f;
-			chevronAfterLastDelay = 1.25f;
-		}
-		else if ( addrLen == 9 )
-		{
-			chevronsStartDelay = 0.6f;
-			chevronsLoopDuration = 4.4f;
-			chevronBeforeLastDelay = 0.75f;
-			chevronAfterLastDelay = 1.25f;
-		}
-
-		var chevronDelay = chevronsLoopDuration / (addrLen - 1);
-
-		await GameTask.DelaySeconds( chevronsStartDelay ); // wait 0.5 sec and start locking chevrons
-		
-		for (var i = 1; i < addrLen; i++ )
-		{
-			if ( ShouldStopDialing && !wasDialStopped ) // check if we should stop dialing or not
+			if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFast() )
 			{
-				Ring.StopRingRotation();
-				wasDialStopped = true;
+				wasTargetReadyOnStart = true;
+				target.BeginInboundFast( Address, target.Address.Length );
+				OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
+			}
+
+			Ring.StartRingRotation(); // start rotating ring
+
+			var addrLen = address.Length;
+
+			// duration of the dial until the gate starts opening - let's stick to 7 seconds for total (just like GMod stargates)
+			// default values are for 7 chevron sequence
+			var chevronsStartDelay = (addrLen == 9) ? 0.60f : ((addrLen == 8) ? 0.70f : 0.70f);
+			var chevronsLoopDuration = (addrLen == 9) ? 4.40f : ((addrLen == 8) ? 4.25f : 3.90f);
+			var chevronBeforeLastDelay = (addrLen == 9) ? 0.75f : ((addrLen == 8) ? 0.80f : 1.05f);
+			var chevronAfterLastDelay = (addrLen == 9) ? 1.25f : ((addrLen == 8) ? 1.25f : 1.35f);
+			var chevronDelay = chevronsLoopDuration / (addrLen - 1);
+
+			await Task.DelaySeconds( chevronsStartDelay ); // wait 0.5 sec and start locking chevrons
+
+			// lets encode each chevron but the last
+			for ( var i = 1; i < addrLen; i++ )
+			{
+				if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
+
+				var chev = GetChevronBasedOnAddressLength( i, addrLen );
+				if ( chev.IsValid() )
+				{
+					chev.TurnOn();
+					chev.ChevronSound( "chevron_dhd" );
+				}
+
+				if ( i == addrLen - 1 ) Ring.StopRingRotation(); // stop rotating ring when the last looped chevron locks
+
+				await Task.DelaySeconds( chevronDelay );
+			}
+
+			if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
+
+			await Task.DelaySeconds( chevronBeforeLastDelay ); // wait before locking the last chevron
+
+			if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
+
+			Busy = true; // gate has to lock last chevron, lets go busy so we cant stop the dialing at this point
+
+			var topChev = GetChevron( 7 ); // lock last (top) chevron
+			if ( topChev.IsValid() )
+			{
+				if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) topChev.TurnOn();
+				topChev.ChevronLockUnlockLong();
+				topChev.ChevronSound( "chevron_lock_sg1" );
+			}
+
+			await Task.DelaySeconds( chevronAfterLastDelay ); // wait after the last chevron, then open the gate or fail dial (if gate became invalid/was busy)
+
+			if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
+
+			Busy = false;
+
+			if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) // if valid, open both gates
+			{
+				EstablishWormholeTo( target );
+			}
+			else
+			{
+				await Task.DelaySeconds( 0.25f ); // otherwise wait a bit, fail and stop dialing
 				StopDialing();
-				return;
 			}
-
-			var chev = GetChevronBasedOnAddressLength( i, addrLen );
-
-			if ( chev.IsValid() )
-			{
-				chev.Glowing = true;
-				Sound.FromEntity( "chevron_dhd", this );
-			}
-
-			if (i == addrLen - 1) Ring.StopRingRotation(); // stop rotating ring when the last looped chevron locks
-
-			await GameTask.DelaySeconds( chevronDelay ); // each chevron delay
-			if ( !this.IsValid() ) return;
 		}
-
-		if ( ShouldStopDialing && !wasDialStopped ) // check if we should stop dialing at the end or not
+		catch ( Exception )
 		{
-			wasDialStopped = true;
-			StopDialing();
-			return;
-		}
-
-		await GameTask.DelaySeconds( chevronBeforeLastDelay ); // wait before locking the last chevron
-		if ( !this.IsValid() ) return;
-
-		if ( ShouldStopDialing && !wasDialStopped ) // check if we should stop dialing at the end or not
-		{
-			wasDialStopped = true;
-			StopDialing();
-			return;
-		}
-
-		Busy = true; // so we cant stop dial at this point
-
-		var topChev = GetChevron( 7 ); // lock last (top) chevron
-		if ( topChev.IsValid())
-		{
-
-			if ( wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing )
-			{
-				topChev.Glowing = true;
-			}
-
-			topChev.ChevronLockUnlock();
-			Sound.FromEntity( "chevron_lock_sg1", this );
-		}
-
-		await GameTask.DelaySeconds( chevronAfterLastDelay ); // wait after the last chevron, then open the gate or fail dial (if gate became invalid/was busy)
-		if ( !this.IsValid() ) return;
-
-		if ( ShouldStopDialing && !wasDialStopped ) // check if we should stop dialing at the end or not
-		{
-			wasDialStopped = true;
-			StopDialing();
-			return;
-		}
-
-		var timeEnd = RealTime.Now - timeStart;
-		Log.Info( $"Gate dial time: {timeEnd}" );
-
-		Busy = false;
-
-		if ( !wasDialStopped && wasTargetGateValidOnDialStart && targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy && !targetGate.Dialing ) // if valid, open both gates
-		{
-			Dialing = false;
-
-			targetGate.OtherGate = this;
-			OtherGate = targetGate;
-
-			targetGate.DoStargateOpen();
-			DoStargateOpen();
-
-			targetGate.Inbound = true;
-		}
-		else
-		{
-			await GameTask.DelaySeconds( 0.5f ); // if not valid, wait 0.5 sec, then fail and stop dialing
-			if ( !this.IsValid() ) return;
-
-			//if ( wasTargetGateValidOnDialStart && OtherGate.IsValid() && OtherGate != this && !OtherGate.Open && !OtherGate.Busy && !OtherGate.Dialing )
-			//{
-			//	OtherGate.StopDialing();
-			//}
-
-			if ( (ShouldStopDialing && !wasDialStopped && Dialing) || !wasTargetGateValidOnDialStart || !targetGate.IsValid() ) // check if we should stop dialing at the end or not
-			{
-				wasDialStopped = true;
-				StopDialing();
-				return;
-			}
+			if ( this.IsValid() ) StopDialing();
 		}
 	}
 
 	public async override void BeginInboundFast( string address, int numChevs = 7 )
 	{
-		if ( Dialing ) return;
+		if ( !IsStargateReadyForInboundFast() ) return;
 
-		Inbound = true;
-
-		//var timeStart = RealTime.Now; // dial start time
-
-		// duration of the dial until the gate starts opening - let's stick to 7 seconds for total (just like GMod stargates)
-		// default values are for 7 chevron sequence
-		var chevronsStartDelay = 0.5f;
-		var chevronsLoopDuration = 6.75f;
-		var chevronBeforeLastDelay = 0.5f;
-
-		if ( numChevs == 8 )
+		try
 		{
-			chevronsStartDelay = 0.4f;
-			chevronsLoopDuration = 6.6f;
-			chevronBeforeLastDelay = 0.6f;
-		}
-		else if ( numChevs == 9 )
-		{
-			chevronsStartDelay = 0.25f;
-			chevronsLoopDuration = 6.75f;
-			chevronBeforeLastDelay = 0.5f;
-		}
+			if ( Dialing ) await DoStargateReset();
 
-		var chevronDelay = chevronsLoopDuration / (numChevs);
+			CurGateState = GateState.ACTIVE;
+			Inbound = true;
 
-		await GameTask.DelaySeconds( chevronsStartDelay ); // wait 0.5 sec and start locking chevrons
+			// duration of the dial until the gate starts opening - let's stick to 7 seconds for total (just like GMod stargates)
+			// default values are for 7 chevron sequence
+			var chevronsStartDelay = (numChevs == 9) ? 0.25f : ((numChevs == 8) ? 0.40f : 0.50f);
+			var chevronsLoopDuration = (numChevs == 9) ? 6.75f : ((numChevs == 8) ? 6.60f : 6.75f);
+			var chevronBeforeLastDelay = (numChevs == 9) ? 0.50f : ((numChevs == 8) ? 0.60f : 0.50f);
+			var chevronDelay = chevronsLoopDuration / (numChevs);
 
-		for ( var i = 1; i < numChevs; i++ )
-		{
-			if ( ShouldStopDialing ) // check if we should stop dialing or not
+			await Task.DelaySeconds( chevronsStartDelay ); // wait 0.5 sec and start locking chevrons
+
+			for ( var i = 1; i < numChevs; i++ )
 			{
-				//Ring.StopRingRotation();
-				//StopDialing();
-				return;
+				if ( ShouldStopDialing ) return; // check if we should stop dialing or not
+
+				var chev = GetChevronBasedOnAddressLength( i, numChevs );
+				if ( chev.IsValid() )
+				{
+					chev.TurnOn();
+					chev.ChevronSound( "chevron_incoming" );
+				}
+
+				await Task.DelaySeconds( chevronDelay ); // each chevron delay
 			}
 
-			var chev = GetChevronBasedOnAddressLength( i, numChevs );
+			await Task.DelaySeconds( chevronBeforeLastDelay ); // wait before locking the last chevron
 
-			if ( chev.IsValid() )
+			var topChev = GetChevron( 7 );
+			if ( topChev.IsValid() )
 			{
-				chev.Glowing = true;
-				Sound.FromEntity( "chevron_incoming", this );
+				topChev.TurnOn();
+				topChev.ChevronSound( "chevron_incoming" );
 			}
-
-			await GameTask.DelaySeconds( chevronDelay ); // each chevron delay
-			if ( !this.IsValid() ) return;
 		}
-
-		await GameTask.DelaySeconds( chevronBeforeLastDelay ); // wait before locking the last chevron
-		if ( !this.IsValid() ) return;
-
-		var topChev = GetChevron( 7 );
-		if ( topChev.IsValid() )
+		catch ( Exception )
 		{
-			topChev.Glowing = true;
-			Sound.FromEntity( "chevron_incoming", this );
+			if ( this.IsValid() ) StopDialing();
 		}
 	}
 
 	public async override void BeginDialSlow( string address )
 	{
-		if ( Busy || Inbound ) return;
+		if ( !CanStargateStartDial() ) return;
 
-		Dialing = true;
-
-		if ( !IsValidAddress( address ) )
+		try
 		{
-			StopDialing();
-			return;
-		}
+			CurGateState = GateState.DIALING;
+			CurDialType = DialType.SLOW;
 
-		Stargate targetGate = null;
-
-		var chevNum = 1;
-		foreach ( var sym in address )
-		{
-			// try to encode each symbol
-			var success = await RotateRingToSymbol( sym ); // wait for ring to rotate to the target symbol
-			if ( !success )
+			if ( !IsValidAddress( address ) )
 			{
-				Dialing = false;
+				StopDialing();
 				return;
 			}
 
-			await GameTask.DelaySeconds( 0.2f ); // wait a bit
+			Stargate target = null;
 
-			// go do chevron stuff
-
-			var topChev = GetChevron( 7 );
-			if (topChev.IsValid())
+			var readyForOpen = false;
+			var chevNum = 1;
+			foreach ( var sym in address )
 			{
-				Sound.FromEntity( (sym.Equals( address.Last())) ? "chevron_lock" : "chevron_sg1", topChev );
-				topChev.ChevronLockUnlock(); // play top chevron anim
-			}
-
-			if ( chevNum == address.Length )
-			{
-				targetGate = FindByAddress( address );
-			}
-
-			var chev = GetChevronBasedOnAddressLength( chevNum, address.Length);
-			if (chev.IsValid())
-			{
-				await GameTask.DelaySeconds( 0.5f );
-				if (chevNum == address.Length)
+				// try to encode each symbol
+				var success = await RotateRingToSymbol( sym ); // wait for ring to rotate to the target symbol
+				if ( !success || ShouldStopDialing )
 				{
-					if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy )
+					CurGateState = GateState.IDLE;
+					return;
+				}
+
+				await Task.DelaySeconds( 0.2f ); // wait a bit
+
+				// go do chevron stuff
+
+				var topChev = GetChevron( 7 );
+				if ( topChev.IsValid() )
+				{
+					topChev.ChevronSound( (sym.Equals( address.Last() )) ? "chevron_lock" : "chevron_sg1" );
+					topChev.ChevronLockUnlock(); // play top chevron anim
+					if ( chevNum != address.Length )
 					{
-						chev.Glowing = true;
+						topChev.TurnOn();
+						topChev.TurnOff( 1.5f );
+					}
+
+				}
+
+				if ( chevNum == address.Length ) target = FindByAddress( address );
+
+				var chev = GetChevronBasedOnAddressLength( chevNum, address.Length );
+				if ( chev.IsValid() )
+				{
+					await Task.DelaySeconds( 0.5f );
+					if ( ( chevNum == address.Length && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() ) || chevNum != address.Length )
+					{
+						chev.TurnOn();
 					}
 				}
-				else
+
+				if ( chevNum == address.Length )
 				{
-					chev.Glowing = true; // glow current chevron after a small delay
+					if ( chevNum == address.Length && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() )
+					{
+						target.BeginInboundSlow( address, address.Length );
+						readyForOpen = true;
+					}
 				}
+
+				await Task.DelaySeconds( 1.75f ); // wait a bit
+
+				chevNum++;
 			}
 
-			if (chevNum == address.Length)
+			Busy = false;
+
+			if ( target.IsValid() && target != this && readyForOpen )
 			{
-				if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy )
-				{
-					targetGate.BeginInboundSlow( address, address.Length );
-				}
+				EstablishWormholeTo( target );
 			}
-
-			await GameTask.DelaySeconds( 1.75f ); // wait a bit
-
-			chevNum++;
+			else
+			{
+				StopDialing();
+			}
 		}
-
-		Busy = false;
-
-		if ( targetGate.IsValid() && targetGate != this && !targetGate.Open && !targetGate.Busy ) // if valid, open both gates
+		catch ( Exception )
 		{
-			Dialing = false;
-
-			targetGate.OtherGate = this;
-			OtherGate = targetGate;
-
-			targetGate.DoStargateOpen();
-			DoStargateOpen();
-
-			targetGate.Inbound = true;
-		}
-		else
-		{
-			StopDialing();
+			if ( this.IsValid() ) StopDialing();
 		}
 	}
 
-	public override void BeginInboundSlow( string address, int numChevs = 7 )
+	public async override void BeginInboundSlow( string address, int numChevs = 7 )
 	{
-		Inbound = true;
+		if ( !IsStargateReadyForInboundInstantSlow() ) return;
 
-		for ( var i = 1; i <= numChevs; i++ )
+		try
 		{
-			var chev = GetChevronBasedOnAddressLength( i, numChevs );
-			if ( chev.IsValid() )
+			if ( Dialing ) await DoStargateReset();
+
+			CurGateState = GateState.ACTIVE;
+			Inbound = true;
+
+			for ( var i = 1; i <= numChevs; i++ )
 			{
-				chev.Glowing = true;
+				var chev = GetChevronBasedOnAddressLength( i, numChevs );
+				if ( chev.IsValid() )
+				{
+					chev.TurnOn();
+					if ( i == 1 ) chev.ChevronSound( "chevron_incoming" ); // play once to avoid insta earrape
+				}
+				
 			}
 		}
-		Sound.FromEntity( "chevron_incoming", this ); // play once to avoid insta earrape
+		catch ( Exception )
+		{
+			if ( this.IsValid() ) StopDialing();
+		}
 	}
 
 	public async override void BeginDialInstant( string address )
 	{
-		if ( Busy || Inbound || Dialing || Open) return;
+		if ( !CanStargateStartDial() ) return;
 
-		Dialing = true;
-
-		if ( !IsValidAddress( address ) )
+		try
 		{
-			StopDialing();
-			return;
-		}
+			CurGateState = GateState.DIALING;
+			CurDialType = DialType.INSTANT;
 
-		var otherGate = FindByAddress( address );
-		if ( !otherGate.IsValid() || otherGate.Busy || otherGate.Open || otherGate.Inbound || otherGate.Dialing )
-		{
-			StopDialing();
-			return;
-		}
-
-		Busy = true;
-
-		OtherGate = otherGate;
-		otherGate.OtherGate = this;
-
-		OtherGate.Inbound = true;
-		OtherGate.Busy = true;
-
-		for ( var i = 1; i <= address.Length; i++ )
-		{
-			var chev = GetChevronBasedOnAddressLength( i, address.Length );
-			if ( chev.IsValid() )
+			if ( !IsValidAddress( address ) )
 			{
-				chev.Glowing = true;
+				StopDialing();
+				return;
 			}
+
+			var otherGate = FindByAddress( address );
+			if ( !otherGate.IsValid() || otherGate == this || !otherGate.IsStargateReadyForInboundInstantSlow() )
+			{
+				StopDialing();
+				return;
+			}
+
+			otherGate.BeginInboundSlow( Address );
+
+			for ( var i = 1; i <= address.Length; i++ )
+			{
+				var chev = GetChevronBasedOnAddressLength( i, address.Length );
+				if ( chev.IsValid() )
+				{
+					chev.TurnOn();
+					if ( i == 1 ) chev.ChevronSound( "chevron_incoming" ); // play once to avoid insta earrape
+				}
+			}
+
+			await Task.DelaySeconds( 0.5f );
+
+			EstablishWormholeTo( otherGate );
 		}
-		Sound.FromEntity( "chevron_incoming", this ); // play once to avoid insta earrape
-
-		otherGate.BeginInboundSlow( Address );
-
-		await GameTask.DelaySeconds( 0.5f );
-
-		DoStargateOpen();
-		OtherGate.DoStargateOpen();
-
+		catch ( Exception )
+		{
+			if ( this.IsValid() ) StopDialing();
+		}
 	}
 }
