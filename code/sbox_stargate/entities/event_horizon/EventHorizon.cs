@@ -235,15 +235,23 @@ public partial class EventHorizon : AnimEntity
 		if ( Gate.AutoClose ) Gate.AutoCloseTime = Time.Now + Stargate.AutoCloseTimerDuration;
 	}
 
+	[ClientRpc]
+	public void RemoveDeathRagdoll(Player ply)
+	{
+		ply.Corpse?.Delete();
+	}
+
 	public void DissolveEntity( Entity ent )
 	{
-		if ( ent is SandboxPlayer )
+		if ( ent is SandboxPlayer ply )
 		{
-			ent.Health = 1;
+			ply.Health = 1;
 			var dmg = new DamageInfo();
 			dmg.Attacker = Gate;
 			dmg.Damage = 100;
-			ent.TakeDamage( dmg );
+			ply.TakeDamage( dmg );
+
+			RemoveDeathRagdoll( To.Single( ply ), ply);
 		}
 		else
 		{
