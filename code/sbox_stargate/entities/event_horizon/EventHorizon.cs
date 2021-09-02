@@ -168,7 +168,7 @@ public partial class EventHorizon : AnimEntity
 	}
 
 	// CLIENT LOGIC
-	[Event( "client.tick" )]
+	[Event.Frame]
 	public void EventHorizonClientTick()
 	{
 		ClientAnimLogic();
