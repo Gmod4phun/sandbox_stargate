@@ -14,7 +14,7 @@ public partial class StargateRing : AnimEntity
 	public float TargetRingAngle { get; private set; } = 0.0f;
 	public float RingRotSpeed { get; private set; } = 0.0f;
 	private float RingRotMinSpeed = 0.5f;
-	private float RingRotMaxSpeed = 17f;
+	private float RingRotMaxSpeed = 10f;
 	public int RingRotDir { get; private set; } = 1;
 	public bool RingShouldRotate { get; private set; } = false;
 	private bool RingShouldAcc = false;
