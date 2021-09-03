@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Sandbox;
 
-[Library( "sandbox", Title = "Sandbox" )]
+[Library( "sandbox", Title = "Sandbox Stargate" )]
 partial class SandboxGame : Game
 {
 	public SandboxGame()
