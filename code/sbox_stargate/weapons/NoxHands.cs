@@ -29,13 +29,7 @@ public partial class StargateNoxHands : Weapon
 		TimeSincePrimaryAttack = 0;
 
 		var gate = Stargate.FindClosestGate( Owner.Position, MaxDistance );
-		if ( gate is not null )
-		{
-			if ( gate.IsValid() )
-			{
-				gate.OpenStargateMenu();
-			}
-		}
+		gate?.OpenStargateMenu();
 
 	}
 
