@@ -30,8 +30,8 @@ public partial class Chevron : AnimEntity
 		Light.SetParent( this, "light" );
 
 		Light.SetLightColor( Color.Parse( "#FF6A00" ).GetValueOrDefault() );
-		Light.Brightness = 0.25f;
-		Light.Range = 8f;
+		Light.Brightness = 0.6f;
+		Light.Range = 12f;
 		Light.Enabled = On;
 	}
 

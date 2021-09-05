@@ -50,7 +50,7 @@
 					{
 						_class = "RenderMeshFile"
 						name = "chevron"
-						filename = "models/gmod4phun/stargate/gate_sg1/src/chevron.smd"
+						filename = "models/gmod4phun/stargate/gate_sg1/src/chevron_edit.smd"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -220,8 +220,8 @@
 					{
 						_class = "Attachment"
 						name = "light"
-						parent_bone = ""
-						relative_origin = [ 7.5, 0.0, 136.0 ]
+						parent_bone = "chevron_follower"
+						relative_origin = [ 0.0, 8.75, 136.5 ]
 						relative_angles = [ 0.0, 0.0, 0.0 ]
 						weight = 1.0
 						ignore_rotation = false

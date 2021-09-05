@@ -88,11 +88,13 @@ public partial class EventHorizon : AnimEntity
 
 	public bool IsEntityBehindEventHorizon( Entity ent )
 	{
+		if ( !this.IsValid() || !ent.IsValid() ) return false;
 		return (ent.Position - Position).Dot( Rotation.Forward ) < 0;
 	}
 
 	public bool IsPawnBehindEventHorizon( Entity pawn )
 	{
+		if ( !this.IsValid() || !pawn.IsValid() ) return false;
 		return (pawn.EyePos - Position).Dot( Rotation.Forward ) < 0;
 	}
 
