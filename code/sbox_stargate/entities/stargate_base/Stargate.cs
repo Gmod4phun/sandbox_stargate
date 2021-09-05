@@ -23,6 +23,8 @@ public abstract partial class Stargate : Prop, IUse
 	[Net]
 	public string Group { get; set; } = "";
 	[Net]
+	public int GroupLength  { get; set; } = 2;
+	[Net]
 	public string Name { get; set; } = "";
 	[Net]
 	public bool AutoClose { get; set; } = true;
@@ -282,7 +284,7 @@ public abstract partial class Stargate : Prop, IUse
 
 	public void AutoCloseThink()
 	{
-		if ( AutoCloseTime != -1 && AutoCloseTime <= Time.Now && CanStargateClose() )
+		if ( AutoClose && AutoCloseTime != -1 && AutoCloseTime <= Time.Now && CanStargateClose() )
 		{
 			AutoCloseTime = -1;
 			DoStargateClose( true );
