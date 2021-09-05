@@ -20,8 +20,10 @@ public abstract partial class Stargate : Prop, IUse
 
 	[Net]
 	public string Address { get; set; } = "";
+	//[Net]
+	//public string Group { get => Group; set => { value = "helo"; } }
 	[Net]
-	public string Group { get; set; } = "";
+	public string Group { get { return Group; } set { if ( value.Length != GroupLength ) return; Group = value; } }
 	[Net]
 	public int GroupLength  { get; set; } = 2;
 	[Net]

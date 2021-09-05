@@ -23,6 +23,7 @@ public partial class StargateMilkyWay : Stargate
 		CreateRing();
 		CreateAllChevrons();
 
+		Group = "M@";
 		Address = GenerateRandomAddress(7);
 	}
 

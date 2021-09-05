@@ -16,6 +16,8 @@ public abstract partial class Dhd : Prop
 	public float lastPressTime = 0;
 	public float pressDelay = 0.5f;
 
+	public List<string> PressedActions = new();
+
 	public override void Spawn()
 	{
 		base.Spawn();
@@ -97,11 +99,58 @@ public abstract partial class Dhd : Prop
 		if ( button.IsValid() ) button.CurrentSequence.Name = "button_press";
 	}
 
+	public string GetPressedActions()
+	{
+		var retVal = "";
+		foreach (string action in PressedActions)
+		{
+			retVal += action;
+		}
+		return retVal;
+	}
+
 	public void TriggerAction(string action) // this gets called from the Button Trigger after pressing it
 	{
+		if ( action == "DIAL" && PressedActions.Count < 7 ) return; // cant press dial unless we have atleast 7 symbols
+
+		if ( action != "DIAL" ) // if we pressed a regular symbol
+		{
+			if ( PressedActions.Contains( "DIAL" ) ) return; // do nothing if we already have dial pressed
+
+			if ( !PressedActions.Contains(action) && PressedActions.Count == 9 ) return; // do nothing if we already have max symbols pressed
+		}
+
 		var button = GetButtonByAction( action );
 		PlayButtonPressAnim( button );
-		ToggleButton( button );
+
+		if (PressedActions.Contains(action))
+		{
+			PressedActions.Remove( action );
+			SetButtonState( button, false );
+		}
+		else
+		{
+			PressedActions.Add( action );
+			SetButtonState( button, true );
+
+			if ( action == "DIAL" )
+			{
+				var allActions = GetPressedActions();
+				var sequence = allActions.Substring( 0, allActions.Length - 4 );
+				Log.Info( $"Address for dial = {sequence}" );
+
+				var gate = Stargate.FindNearestGate( this );
+				if (gate.IsValid())
+				{
+					if (gate.CanStargateStartDial())
+					{
+						gate.BeginDialFast( sequence );
+					}
+				}
+
+			}
+		}
+
 	}
 
 	public void SetButtonState( string action, bool glowing )
