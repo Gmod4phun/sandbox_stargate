@@ -249,4 +249,26 @@ public partial class StargateRing : AnimEntity
 
 		StopRollSound();
 	}
+
+
+	public void DrawSymbols()
+	{
+		var deg = 360f / RingSymbols.Length;
+		var i = 0;
+		var ang = Rotation.Angles();
+		foreach (char sym in RingSymbols)
+		{
+			var rotAng = ang.WithRoll( ang.roll - (i * deg) );
+			var newRot = rotAng.ToRotation();
+			var pos = Position + newRot.Forward * 4 + newRot.Up * 117.5f;
+			DebugOverlay.Text( pos, sym.ToString(), Color.Yellow );
+			i++;
+		}
+	}
+
+	[Event.Frame]
+	public void RingSymbolsDebug()
+	{
+		if ( Local.Pawn.IsValid() && Local.Pawn.Position.Distance( Position ) < 800 ) DrawSymbols();
+	}
 }
