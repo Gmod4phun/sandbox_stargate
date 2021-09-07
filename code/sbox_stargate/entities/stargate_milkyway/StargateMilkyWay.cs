@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
-[Library( "ent_stargate_sg1", Title = "Stargate SG-1", Spawnable = true, Group = "Stargate" )]
+[Library( "ent_stargate_milkyway", Title = "Stargate (Milky Way)", Spawnable = true, Group = "Stargate" )]
 public partial class StargateMilkyWay : Stargate
 {
 
