@@ -195,13 +195,13 @@ public partial class Rings : AnimEntity, IUse
 		particle.Destroy();
 		particle2.Destroy();
 
-		RefractRings();
-		DestinationRings.RefractRings();
+		RetractRings();
+		DestinationRings.RetractRings();
 
 		EndPos = Vector3.Zero;
 	}
 
-	public async virtual void RefractRings() {
+	public async virtual void RetractRings() {
 
 		PlaySound("ring_transporter3");
 
