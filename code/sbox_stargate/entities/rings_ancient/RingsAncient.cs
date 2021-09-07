@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Sandbox;
 
-[Library( "ent_rings_ancient", Title = "Ancient Rings", Spawnable = true, Group = "Stargate" )]
+[Library( "ent_rings_ancient", Title = "Rings (Ancient)", Spawnable = true, Group = "Stargate" )]
 public partial class RingsAncient : Rings {
 	public override void Spawn()
 	{

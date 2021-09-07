@@ -172,9 +172,9 @@ public partial class Rings : AnimEntity, IUse
 			}
 		}
 
-		var particle = Particles.Create("particles/rings_transporter.vpcf", Transform.PointToWorld(EndPos));
+		var particle = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", Transform.PointToWorld(EndPos));
 
-		var	particle2 = Particles.Create("particles/rings_transporter.vpcf", DestinationRings.Transform.PointToWorld(DestinationRings.EndPos));
+		var	particle2 = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", DestinationRings.Transform.PointToWorld(DestinationRings.EndPos));
 
 		foreach (Entity e in toDest) {
 			var localPos = ChildRings[0].Transform.PointToLocal( e.Position );

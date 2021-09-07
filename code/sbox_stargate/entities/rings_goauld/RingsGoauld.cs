@@ -1,7 +1,7 @@
 using System.Linq;
 using Sandbox;
 
-[Library( "ent_rings_goauld", Title = "Rings Goaulds", Spawnable = true, Group = "Stargate" )]
+[Library( "ent_rings_goauld", Title = "Rings (Goa'uld)", Spawnable = true, Group = "Stargate" )]
 public partial class RingsGoauld : Rings {
 	public override void Spawn()
 	{
