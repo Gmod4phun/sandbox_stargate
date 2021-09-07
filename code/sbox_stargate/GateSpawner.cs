@@ -87,6 +87,8 @@ public partial class GateSpawner {
 
 				gate.Address = ent[4];
 				gate.Name = ent[5];
+
+				gate.PhysicsEnabled = false;
 				
 				break;
 
@@ -108,6 +110,8 @@ public partial class GateSpawner {
 				var sRotD = rotD.Split(',');
 
 				dhd.Rotation = new Angles(float.Parse(sRotD[0]), float.Parse(sRotD[1]), float.Parse(sRotD[2])).ToRotation();
+
+				dhd.PhysicsEnabled = false;
 
 				break;
 			}
