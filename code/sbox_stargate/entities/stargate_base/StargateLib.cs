@@ -9,7 +9,8 @@ public partial class Stargate : Prop, IUse
 		SLOW,
 		FAST,
 		INSTANT,
-		NOX
+		NOX,
+		DHD
 	}
 
 	public enum GateState
@@ -22,8 +23,8 @@ public partial class Stargate : Prop, IUse
 		CLOSING
 	}
 
-	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#?@*";
-	public const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@*";
+	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@"; // we wont use * and ? for now, since they arent on the DHD
+	public const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@";
 
 	public readonly int[] ChevronAngles = { 40, 80, 120, 240, 280, 320, 0, 160, 200 };
 
@@ -32,7 +33,7 @@ public partial class Stargate : Prop, IUse
 	/// <summary>
 	/// Generates a random address.
 	/// </summary>
-	/// <param name="length">how much the symbol address should be generated.</param>
+	/// <param name="length">how many symbols should the address have.</param>
 	/// <returns>Gate Adress.</returns>
 	public static string GenerateRandomAddress( int length = 7 )
 	{
@@ -53,7 +54,7 @@ public partial class Stargate : Prop, IUse
 	}
 
 	/// <summary>
-	/// verify that the address is valid.
+	/// Checks if the format of the input string is that of a valid Stargate address.
 	/// </summary>
 	/// <param name="address">The gate address represented in the string.</param>
 	/// <returns>True or False</returns>
@@ -88,11 +89,9 @@ public partial class Stargate : Prop, IUse
 	/// <returns>A gate that matches the parameter.</returns>
 	public static Stargate FindRandomGate()
 	{
-		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
-		{
-			return gate;
-		}
-		return null;
+		var allGates = All.OfType<Stargate>().ToList();
+
+		return allGates.Count is 0 ? null : (new Random().FromList( allGates ));
 	}
 
 	/// <summary>
@@ -102,14 +101,10 @@ public partial class Stargate : Prop, IUse
 	/// <returns>A gate that matches the parameter.</returns>
 	public static Stargate FindRandomGate( Stargate ent )
 	{
-		foreach ( Stargate gate in Entity.All.OfType<Stargate>().ToList() )
-		{
-			if (gate.IsValid() && ent != gate && !gate.Busy && !ent.Busy )
-			{
-				return gate;
-			}
-		}
-		return null;
+		var allGates = All.OfType<Stargate>().ToList();
+		allGates.Remove( ent ); // it will always be in the list, since it is a stargate
+
+		return allGates.Count is 0 ? null : (new Random().FromList( allGates ));
 	}
 
 	/// <summary>
@@ -119,18 +114,13 @@ public partial class Stargate : Prop, IUse
 	/// <returns>A gate that matches the parameter.</returns>
 	public static Stargate FindNearestGate( Entity ent )
 	{
-		var allGates = Entity.All.OfType<Stargate>().ToList();
+		var allGates = All.OfType<Stargate>().ToList();
 		if ( allGates.Count() is 0 ) return null;
-		var distanceAllGates = new int[allGates.Count()];
 
-		for ( int i = 0; i < allGates.Count(); i++ )
-		{
-			distanceAllGates[i] = (int)Vector3.DistanceBetween( ent.Position, allGates[i].Position );
-		}
+		var distances = new float[allGates.Count()];
+		for ( int i = 0; i < allGates.Count(); i++ ) distances[i] = ent.Position.Distance( allGates[i].Position );
 
-		int minDistance = distanceAllGates.Min();
-		int indexInArray = distanceAllGates.ToList().IndexOf( minDistance );
-		return allGates[indexInArray];
+		return allGates[distances.ToList().IndexOf( distances.Min() )];
 	}
 
 	/// <summary>
@@ -142,16 +132,11 @@ public partial class Stargate : Prop, IUse
 	{
 		var allGates = Entity.All.OfType<Stargate>().ToList();
 		if ( allGates.Count() is 0 ) return null;
-		var distanceAllGates = new int[allGates.Count()];
 
-		for ( int i = 0; i < allGates.Count(); i++ )
-		{
-			distanceAllGates[i] = (int)Vector3.DistanceBetween( ent.Position, allGates[i].Position );
-		}
+		var distanceAllGates = new float[allGates.Count()];
+		for ( int i = 0; i < allGates.Count(); i++ ) distanceAllGates[i] = ent.Position.Distance( allGates[i].Position );
 
-		int minDistance = distanceAllGates.Max();
-		int indexInArray = distanceAllGates.ToList().IndexOf( minDistance );
-		return allGates[indexInArray];
+		return allGates[distanceAllGates.ToList().IndexOf( distanceAllGates.Max() )];
 	}
 
 	/// <summary>
@@ -168,7 +153,7 @@ public partial class Stargate : Prop, IUse
 			iris.Scale = gate.Scale;
 			iris.SetParent( gate );
 			iris.Gate = gate;
-			//iris.Owner = owner; -- why the fuck does this break iris anims
+			//iris.Owner = owner; -- why the fuck does this break iris anims // its a sbox issue, ofcourse
 			gate.Iris = iris;
 		}
 		return gate.Iris;

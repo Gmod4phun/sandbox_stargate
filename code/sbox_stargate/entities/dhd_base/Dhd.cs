@@ -21,6 +21,16 @@ public abstract partial class Dhd : Prop
 	public override void Spawn()
 	{
 		base.Spawn();
+
+		PostSpawn();
+	}
+
+	public virtual async void PostSpawn()
+	{
+		await GameTask.NextPhysicsFrame();
+		if ( !this.IsValid() ) return;
+
+		Gate = Stargate.FindNearestGate( this );
 	}
 
 	public void CreateSingleButtonTrigger(string model, string action) // invisible triggers used for handling the user interaction
@@ -99,60 +109,6 @@ public abstract partial class Dhd : Prop
 		if ( button.IsValid() ) button.CurrentSequence.Name = "button_press";
 	}
 
-	public string GetPressedActions()
-	{
-		var retVal = "";
-		foreach (string action in PressedActions)
-		{
-			retVal += action;
-		}
-		return retVal;
-	}
-
-	public void TriggerAction(string action) // this gets called from the Button Trigger after pressing it
-	{
-		if ( action == "DIAL" && PressedActions.Count < 7 ) return; // cant press dial unless we have atleast 7 symbols
-
-		if ( action != "DIAL" ) // if we pressed a regular symbol
-		{
-			if ( PressedActions.Contains( "DIAL" ) ) return; // do nothing if we already have dial pressed
-
-			if ( !PressedActions.Contains(action) && PressedActions.Count == 9 ) return; // do nothing if we already have max symbols pressed
-		}
-
-		var button = GetButtonByAction( action );
-		PlayButtonPressAnim( button );
-
-		if (PressedActions.Contains(action))
-		{
-			PressedActions.Remove( action );
-			SetButtonState( button, false );
-		}
-		else
-		{
-			PressedActions.Add( action );
-			SetButtonState( button, true );
-
-			if ( action == "DIAL" )
-			{
-				var allActions = GetPressedActions();
-				var sequence = allActions.Substring( 0, allActions.Length - 4 );
-				Log.Info( $"Address for dial = {sequence}" );
-
-				var gate = Stargate.FindNearestGate( this );
-				if (gate.IsValid())
-				{
-					if (gate.CanStargateStartDial())
-					{
-						gate.BeginDialFast( sequence );
-					}
-				}
-
-			}
-		}
-
-	}
-
 	public void SetButtonState( string action, bool glowing )
 	{
 		var b = GetButtonByAction( action );
@@ -182,6 +138,176 @@ public abstract partial class Dhd : Prop
 	public void DisableAllButtons()
 	{
 		foreach ( DhdButton b in Buttons.Values ) SetButtonState( b, false );
+	}
+
+	// TOUCH
+
+	public override void StartTouch( Entity other )
+	{
+		base.StartTouch( other );
+
+		if (other is Stargate gate)
+		{
+			Gate = gate;
+			PlaySound( "balloon_pop_cute" );
+		}
+	}
+
+	// BUTTON PRESS LOGIC
+	public string GetPressedActions()
+	{
+		var retVal = "";
+		foreach ( string action in PressedActions )
+		{
+			retVal += action;
+		}
+		return retVal;
+	}
+
+	public void EnableButtonsForDialingAddress()
+	{
+		if ( !Gate.IsValid() )
+		{
+			DisableAllButtons(); return;
+		}
+
+		DisableAllButtons();
+		foreach (char sym in Gate.DialingAddress) SetButtonState( sym.ToString() , true);
+
+		if ( Gate.Open || Gate.Opening || Gate.Closing )
+		{
+			var dial = GetButtonByAction( "DIAL" );
+			if ( dial.IsValid() ) SetButtonState( dial, true );
+		}
+	}
+
+	public void TriggerAction( string action ) // this gets called from the Button Trigger after pressing it
+	{
+		if ( !Gate.IsValid() || Gate.Busy || Gate.Inbound ) return; // if we have no gate to control or we are busy, we cant do anything
+
+		if ( Gate.Dialing && Gate.CurDialType is not Stargate.DialType.DHD ) return; // if we are dialing, but not by DHD, cant do anything
+
+		if ( action is not "DIAL" ) // if we pressed a regular symbol
+		{
+			if ( PressedActions.Contains( "DIAL" ) ) return; // do nothing if we already have dial pressed
+			if ( !PressedActions.Contains( action ) && PressedActions.Count is 9 ) return; // do nothing if we already have max symbols pressed
+			if ( !PressedActions.Contains( action ) && action is "#" )
+			{
+				if ( PressedActions.Count < 6 ) return;
+			}
+			if ( Gate.Opening || Gate.Open || Gate.Closing ) return;
+		}
+
+		var button = GetButtonByAction( action );
+
+		if ( action is "DIAL" ) // we presed dial button
+		{
+			if ( Gate.Idle ) // if gate is idle, open dial menu
+			{
+				//Gate.OpenStargateMenu(); // TODO - make the menu stay open
+				return;
+			}
+
+			if (Gate.Open) // if gate is open, close the gate
+			{
+				if (Gate.CanStargateClose())
+				{
+					Gate.DoStargateClose( true );
+					PressedActions.Clear();
+				}
+				return;
+			}
+
+			if (PressedActions.Count < 7) // if we pressed less than 7 symbols, we should cancel dial
+			{
+				if (Gate.Dialing && Gate.CurDialType is Stargate.DialType.DHD)
+				{
+					PlayButtonPressAnim( button );
+
+					Gate.StopDialing();
+					PressedActions.Clear();
+				}
+
+				return;
+			}
+			else // try dial
+			{
+				var sequence = GetPressedActions();
+				Log.Info( $"Address for dial = {sequence}" );
+
+				PlayButtonPressAnim( button );
+
+				var target = Stargate.FindByAddress( sequence );
+				if ( target.IsValid() && target != Gate && target.IsStargateReadyForInboundDHDEnd() && Gate.CanStargateOpen() )
+				{
+					PlaySound( "dhd_dial" );
+
+					Gate.CurGateState = Stargate.GateState.IDLE; // temporarily make it idle so it can 'begin' dialing
+					Gate.BeginOpenByDHD(sequence);
+				}
+				else
+				{
+					Gate.StopDialing();
+					PressedActions.Clear();
+					return;
+				}
+			}
+
+		}
+		else // we pressed a symbol
+		{
+			var symbol = action[0];
+
+			if ( symbol != '#' && PressedActions.Contains( "#" ) ) return; // if # is pressed, and we try to depress other symbol, do nothing
+
+			if ( PressedActions.Contains( action ) ) // if symbol was pressed before already, deactivate it
+			{
+				Gate.DoChevronUnlock( symbol );
+
+				if ( PressedActions.Count == 1 ) // if we are deactivating last symbol, stop dialing and go back to idle
+				{
+					Gate.ResetGateVariablesToIdle();
+				}
+
+				PressedActions.Remove( action );
+				PlayButtonPressAnim( button );
+			}
+			else // otherwise activate it
+			{
+				if ( !Gate.Dialing ) // if gate wasnt dialing, begin dialing
+				{
+					Gate.CurGateState = Stargate.GateState.DIALING;
+					Gate.CurDialType = Stargate.DialType.DHD;
+				}
+
+				if ( PressedActions.Count == 8 || symbol is '#' ) // lock if we are putting Point of Origin or 9th symbol, otherwise encode
+				{
+					Gate.DoChevronLock( symbol );
+				}
+				else
+				{
+					Gate.DoChevronEncode( symbol );
+				}
+					
+
+				PressedActions.Add( action );
+				PlayButtonPressAnim( button );
+				PlaySound("dhd_sg1_press");
+			}
+		}
+
+
+	}
+
+	[Event.Tick.Server]
+	public void ButtonThink()
+	{
+		EnableButtonsForDialingAddress();
+
+		if ( ((!Gate.IsValid()) || (Gate.IsValid() && Gate.Idle)) && PressedActions.Count != 0 )
+		{
+			PressedActions.Clear();
+		} 
 	}
 
 }

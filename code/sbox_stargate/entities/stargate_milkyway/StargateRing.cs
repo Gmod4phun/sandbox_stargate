@@ -20,7 +20,7 @@ public partial class StargateRing : AnimEntity
 	private bool RingShouldAcc = false;
 	private bool RingShouldDecc = false;
 	public bool RingFreeSpin { get; private set; } = false;
-	public String RingSymbols { get; private set; } = "?0JKNTR3MBZX*H69IGPL#@QFS1E4AU85OCW72YVD";
+	public string RingSymbols { get; private set; } = "?0JKNTR3MBZX*H69IGPL#@QFS1E4AU85OCW72YVD";
 
 	private Sound RollSound;
 
@@ -269,6 +269,6 @@ public partial class StargateRing : AnimEntity
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
-		if ( Local.Pawn.IsValid() && Local.Pawn.Position.Distance( Position ) < 800 ) DrawSymbols();
+		//if ( Local.Pawn.IsValid() && Local.Pawn.Position.Distance( Position ) < 800 ) DrawSymbols();
 	}
 }

@@ -20,8 +20,6 @@ public abstract partial class Stargate : Prop, IUse
 
 	[Net]
 	public string Address { get; set; } = "";
-	//[Net]
-	//public string Group { get => Group; set => { value = "helo"; } }
 	[Net]
 	public string Group { get { return Group; } set { if ( value.Length != GroupLength ) return; Group = value; } }
 	[Net]
@@ -47,8 +45,10 @@ public abstract partial class Stargate : Prop, IUse
 	public bool Open { get => CurGateState is GateState.OPEN; }
 	public bool Closing { get => CurGateState is GateState.CLOSING; }
 
+	public string DialingAddress { get; set; } = "";
+
 	// VARIABLE RESET
-	public void ResetGateVariablesToIdle()
+	public virtual void ResetGateVariablesToIdle()
 	{
 		ShouldStopDialing = false;
 		OtherGate = null;
@@ -56,6 +56,7 @@ public abstract partial class Stargate : Prop, IUse
 		Busy = false;
 		CurGateState = GateState.IDLE;
 		CurDialType = DialType.FAST;
+		DialingAddress = "";
 	}
 
 	// USABILITY
@@ -200,7 +201,7 @@ public abstract partial class Stargate : Prop, IUse
 		}
 		else
 		{
-			return (!Busy && !Open && !Inbound && CurDialType == DialType.SLOW);
+			return ( !Busy && !Open && !Inbound && (CurDialType is DialType.SLOW || CurDialType is DialType.DHD) );
 		}
 	}
 
@@ -214,12 +215,42 @@ public abstract partial class Stargate : Prop, IUse
 		return ( !Busy && !Open && !Inbound );
 	}
 
+	public bool IsStargateReadyForInboundDHD() // checks if the gate is ready to be locked onto by dhd dial
+	{
+		if ( !Dialing )
+		{
+			return (!Busy && !Open && !Inbound);
+		}
+		else
+		{
+			return (!Busy && !Open && !Inbound && CurDialType == DialType.SLOW);
+		}
+	}
+
+	public bool IsStargateReadyForInboundDHDEnd() // checks if the gate is ready to be opened while locked onto by a gate using dhd dial
+	{
+		if ( !Dialing )
+		{
+			return (!Busy && !Open && Inbound);
+		}
+		else
+		{
+			return (!Busy && !Open && Inbound && CurDialType == DialType.SLOW);
+		}
+	}
+
 	public virtual void BeginDialFast(string address) { }
 	public virtual void BeginDialSlow(string address) { }
 	public virtual void BeginDialInstant( string address ) { } // instant gate open, with kawoosh
 	public virtual void BeginDialNox( string address ) { } // instant gate open without kawoosh - asgard/ancient/nox style 
+
 	public virtual void BeginInboundFast( string address, int numChevs = 7 ) { }
 	public virtual void BeginInboundSlow( string address, int numChevs = 7 ) { } // this can be used with Instant dial, too
+
+
+	// DHD DIAL
+	public virtual void BeginOpenByDHD( string address ) { } // when dhd dial button is pressed
+	public virtual void BeginInboundDHD( string address, int numChevs = 7 ) { } // when a dhd dialing gate locks onto another gate
 
 	public async void StopDialing()
 	{
@@ -283,6 +314,32 @@ public abstract partial class Stargate : Prop, IUse
 		target.DoStargateOpen();
 		DoStargateOpen();
 	}
+
+	// CHEVRON
+
+	public virtual void DoChevronEncode(char sym)
+	{
+		DialingAddress += sym;
+		Log.Info( $"Encoded {sym}, DialingAddress = '{DialingAddress}'" );
+	}
+
+	public virtual void DoChevronLock(char sym)
+	{
+		DialingAddress += sym;
+		Log.Info( $"Locked {sym}, DialingAddress = '{DialingAddress}'" );
+	}
+
+	public virtual void DoChevronUnlock(char sym)
+	{
+		var sb = new StringBuilder(DialingAddress);
+		sb.Remove( DialingAddress.IndexOf( sym ), 1 );
+
+		DialingAddress = sb.ToString();
+
+		Log.Info( $"Unlocked {sym}, DialingAddress = '{DialingAddress}'" );
+	}
+
+	// THINK
 
 	public void AutoCloseThink()
 	{

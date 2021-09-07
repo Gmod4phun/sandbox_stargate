@@ -9,6 +9,8 @@ using Sandbox;
 public partial class StargateMilkyWay : Stargate
 {
 
+	public List<Chevron> EncodedChevronsOrdered = new ();
+
 	// SPAWN
 
 	public override void Spawn()
@@ -25,6 +27,13 @@ public partial class StargateMilkyWay : Stargate
 
 		Group = "M@";
 		Address = GenerateRandomAddress(7);
+	}
+
+	public override void ResetGateVariablesToIdle()
+	{
+		base.ResetGateVariablesToIdle();
+
+		EncodedChevronsOrdered.Clear();
 	}
 
 	// RING
@@ -84,6 +93,11 @@ public partial class StargateMilkyWay : Stargate
 			else if ( num == 9 ) return GetChevron( 7 );
 		}
 		return GetChevron( num );
+	}
+
+	public Chevron GetTopChevron()
+	{
+		return GetChevron( 7 );
 	}
 
 	// DIALING
@@ -449,4 +463,115 @@ public partial class StargateMilkyWay : Stargate
 			if ( this.IsValid() ) StopDialing();
 		}
 	}
+
+	// DHD DIAL
+
+	public async override void BeginOpenByDHD( string address )
+	{
+		if ( !CanStargateStartDial() ) return;
+
+		try
+		{
+			CurGateState = GateState.DIALING;
+			CurDialType = DialType.DHD;
+
+			if ( !IsValidAddress( address ) )
+			{
+				StopDialing();
+				return;
+			}
+
+			var otherGate = FindByAddress( address );
+
+			await Task.DelaySeconds( 0.5f );
+			
+			if ( !otherGate.IsValid() || otherGate == this || !otherGate.IsStargateReadyForInboundDHDEnd() )
+			{
+				StopDialing();
+				return;
+			}
+
+			EstablishWormholeTo( otherGate );
+		}
+		catch ( Exception )
+		{
+			if ( this.IsValid() ) StopDialing();
+		}
+	}
+
+	public async override void BeginInboundDHD( string address, int numChevs = 7 )
+	{
+		if ( !IsStargateReadyForInboundDHD() ) return;
+
+		try
+		{
+			if ( Dialing ) await DoStargateReset();
+
+			CurGateState = GateState.ACTIVE;
+			Inbound = true;
+
+			for ( var i = 1; i <= numChevs; i++ )
+			{
+				var chev = GetChevronBasedOnAddressLength( i, numChevs );
+				if ( chev.IsValid() )
+				{
+					chev.TurnOn();
+					if ( i == 1 ) chev.ChevronSound( "chevron_incoming" ); // play once to avoid insta earrape
+				}
+
+			}
+		}
+		catch ( Exception )
+		{
+			if ( this.IsValid() ) StopDialing();
+		}
+	}
+
+	// CHEVRON STUFF - DHD DIALING
+	public override void DoChevronEncode(char sym)
+	{
+		base.DoChevronEncode( sym );
+
+		//var clampLen = DialingAddress.Length.Clamp( 7, 9 );
+
+		var chev = GetChevronBasedOnAddressLength(DialingAddress.Length, 9 );
+		EncodedChevronsOrdered.Add( chev );
+
+		chev?.TurnOn(0.1f);
+		chev?.ChevronSound( "chevron_sg1_usual", 0.15f );
+	}
+
+	public override void DoChevronLock( char sym ) // only the top chevron locks, always
+	{
+		base.DoChevronLock( sym );
+
+		var chev = GetTopChevron();
+		EncodedChevronsOrdered.Add( chev );
+
+		var gate = FindByAddress( DialingAddress );
+		if (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD())
+		{
+			chev?.TurnOn(0.1f);
+			
+			gate.BeginInboundDHD(Address, DialingAddress.Length);
+			OtherGate = gate;
+		}
+
+		chev?.ChevronSound( "chevron_lock", 0.15f );
+		chev.ChevronLockUnlockLong();
+	}
+
+	public override void DoChevronUnlock( char sym )
+	{
+		base.DoChevronUnlock( sym );
+
+		var chev = EncodedChevronsOrdered.Last();
+		EncodedChevronsOrdered.Remove( chev );
+
+		chev?.TurnOff();
+
+		OtherGate?.StopDialing();
+		OtherGate = null;
+	}
+
 }
