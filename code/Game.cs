@@ -4,12 +4,16 @@ using Sandbox;
 [Library( "sandbox", Title = "Sandbox Stargate" )]
 partial class SandboxGame : Game
 {
+
+	public GateSpawner gateSpawner;
 	public SandboxGame()
 	{
 		if ( IsServer )
 		{
 			// Create the HUD
 			_ = new SandboxHud();
+			gateSpawner = new GateSpawner();
+			gateSpawner.LoadGateSpawner();
 		}
 	}
 
