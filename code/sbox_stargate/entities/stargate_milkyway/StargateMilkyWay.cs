@@ -40,7 +40,7 @@ public partial class StargateMilkyWay : Stargate
 
 	public void CreateRing()
 	{
-		Ring = new StargateRing();
+		Ring = new ();
 		Ring.Position = Position;
 		Ring.Rotation = Rotation;
 		Ring.SetParent( this );

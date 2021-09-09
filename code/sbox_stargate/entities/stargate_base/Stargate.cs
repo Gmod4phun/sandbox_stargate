@@ -65,7 +65,7 @@ public abstract partial class Stargate : Prop, IUse
 		return true; // we should be always usable
 	}
 
-	public bool OnUse( Entity user )
+	public virtual bool OnUse( Entity user )
 	{
 		OpenStargateMenu(To.Single( user ));
 		return false; // aka SIMPLE_USE, not continuously
