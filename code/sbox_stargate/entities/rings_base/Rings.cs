@@ -45,17 +45,23 @@ public partial class Rings : AnimEntity, IUse
 
 	public virtual bool OnUse( Entity user )
 	{
-		if (Busy) return false;
+		DialClosest();
+		return false;
+	}
+
+	public void DialClosest() {
+		if (Busy) return;
+
+		Busy = true;
 
 		var other = Entity.All.OfType<Rings>().Where(x => x != this && !x.Busy).FirstOrDefault();
 		if (other.IsValid()) {
+			other.Busy = true;
 			DestinationRings = other;
 			other.DestinationRings = this;
 			other.DeployRings();
 		}
 		DeployRings(true);
-
-		return false;
 	}
 
 	public virtual void OnRingReturn() {
@@ -91,7 +97,6 @@ public partial class Rings : AnimEntity, IUse
 		var isUpDown = IsUpsideDown;
 
 		var tr = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
-			.WorldOnly()
 			.Run();
 
 		var hitGround = false;
@@ -161,7 +166,7 @@ public partial class Rings : AnimEntity, IUse
 		if (DestinationRings.IsValid()) {
 
 			var testPos2 = DestinationRings.Transform.PointToWorld( DestinationRings.EndPos );
-			var fromTp = Entity.All.Where(x => x.Position.Distance(testPos2) <= 80);
+			var fromTp = Entity.All.Where(x => x.Position.Distance(testPos2) <= 80 && !x.Parent.IsValid());
 
 			foreach (Entity p in fromTp) {
 
@@ -172,23 +177,46 @@ public partial class Rings : AnimEntity, IUse
 			}
 		}
 
-		var particle = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", Transform.PointToWorld(EndPos));
+		var particlePos = IsUpsideDown ? Transform.PointToWorld(ChildRings[^1].LocalPosition) : Transform.PointToWorld(EndPos) - Rotation.Down * 50;
+		var particleVelocity = IsUpsideDown ? Rotation.Down * -110 : Rotation.Down * 110;
 
-		var	particle2 = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", DestinationRings.Transform.PointToWorld(DestinationRings.EndPos));
+		var particle = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", particlePos);//Transform.PointToWorld(EndPos) - Rotation.Down * 50);
+		particle.SetPosition(1, particleVelocity);
+		var a = Rotation.Angles();
+		particle.SetPosition(2, new Vector3(a.roll, a.pitch, a.yaw));
+		particle.SetPosition(3, new Vector3(Scale, 0, 0));
 
+		particlePos = DestinationRings.IsUpsideDown ? DestinationRings.Transform.PointToWorld(DestinationRings.ChildRings[^1].LocalPosition) : DestinationRings.Transform.PointToWorld(DestinationRings.EndPos) - DestinationRings.Rotation.Down * 50;
+		particleVelocity = DestinationRings.IsUpsideDown ? DestinationRings.Rotation.Down * -110 : DestinationRings.Rotation.Down * 110;
+		a = DestinationRings.Rotation.Angles();
+
+		var	particle2 = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", particlePos);
+		particle2.SetPosition(1, particleVelocity);
+		particle2.SetPosition(2, new Vector3(a.roll, a.pitch, a.yaw));
+		particle2.SetPosition(3, new Vector3(DestinationRings.Scale, 0, 0));
+
+
+		var worldEndPos = Transform.PointToWorld(EndPos);
+		var tempBody = new PhysicsBody();
+		tempBody.Position = worldEndPos;
+		var tempBody2 = new PhysicsBody();
+		tempBody2.Position = DestinationRings.Transform.PointToWorld(DestinationRings.EndPos);
 		foreach (Entity e in toDest) {
-			var localPos = ChildRings[0].Transform.PointToLocal( e.Position );
-			var newPos = DestinationRings.ChildRings[0].Transform.PointToWorld( localPos );
+			var localPos = tempBody.Transform.PointToLocal( e.Position );
+			var newPos = tempBody2.Transform.PointToWorld( localPos );
 
 			e.Position = newPos;
 		}
 
 		foreach (Entity e in fromDest) {
-			var localPos = DestinationRings.ChildRings[0].Transform.PointToLocal( e.Position );
-			var newPos = ChildRings[0].Transform.PointToWorld( localPos );
+			var localPos = tempBody2.Transform.PointToLocal( e.Position );
+			var newPos = tempBody.Transform.PointToWorld( localPos );
 
 			e.Position = newPos;
 		}
+
+		tempBody.Remove();
+		tempBody2.Remove();
 
 		await Task.Delay(500);
 
@@ -223,5 +251,37 @@ public partial class Rings : AnimEntity, IUse
 
 		ChildRings.Clear();
 	}
+
+	// [Event.Frame]
+	// public void OnFrame() {
+	// 	if (!IsUpsideDown)
+	// 		return;
+
+	// 	var mins = GetModel().Bounds.Mins;
+	// 	mins.x = 60;
+	// 	mins.y = 60;
+	// 	var b = new BBox(mins, GetModel().Bounds.Maxs);
+
+	// 	var tr = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
+	// 		.Radius(60f)
+	// 		.Run();
+	// 	var tr2 = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
+	// 		.Size(GetModel().Bounds)
+	// 		.Run();
+	// 	DebugOverlay.TraceResult(tr);
+	// 	DebugOverlay.TraceResult(tr2);
+	// 	DebugOverlay.Line((Position + Rotation.Left * b.Maxs) + Rotation.Up, (Position + Rotation.Left * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+	// 	DebugOverlay.Line((Position + Rotation.Right * b.Maxs) + Rotation.Up, (Position + Rotation.Right * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+	// 	DebugOverlay.Line((Position + Rotation.Forward * b.Maxs) + Rotation.Up, (Position + Rotation.Forward * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+	// 	DebugOverlay.Line((Position + Rotation.Backward * b.Maxs) + Rotation.Up, (Position + Rotation.Backward * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+
+	// 	DebugOverlay.Line((Position + Rotation.Left * b.Mins) + Rotation.Up, (Position + Rotation.Left * b.Mins) + Rotation.Up * 1024, Color.Blue);
+	// 	DebugOverlay.Line((Position + Rotation.Right * b.Mins) + Rotation.Up, (Position + Rotation.Right * b.Mins) + Rotation.Up * 1024, Color.Blue);
+	// 	DebugOverlay.Line((Position + Rotation.Forward * b.Mins) + Rotation.Up, (Position + Rotation.Forward * b.Mins) + Rotation.Up * 1024, Color.Blue);
+	// 	DebugOverlay.Line((Position + Rotation.Backward * b.Mins) + Rotation.Up, (Position + Rotation.Backward * b.Mins) + Rotation.Up * 1024, Color.Blue);
+
+	// 	DebugOverlay.Circle(tr.EndPos, Angles.Zero.WithPitch(90).ToRotation(), 60, Color.Yellow);
+	// 	DebugOverlay.Circle(tr.EndPos - Vector3.OneZ, Angles.Zero.WithPitch(90).ToRotation(), 80, Color.Red);
+	// }
 
 }
