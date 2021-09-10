@@ -8,9 +8,6 @@ public partial class StargateRingsController : Weapon
 	//public override string ViewModelPath => "hand model";
 	public override float PrimaryRate => 15.0f;
 	public override float SecondaryRate => 1.0f;
-	/// <summary>
-	/// in the future when all settings are globalized, there is this value so that the gate opening distance can be adjusted.
-	/// </summary>
 	public override void Spawn()
 	{
 		base.Spawn();
@@ -26,10 +23,8 @@ public partial class StargateRingsController : Weapon
 	{
 		TimeSincePrimaryAttack = 0;
 
-		if (IsServer) {
-			var ring = Entity.All.OfType<Rings>().FirstOrDefault();
+		var ring = Entity.All.OfType<Rings>().FirstOrDefault();
 
-			ring.DialClosest();
-		}
+		ring.DialClosest();
 	}
 }

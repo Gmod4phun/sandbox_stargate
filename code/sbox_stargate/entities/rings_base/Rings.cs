@@ -49,7 +49,9 @@ public partial class Rings : AnimEntity, IUse
 		return false;
 	}
 
+	[ServerCmd]
 	public void DialClosest() {
+		if (IsClient) return;
 		if (Busy) return;
 
 		Busy = true;
