@@ -101,6 +101,18 @@ public partial class EventHorizon : AnimEntity
 	// CLIENT ANIM CONTROL
 
 	[ClientRpc]
+	public async void TeleportScreenOverlay()
+	{
+		var hud = Local.Hud;
+
+		var panel = hud.AddChild<EventHorizonScreenPanel>();
+
+		await Task.DelaySeconds( 5f );
+
+		panel?.Delete( true );
+	}
+
+	[ClientRpc]
 	public void EstablishClientAnim()
 	{
 		curFrame = minFrame;
@@ -212,6 +224,9 @@ public partial class EventHorizon : AnimEntity
 
 		if (ent is SandboxPlayer ply)
 		{
+
+			TeleportScreenOverlay( To.Single( ply ) );
+
 			var oldController = ply.DevController;
 			using ( Prediction.Off() ) ply.DevController = new EventHorizonController();
 

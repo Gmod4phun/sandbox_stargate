@@ -15,9 +15,9 @@ public partial class StargateRingTest : PlatformEntity, IUse
 	public float TargetRingAngle { get; private set; } = 0.0f;
 	public float RingRotSpeed { get; private set; } = 0.0f;
 	private float RingRotMinSpeed = 0f;
-	private float RingRotMaxSpeed = 50f;
+	private float RingRotMaxSpeed = 80f;
 	private float RingAcceleration = 15f;
-	private float RingFriction = 0.25f;
+	private float RingFriction = 0.5f;
 	public int RingRotDir { get; private set; } = 1;
 	public bool RingShouldRotate { get; private set; } = false;
 	private bool RingShouldAcc = false;
@@ -36,8 +36,6 @@ public partial class StargateRingTest : PlatformEntity, IUse
 		Transmit = TransmitType.Always;
 
 		SetModel( "models/gmod4phun/stargate/gate_sg1/ring_sg1.vmdl" );
-		//PhysicsBody.BodyType = PhysicsBodyType.Static;
-		EnableAllCollisions = false;
 
 		SpawnSettings = Flags.LoopMovement;
 		MoveDirType = PlatformMoveType.RotatingContinious;
@@ -50,6 +48,10 @@ public partial class StargateRingTest : PlatformEntity, IUse
 		StopMoveSound = "gate_sg1_ring_stop";
 
 		base.Spawn();
+
+		PhysicsBody.BodyType = PhysicsBodyType.Static;
+		EnableAllCollisions = false;
+		EnableTraceAndQueries = true;
 	}
 
 	protected override void OnDestroy()
@@ -125,7 +127,7 @@ public partial class StargateRingTest : PlatformEntity, IUse
 
 			if ( RingRotSpeed < RingRotMaxSpeed)
 			{
-				RingRotSpeed += 0.2f * RingAcceleration * RingFriction;
+				RingRotSpeed += 0.1f * RingAcceleration * RingFriction;
 			}
 			else
 			{
@@ -137,13 +139,14 @@ public partial class StargateRingTest : PlatformEntity, IUse
 		{
 			if ( RingRotSpeed > RingRotMinSpeed )
 			{
-				RingRotSpeed -= 0.2f * RingAcceleration * RingFriction;
+				RingRotSpeed -= 0.1f * RingAcceleration * RingFriction;
 			}
 			else
 			{
 				RingRotSpeed = RingRotMinSpeed;
 				RingShouldDecc = false;
 				StopMoving();
+				CurrentRotation %= 360;
 
 				var endTime = Time.Now - TestTime;
 
@@ -169,7 +172,11 @@ public partial class StargateRingTest : PlatformEntity, IUse
 			}
 		}
 
-		Log.Info( currentRotation );
+		if (IsMoving)
+		{
+			Log.Info( CurrentRotation );
+		}
+		
 
 	}
 }
