@@ -28,7 +28,7 @@ public partial class RingRing : Prop {
 		SetModel( "models/gmod4phun/stargate/rings_ancient/ring_ancient.vmdl" );
 	}
 
-	public async Task<bool> MoveUp(int num) {
+	public async Task<bool> MoveUp() {
 		RenderAlpha = 1;
 		reachedPos = false;
 		while (!reachedPos) {

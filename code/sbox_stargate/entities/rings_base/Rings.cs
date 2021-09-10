@@ -136,7 +136,7 @@ public partial class Rings : AnimEntity, IUse
 
 			await Task.Delay(times[y]);
 
-			_ = r.MoveUp(0);
+			_ = r.MoveUp();
 
 			y++;
 		}
