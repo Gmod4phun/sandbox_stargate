@@ -5,31 +5,34 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
-[Library( "ent_stargate_ringtest", Title = "Stargate Ring Test", Spawnable = true, Group = "Stargate" )]
-public partial class StargateRingTest : PlatformEntity, IUse
+public partial class StargateRingTest : PlatformEntity
 {
 	// ring variables
 
 	public Stargate Gate;
-	public float RingAngle { get; private set; } = 0.0f;
-	public float TargetRingAngle { get; private set; } = 0.0f;
-	public float RingRotSpeed { get; private set; } = 0.0f;
-	private float RingRotMinSpeed = 0f;
-	private float RingRotMaxSpeed = 80f;
-	private float RingAcceleration = 15f;
-	private float RingFriction = 0.5f;
-	public int RingRotDir { get; private set; } = 1;
-	public bool RingShouldRotate { get; private set; } = false;
-	private bool RingShouldAcc = false;
-	private bool RingShouldDecc = false;
-	public bool RingFreeSpin { get; private set; } = false;
+
 	public string RingSymbols { get; private set; } = "?0JKNTR3MBZX*H69IGPL#@QFS1E4AU85OCW72YVD";
 
+	[Net]
+	public float RingAngle { get; private set; } = 0.0f;
+	[Net]
+	public char GateDialingSymbol { get; private set; } = '!';
+	public float TargetRingAngle { get; private set; } = 0.0f;
 
-	private float TestTime = 0f;
+	private float RingCurSpeed = 0.0f;
+	private float RingMaxSpeed = 50f;
+	private float RingAccelStep = 1.5f;
+	private float RingDeccelStep = 0.5f;
+
+	private int RingDirection = 1;
+	private bool ShouldAcc = false;
+	private bool ShouldDecc = false;
 
 	private bool ShouldStopAtAngle = false;
 	private float CurStopAtAngle = 0f;
+
+	private float StartedAccelAngle = 0f;
+	private float StoppedAccelAngle = 0f;
 
 	public override void Spawn()
 	{
@@ -49,134 +52,226 @@ public partial class StargateRingTest : PlatformEntity, IUse
 
 		base.Spawn();
 
-		PhysicsBody.BodyType = PhysicsBodyType.Static;
 		EnableAllCollisions = false;
-		EnableTraceAndQueries = true;
 	}
+
+	/*
+	public async Task ApproachAngle( float rot, float timeDelta = 0.1f )
+	{
+		var localRot = Transform.RotationToLocal( Rotation );
+		await LocalRotateKeyframeTo( localRot.RotateAroundAxis(localRot.Forward, rot) , timeDelta );
+	}
+	*/
 
 	protected override void OnDestroy()
 	{
 		base.OnDestroy();
 	}
 
+	// symbol pos/ang
+	public float GetSymbolPosition( char sym ) // gets the symbols position on the ring
+	{
+		sym = sym.ToString().ToUpper()[0];
+		return RingSymbols.Contains( sym ) ? RingSymbols.IndexOf( sym ) : -1;
+	}
+
+	public float GetSymbolAngle( char sym ) // gets the symbols angle on the ring
+	{
+		sym = sym.ToString().ToUpper()[0];
+		return GetSymbolPosition( sym ) * 9;
+	}
+
+	// spinup/spindown
 	public void SpinUp()
 	{
-		RingShouldDecc = false;
-		RingShouldAcc = true;
+		ShouldDecc = false;
+		ShouldAcc = true;
 	}
 
 	public void SpinDown()
 	{
-		RingShouldAcc = false;
-		RingShouldDecc = true;
-
-		TestTime = Time.Now;
+		ShouldAcc = false;
+		ShouldDecc = true;
 	}
 
-	public float CalcStopAngleForAngle( float targetAng )
-	{
-		//var localRot = Transform.RotationToLocal( Rotation ); // prop rotation instead
-		//var ringAng = LocalRotation.Angles();
-
-		return targetAng - 33.333f;
-	}
-
-	public void StopAtAngle(float targetAng)
+	// rotate to angle/symbol
+	public void RotateRingTo( float targetAng ) // gradually rotates the ring to a specific angle
 	{
 		TargetRingAngle = targetAng;
-		CurStopAtAngle = CalcStopAngleForAngle( targetAng );
+		//CurStopAtAngle = CalcStopAngleForAngle( TargetRingAngle );
 		ShouldStopAtAngle = true;
 
-		Log.Info("should stop at angle");
+		//StartedAccelAngle = RingAngle;
+
+		//Log.Info($"Rotate ring to: {TargetRingAngle}, StopAng = {CurStopAtAngle}");
+		SpinUp();
 	}
 
-	public bool OnUse( Entity user )
+	public void RotateRingToSymbol( char sym, int angOffset = 0 )
 	{
-		if (!IsMoving)
-		{
-			ReverseMoving();
-			SpinUp();
-			
-		}
-		else
-		{
-			SpinDown();
-		}
-		
-
-		//SpinUp();
-		//StopAtAngle( -9f );
-
-		return false;
+		if ( RingSymbols.Contains( sym ) ) RotateRingTo( GetDesiredRingAngleForSymbol( sym, angOffset ) );
 	}
 
-	public bool IsUsable( Entity user )
+	// helper calcs
+	public float GetDesiredRingAngleForSymbol( char sym, int angOffset = 0 )
 	{
+		// get the symbol's position on the ring
+		var symPos = GetSymbolPosition( sym );
+
+		// if we input an invalid symbol, return current ring angles
+		if ( symPos == -1 ) return RingAngle;
+
+		// if its a valid symbol, lets calc the required angle
+		var symAng = symPos * 9; // there are 40 symbols, each 9 degrees apart
+
+		// clockwise and counterclockwise symbol angles relative to 0 (the top chevron)
+		var D_CW = -symAng - RingAngle - angOffset; // offset, if we want it to be relative to another chevron (for movie stargate dialing)
+		var D_CCW = 360 - D_CW;
+
+		D_CW = D_CW.UnsignedMod( 360 );
+		D_CCW = D_CCW.UnsignedMod( 360 );
+
+		// angle differences are setup, choose based on the direction of ring rotation
+		// if the required angle to too small, spin it around once
+		var angToRotate = (RingDirection == -1) ? D_CCW : D_CW;
+		if ( angToRotate < 170f ) angToRotate += 360f;
+
+		// set the final angle to the current angle + the angle needed to rotate, also considering ring direction
+		var finalAng = RingAngle + (angToRotate * RingDirection);
+
+		//Log.Info($"Sym = {sym}, RingAng = {RingAngle}, SymPos = {symPos}, D_CCW = {D_CCW}, D_CW = {D_CW}, finalAng = {finalAng}" );
+
+		return finalAng;
+	}
+
+	public float GetAccelTime()
+	{
+		var ticks = 1;
+		for ( float i = 0; i < RingMaxSpeed; i += RingAccelStep )
+		{
+			ticks++;
+		}
+
+		return Global.TickInterval * ticks;
+	}
+
+	public float GetDeaccelTime()
+	{
+		var ticks = 1;
+		for (float i = RingMaxSpeed; i > 0; i -= RingAccelStep )
+		{
+			ticks++;
+		}
+
+		return Global.TickInterval * ticks;
+	}
+
+	/*
+	public float CalcStopAngleForAngle( float targetAng )
+	{
+		//var modif = 0.333f;
+		//return targetAng - (RingMaxSpeed * RingDirection * modif);
+		//return targetAng - (RingMaxSpeed * 0.5f * RingDirection * (1f / RingSpeedStep) );
+		return targetAng - (((RingMaxSpeed / (1f / RingSpeedStep)) * RingMaxSpeed / 2) * RingDirection);
+	}
+	*/
+
+	public async Task<bool> RotateRingToSymbolAsync( char sym, int angOffset = 0 )
+	{
+		RotateRingToSymbol( sym, angOffset );
+		GateDialingSymbol = sym;
+
+		await Task.DelaySeconds( Global.TickInterval ); // wait, otherwise it hasnt started moving yet and can cause issues
+
+		while (IsMoving)
+		{
+			await Task.DelaySeconds( Global.TickInterval ); // wait here, too, otherwise game hangs :)
+			if (Gate.ShouldStopDialing) return false;
+		}
+
 		return true;
 	}
 
 	[Event.Tick.Server]
-	public void Think()
+	public async void Think()
 	{
-		var localRot = Transform.RotationToLocal( Rotation );
-		RingAngle = LocalRotation.Angles().roll;
-
-		if (RingShouldAcc )
+		if ( ShouldAcc )
 		{
-			if ( !IsMoving ) StartMoving();
-
-			if ( RingRotSpeed < RingRotMaxSpeed)
+			if ( !IsMoving )
 			{
-				RingRotSpeed += 0.1f * RingAcceleration * RingFriction;
+				StartedAccelAngle = RingAngle;
+				StartMoving();
+			}
+
+			if ( RingCurSpeed < RingMaxSpeed )
+			{
+				RingCurSpeed += RingAccelStep;
 			}
 			else
 			{
-				RingRotSpeed = RingRotMaxSpeed;
-				RingShouldAcc = false;
+				RingCurSpeed = RingMaxSpeed;
+				ShouldAcc = false;
+				StoppedAccelAngle = MathF.Abs( RingAngle - StartedAccelAngle );
+				CurStopAtAngle = TargetRingAngle - (StoppedAccelAngle * RingDirection * (RingAccelStep / RingDeccelStep));
 			}
 		}
-		else if ( RingShouldDecc )
+		else if ( ShouldDecc )
 		{
-			if ( RingRotSpeed > RingRotMinSpeed )
+			if ( RingCurSpeed > 0 )
 			{
-				RingRotSpeed -= 0.1f * RingAcceleration * RingFriction;
+				RingCurSpeed -= RingDeccelStep;
 			}
 			else
 			{
-				RingRotSpeed = RingRotMinSpeed;
-				RingShouldDecc = false;
+				RingCurSpeed = 0;
+				ShouldDecc = false;
 				StopMoving();
-				CurrentRotation %= 360;
+				ReverseMoving();
 
-				var endTime = Time.Now - TestTime;
-
-				Log.Info($"Ring rot finished, time from stop call = {endTime}, TargetAngle = {TargetRingAngle}, RingAngle = {RingAngle}");
+				CurrentRotation %= 360f;
 			}
 		}
 
-		SetSpeed( RingRotSpeed );
-
+		SetSpeed( RingCurSpeed );
 
 		if (ShouldStopAtAngle && IsMoving)
 		{
-			if (!RingShouldDecc)
+			if ( !ShouldAcc && !ShouldDecc )
 			{
-				var angDiff = MathF.Abs( RingAngle - CurStopAtAngle );
-				//Log.Info(angDiff);
+				var angDiff = MathF.Abs( CurrentRotation - CurStopAtAngle );
 				if (angDiff < 1f)
 				{
 					SpinDown();
 					ShouldStopAtAngle = false;
-					//Log.Info( "stopatangle spindown start" );
 				}
 			}
 		}
 
-		if (IsMoving)
-		{
-			Log.Info( CurrentRotation );
-		}
-		
+		RingAngle = CurrentRotation;
+		RingDirection = IsMovingForwards ? -1 : 1;
+	}
 
+	// DEBUG
+	public void DrawSymbols()
+	{
+		var deg = 360f / RingSymbols.Length;
+		var i = 0;
+		var ang = Rotation.Angles();
+		foreach ( char sym in RingSymbols )
+		{
+			var rotAng = ang.WithRoll( ang.roll - (i * deg) );
+			var newRot = rotAng.ToRotation();
+			var pos = Position + newRot.Forward * 4 + newRot.Up * 117.5f;
+			DebugOverlay.Text( pos, sym.ToString(), sym == GateDialingSymbol ? Color.Green : Color.Yellow );
+			i++;
+		}
+
+		DebugOverlay.Text( Position, RingAngle.ToString(), Color.White );
+	}
+
+	[Event.Frame]
+	public void RingSymbolsDebug()
+	{
+		if ( Local.Pawn.IsValid() && Local.Pawn.Position.Distance( Position ) < 800 ) DrawSymbols();
 	}
 }

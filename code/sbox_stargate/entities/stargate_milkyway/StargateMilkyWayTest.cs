@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
-[Library( "ent_stargate_milkyway", Title = "Stargate (Milky Way)", Spawnable = true, Group = "Stargate" )]
-public partial class StargateMilkyWay : Stargate
+[Library( "ent_stargate_milkyway_test", Title = "Stargate Test (Milky Way)", Spawnable = true, Group = "Stargate" )]
+public partial class StargateMilkyWayTest : Stargate
 {
 
-	public StargateRing Ring;
+	public StargateRingTest Ring;
 	public List<Chevron> EncodedChevronsOrdered = new ();
 
 	// SPAWN
@@ -116,7 +116,7 @@ public partial class StargateMilkyWay : Stargate
 
 		Sound.FromEntity( "dial_fail_sg1", this);
 
-		if ( Ring.IsValid() && Ring.RingRotSpeed != 0 ) Ring.StopRingRotation();
+		if ( Ring.IsValid() && Ring.IsMoving ) Ring.SpinDown();
 	}
 
 	public override void OnStopDialingFinish()
@@ -186,7 +186,7 @@ public partial class StargateMilkyWay : Stargate
 				OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
 			}
 
-			Ring.StartRingRotation(); // start rotating ring
+			Ring.SpinUp(); // start rotating ring
 
 			var addrLen = address.Length;
 
@@ -212,7 +212,7 @@ public partial class StargateMilkyWay : Stargate
 					chev.ChevronSound( "chevron_dhd" );
 				}
 
-				if ( i == addrLen - 1 ) Ring.StopRingRotation(); // stop rotating ring when the last looped chevron locks
+				if ( i == addrLen - 1 ) Ring.SpinDown(); // stop rotating ring when the last looped chevron locks
 
 				await Task.DelaySeconds( chevronDelay );
 			}
@@ -326,6 +326,7 @@ public partial class StargateMilkyWay : Stargate
 			foreach ( var sym in address )
 			{
 				// try to encode each symbol
+				Log.Info("try encode symbol");
 				var success = await RotateRingToSymbol( sym ); // wait for ring to rotate to the target symbol
 				if ( !success || ShouldStopDialing )
 				{
@@ -340,7 +341,7 @@ public partial class StargateMilkyWay : Stargate
 				var topChev = GetChevron( 7 );
 				if ( topChev.IsValid() )
 				{
-					topChev.ChevronSound( (sym.Equals( address.Last() )) ? "chevron_lock" : "chevron_sg1" );
+					//topChev.ChevronSound( (sym.Equals( address.Last() )) ? "chevron_lock" : "chevron_sg1" );
 					topChev.ChevronLockUnlock(); // play top chevron anim
 					if ( chevNum != address.Length )
 					{

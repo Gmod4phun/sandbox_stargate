@@ -9,7 +9,6 @@ public abstract partial class Stargate : Prop, IUse
 {
 	public Vector3 SpawnOffset = new( 0, 0, 90 );
 
-	public StargateRing Ring;
 	public List<Chevron> Chevrons = new();
 
 	public EventHorizon EventHorizon;
