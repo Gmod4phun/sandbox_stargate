@@ -101,15 +101,10 @@ public partial class EventHorizon : AnimEntity
 	// CLIENT ANIM CONTROL
 
 	[ClientRpc]
-	public async void TeleportScreenOverlay()
+	public void TeleportScreenOverlay()
 	{
 		var hud = Local.Hud;
-
-		var panel = hud.AddChild<EventHorizonScreenPanel>();
-
-		await Task.DelaySeconds( 5f );
-
-		panel?.Delete( true );
+		hud?.AddChild<EventHorizonScreenOverlay>();
 	}
 
 	[ClientRpc]
