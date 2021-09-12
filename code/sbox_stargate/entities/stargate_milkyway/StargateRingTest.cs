@@ -9,7 +9,8 @@ public partial class StargateRingTest : PlatformEntity
 {
 	// ring variables
 
-	public Stargate Gate;
+	[Net]
+	public Stargate Gate { get; set; } = null;
 
 	public string RingSymbols { get; private set; } = "?0JKNTR3MBZX*H69IGPL#@QFS1E4AU85OCW72YVD";
 
@@ -19,10 +20,10 @@ public partial class StargateRingTest : PlatformEntity
 	public char GateDialingSymbol { get; private set; } = '!';
 	public float TargetRingAngle { get; private set; } = 0.0f;
 
-	private float RingCurSpeed = 0.0f;
+	private float RingCurSpeed = 0f;
 	private float RingMaxSpeed = 50f;
-	private float RingAccelStep = 1.5f;
-	private float RingDeccelStep = 0.5f;
+	private float RingAccelStep = 1f;
+	private float RingDeccelStep = 0.75f;
 
 	private int RingDirection = 1;
 	private bool ShouldAcc = false;
@@ -55,14 +56,6 @@ public partial class StargateRingTest : PlatformEntity
 		EnableAllCollisions = false;
 	}
 
-	/*
-	public async Task ApproachAngle( float rot, float timeDelta = 0.1f )
-	{
-		var localRot = Transform.RotationToLocal( Rotation );
-		await LocalRotateKeyframeTo( localRot.RotateAroundAxis(localRot.Forward, rot) , timeDelta );
-	}
-	*/
-
 	protected override void OnDestroy()
 	{
 		base.OnDestroy();
@@ -81,7 +74,7 @@ public partial class StargateRingTest : PlatformEntity
 		return GetSymbolPosition( sym ) * 9;
 	}
 
-	// spinup/spindown
+	// spinup/spindown - starts or stops rotating the ring
 	public void SpinUp()
 	{
 		ShouldDecc = false;
@@ -95,15 +88,10 @@ public partial class StargateRingTest : PlatformEntity
 	}
 
 	// rotate to angle/symbol
-	public void RotateRingTo( float targetAng ) // gradually rotates the ring to a specific angle
+	public void RotateRingTo( float targetAng ) // starts rotating the ring and stops (hopefully) at the specified angle
 	{
 		TargetRingAngle = targetAng;
-		//CurStopAtAngle = CalcStopAngleForAngle( TargetRingAngle );
 		ShouldStopAtAngle = true;
-
-		//StartedAccelAngle = RingAngle;
-
-		//Log.Info($"Rotate ring to: {TargetRingAngle}, StopAng = {CurStopAtAngle}");
 		SpinUp();
 	}
 
@@ -144,38 +132,6 @@ public partial class StargateRingTest : PlatformEntity
 		return finalAng;
 	}
 
-	public float GetAccelTime()
-	{
-		var ticks = 1;
-		for ( float i = 0; i < RingMaxSpeed; i += RingAccelStep )
-		{
-			ticks++;
-		}
-
-		return Global.TickInterval * ticks;
-	}
-
-	public float GetDeaccelTime()
-	{
-		var ticks = 1;
-		for (float i = RingMaxSpeed; i > 0; i -= RingAccelStep )
-		{
-			ticks++;
-		}
-
-		return Global.TickInterval * ticks;
-	}
-
-	/*
-	public float CalcStopAngleForAngle( float targetAng )
-	{
-		//var modif = 0.333f;
-		//return targetAng - (RingMaxSpeed * RingDirection * modif);
-		//return targetAng - (RingMaxSpeed * 0.5f * RingDirection * (1f / RingSpeedStep) );
-		return targetAng - (((RingMaxSpeed / (1f / RingSpeedStep)) * RingMaxSpeed / 2) * RingDirection);
-	}
-	*/
-
 	public async Task<bool> RotateRingToSymbolAsync( char sym, int angOffset = 0 )
 	{
 		RotateRingToSymbol( sym, angOffset );
@@ -186,15 +142,28 @@ public partial class StargateRingTest : PlatformEntity
 		while (IsMoving)
 		{
 			await Task.DelaySeconds( Global.TickInterval ); // wait here, too, otherwise game hangs :)
-			if (Gate.ShouldStopDialing) return false;
+			if ( Gate.ShouldStopDialing )
+			{
+				SpinDown();
+				Gate.CurGateState = Stargate.GateState.IDLE;
+				return false;
+			}
 		}
 
 		return true;
 	}
 
 	[Event.Tick.Server]
-	public async void Think()
+	public void Think()
 	{
+		if ( !Gate.IsValid() ) return;
+
+		if ( IsMoving && Gate.ShouldStopDialing )
+		{
+			SpinDown();
+			Gate.CurGateState = Stargate.GateState.IDLE;
+		}
+
 		if ( ShouldAcc )
 		{
 			if ( !IsMoving )
@@ -266,7 +235,7 @@ public partial class StargateRingTest : PlatformEntity
 			i++;
 		}
 
-		DebugOverlay.Text( Position, RingAngle.ToString(), Color.White );
+		if (Gate.IsValid())	DebugOverlay.Text( Position, Gate.ShouldStopDialing.ToString(), Color.White );
 	}
 
 	[Event.Frame]

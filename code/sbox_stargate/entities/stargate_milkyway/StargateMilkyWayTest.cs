@@ -114,7 +114,7 @@ public partial class StargateMilkyWayTest : Stargate
 	{
 		base.OnStopDialingBegin();
 
-		Sound.FromEntity( "dial_fail_sg1", this);
+		Sound.FromEntity( "dial_fail_nc", this);
 
 		if ( Ring.IsValid() && Ring.IsMoving ) Ring.SpinDown();
 	}
@@ -326,22 +326,22 @@ public partial class StargateMilkyWayTest : Stargate
 			foreach ( var sym in address )
 			{
 				// try to encode each symbol
-				Log.Info("try encode symbol");
 				var success = await RotateRingToSymbol( sym ); // wait for ring to rotate to the target symbol
 				if ( !success || ShouldStopDialing )
 				{
-					CurGateState = GateState.IDLE;
+					ResetGateVariablesToIdle();
 					return;
 				}
 
-				await Task.DelaySeconds( 0.2f ); // wait a bit
+				await Task.DelaySeconds( 0.65f ); // wait a bit
 
 				// go do chevron stuff
 
 				var topChev = GetChevron( 7 );
 				if ( topChev.IsValid() )
 				{
-					//topChev.ChevronSound( (sym.Equals( address.Last() )) ? "chevron_lock" : "chevron_sg1" );
+					topChev.ChevronSound( "chevron_sg1_open" );
+					topChev.ChevronSound( "chevron_sg1_close", 0.75f );
 					topChev.ChevronLockUnlock(); // play top chevron anim
 					if ( chevNum != address.Length )
 					{
@@ -372,7 +372,13 @@ public partial class StargateMilkyWayTest : Stargate
 					}
 				}
 
-				await Task.DelaySeconds( 1.75f ); // wait a bit
+				await Task.DelaySeconds( 1.5f ); // wait a bit
+
+				if ( ShouldStopDialing || !Dialing )
+				{
+					ResetGateVariablesToIdle();
+					return;
+				}
 
 				chevNum++;
 			}

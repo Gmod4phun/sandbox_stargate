@@ -32,7 +32,9 @@ public abstract partial class Stargate : Prop, IUse
 
 	public bool Busy { get; set; } = false; // this is pretty much used anytime the gate is busy to do anything (usually during animations/transitions)
 	public bool Inbound { get; set; } = false;
-	public bool ShouldStopDialing = false;
+
+	[Net]
+	public bool ShouldStopDialing { get; set; } = false;
 	public GateState CurGateState { get; set; } = GateState.IDLE;
 	public DialType CurDialType { get; set; } = DialType.FAST;
 
