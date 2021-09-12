@@ -46,7 +46,7 @@ public partial class RingRing : Prop {
 		ent.TakeDamage( dmg );
 	}
 
-	public async void MoveUp() {
+	public void MoveUp() {
 		RenderAlpha = 1;
 		Retract = false;
 		Move();
