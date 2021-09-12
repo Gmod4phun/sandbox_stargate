@@ -12,4 +12,6 @@ public partial class RingsGoauld : Rings {
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 	}
 
+	protected override void HideBase() {}
+	protected override void ShowBase() {}
 }

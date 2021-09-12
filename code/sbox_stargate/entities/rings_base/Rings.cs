@@ -1,8 +1,8 @@
-using System.Numerics;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using Sandbox;
+using System.Text;
 
 public partial class Rings : AnimEntity, IUse
 {
@@ -34,6 +34,7 @@ public partial class Rings : AnimEntity, IUse
 		}
 	}
 
+	public bool RingsDeployed { get; protected set; } = false;
 	public const string Symbols = "0123456789";
 
 	public static bool IsAddressValid( string address ) {
@@ -44,11 +45,36 @@ public partial class Rings : AnimEntity, IUse
 			if ( address.Count( c => c == sym ) > 1 ) return false; // only one occurence
 		}
 
+		if (Entity.All.OfType<Rings>().Where( x => x.Address == address ).Any()) return false;
+
 		return true;
+	}
+
+	public static string GenerateRandomAddress( int length = 4, bool checkValidity = false )
+	{
+		if ( length < 1 || length > 9 ) return "";
+
+		StringBuilder symbolsCopy = new( Symbols );
+
+		string generatedAddress = "";
+		for ( int i = 0; i < length; i++ ) // pick random symbols without repeating
+		{
+			var randomIndex = new Random().Int( 0, symbolsCopy.Length - 1 );
+			generatedAddress += symbolsCopy[randomIndex];
+
+			symbolsCopy = symbolsCopy.Remove( randomIndex, 1 );
+		}
+
+		if ( checkValidity && !IsAddressValid( generatedAddress ) )
+			return GenerateRandomAddress(length, checkValidity);
+
+		return generatedAddress;
 	}
 
 	public override void Spawn() {
 		Tags.Add( "no_rings_teleport" );
+
+		this.Address = GenerateRandomAddress();
 	}
 
 	public virtual bool IsUsable( Entity user )
@@ -74,7 +100,7 @@ public partial class Rings : AnimEntity, IUse
 			other.Busy = true;
 			DestinationRings = other;
 			other.DestinationRings = this;
-			other.DeployRings();
+			// other.DeployRings();
 		}
 		DeployRings(true);
 	}
@@ -86,10 +112,11 @@ public partial class Rings : AnimEntity, IUse
 			return;
 
 		returnedRings = 0;
-		CurrentSequence.Name = "up";
+		ShowBase();
 		EnableAllCollisions = true;
 		Busy = false;
 		DestinationRings = null;
+		RingsDeployed = false;
 	}
 
 	public Particles PlayTeleportEffect() {
@@ -102,9 +129,9 @@ public partial class Rings : AnimEntity, IUse
 				particlePos = Transform.PointToWorld(ChildRings[^1].LocalPosition);
 				particleVelocity = Rotation.Down * -110;
 			} else if (destEndPosZ < selfEndPosZ) {
-				// particlePos = Transform.PointToWorld(ChildRings[0].LocalPosition);
-				particlePos = Position;
-				particleVelocity = Rotation.Up * 110;
+				particlePos = Transform.PointToWorld(ChildRings[0].LocalPosition);
+				// particlePos = Position;
+				particleVelocity = Rotation.Up * -110;
 			}
 		} else {
 			if (destEndPosZ <= selfEndPosZ) {
@@ -126,9 +153,43 @@ public partial class Rings : AnimEntity, IUse
 		return particle;
 	}
 
-	public async virtual void DeployRings(bool withTeleport = false) {
+	protected virtual async void HideBase() {
+		CurrentSequence.Name = "down";
+
+		await Task.DelaySeconds(CurrentSequence.Duration);
+
+		RenderColor = RenderColor.WithAlpha(0);
+	}
+
+	protected virtual void ShowBase() {
+		RenderColor = RenderColor.WithAlpha(1);
+		CurrentSequence.Name = "up";
+	}
+
+	public bool IsAbleToExpand() {
+		TraceResult tr = Trace.Ray(Position + Rotation.Up * 10, Position + Rotation.Up * 150)
+			.Run();
+
+		// Object too close, impossible to deploy rings
+		if (tr.Hit && tr.Distance < 100)
+			return false;
+
+		return true;
+	}
+
+	public  async virtual void DeployRings(bool withTeleport = false) {
 
 		Busy = true;
+
+		// Not enough space
+		if (!IsAbleToExpand() || (DestinationRings.IsValid() && !DestinationRings.IsAbleToExpand())) {
+			Busy = false;
+			DestinationRings.Busy = false;
+			return;
+		} else if (DestinationRings.IsValid() && withTeleport) {
+			DestinationRings.DeployRings();
+		}
+
 
 		ChildRings.Clear();
 
@@ -137,7 +198,7 @@ public partial class Rings : AnimEntity, IUse
 		PlaySound("ring_transporter2");
 
 		// Playing the animation
-		CurrentSequence.Name = "down";
+		HideBase();
 		
 		// Disable base collisions
 		EnableAllCollisions = false;
@@ -149,7 +210,7 @@ public partial class Rings : AnimEntity, IUse
 			.Run();
 
 		var hitGround = false;
-		if (isUpDown && tr.Hit && tr.Distance < 999 && tr.Distance > 100)
+		if (isUpDown && tr.Hit && tr.Distance < 999 && tr.Distance > 10)
 			hitGround = true;
 
 		for (int i = 0; i < 5; i++) {
@@ -183,16 +244,29 @@ public partial class Rings : AnimEntity, IUse
 
 			await Task.Delay(times[y]);
 
+			if ( !this.IsValid() )
+				return;
+
+			if ( !r.IsValid() )
+				return;
+
 			r.MoveUp();
 
 			y++;
 		}
+
+		RingsDeployed = true;
 
 		if (withTeleport)
 			DoTeleport();
 	}
 
 	public async virtual void DoTeleport() {
+
+		if (!DestinationRings.IsValid()) {
+			RetractRings();
+			return;
+		}
 
 		List<Entity> toDest = new();
 		List<Entity> fromDest = new();
@@ -288,36 +362,45 @@ public partial class Rings : AnimEntity, IUse
 		ChildRings.Clear();
 	}
 
-	// [Event.Frame]
-	// public void OnFrame() {
-	// 	if (!IsUpsideDown)
-	// 		return;
+	[Event.Frame]
+	public void OnFrame() {
+		DebugOverlay.Text(Position, $"Address: {this.Address}", Color.White);
 
-	// 	var mins = GetModel().Bounds.Mins;
-	// 	mins.x = 60;
-	// 	mins.y = 60;
-	// 	var b = new BBox(mins, GetModel().Bounds.Maxs);
+		// return;
 
-	// 	var tr = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
-	// 		.Radius(60f)
-	// 		.Run();
-	// 	var tr2 = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
-	// 		.Size(GetModel().Bounds)
-	// 		.Run();
-	// 	DebugOverlay.TraceResult(tr);
-	// 	DebugOverlay.TraceResult(tr2);
-	// 	DebugOverlay.Line((Position + Rotation.Left * b.Maxs) + Rotation.Up, (Position + Rotation.Left * b.Maxs) + Rotation.Up * 1024, Color.Blue);
-	// 	DebugOverlay.Line((Position + Rotation.Right * b.Maxs) + Rotation.Up, (Position + Rotation.Right * b.Maxs) + Rotation.Up * 1024, Color.Blue);
-	// 	DebugOverlay.Line((Position + Rotation.Forward * b.Maxs) + Rotation.Up, (Position + Rotation.Forward * b.Maxs) + Rotation.Up * 1024, Color.Blue);
-	// 	DebugOverlay.Line((Position + Rotation.Backward * b.Maxs) + Rotation.Up, (Position + Rotation.Backward * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+		if (!IsUpsideDown)
+			return;
 
-	// 	DebugOverlay.Line((Position + Rotation.Left * b.Mins) + Rotation.Up, (Position + Rotation.Left * b.Mins) + Rotation.Up * 1024, Color.Blue);
-	// 	DebugOverlay.Line((Position + Rotation.Right * b.Mins) + Rotation.Up, (Position + Rotation.Right * b.Mins) + Rotation.Up * 1024, Color.Blue);
-	// 	DebugOverlay.Line((Position + Rotation.Forward * b.Mins) + Rotation.Up, (Position + Rotation.Forward * b.Mins) + Rotation.Up * 1024, Color.Blue);
-	// 	DebugOverlay.Line((Position + Rotation.Backward * b.Mins) + Rotation.Up, (Position + Rotation.Backward * b.Mins) + Rotation.Up * 1024, Color.Blue);
+		var mins = GetModel().Bounds.Mins;
+		mins.x = 60;
+		mins.y = 60;
+		var b = new BBox(mins, GetModel().Bounds.Maxs);
 
-	// 	DebugOverlay.Circle(tr.EndPos, Angles.Zero.WithPitch(90).ToRotation(), 60, Color.Yellow);
-	// 	DebugOverlay.Circle(tr.EndPos - Vector3.OneZ, Angles.Zero.WithPitch(90).ToRotation(), 80, Color.Red);
-	// }
+		var tr = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
+			.Run();
+		// var tr2 = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
+		// 	.Size(GetModel().Bounds)
+		// 	.Run();
+		DebugOverlay.TraceResult(tr);
+		DebugOverlay.Text(tr.EndPos - Rotation.Up * 30, tr.Distance.ToString(), Color.Magenta);
+		// DebugOverlay.TraceResult(tr2);
+		DebugOverlay.Line((Position + Rotation.Left * b.Maxs) + Rotation.Up, (Position + Rotation.Left * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+		DebugOverlay.Line((Position + Rotation.Right * b.Maxs) + Rotation.Up, (Position + Rotation.Right * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+		DebugOverlay.Line((Position + Rotation.Forward * b.Maxs) + Rotation.Up, (Position + Rotation.Forward * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+		DebugOverlay.Line((Position + Rotation.Backward * b.Maxs) + Rotation.Up, (Position + Rotation.Backward * b.Maxs) + Rotation.Up * 1024, Color.Blue);
+
+		DebugOverlay.Line((Position + Rotation.Left * b.Mins) + Rotation.Up, (Position + Rotation.Left * b.Mins) + Rotation.Up * 1024, Color.Blue);
+		DebugOverlay.Line((Position + Rotation.Right * b.Mins) + Rotation.Up, (Position + Rotation.Right * b.Mins) + Rotation.Up * 1024, Color.Blue);
+		DebugOverlay.Line((Position + Rotation.Forward * b.Mins) + Rotation.Up, (Position + Rotation.Forward * b.Mins) + Rotation.Up * 1024, Color.Blue);
+		DebugOverlay.Line((Position + Rotation.Backward * b.Mins) + Rotation.Up, (Position + Rotation.Backward * b.Mins) + Rotation.Up * 1024, Color.Blue);
+
+		DebugOverlay.Circle(tr.EndPos + Vector3.OneZ * 2, Angles.Zero.WithPitch(90).ToRotation(), 60, Color.Yellow);
+		DebugOverlay.Circle(tr.EndPos + Vector3.OneZ, Angles.Zero.WithPitch(90).ToRotation(), 80, Color.Red);
+	}
+
+	protected override void OnDestroy() {
+		if (DestinationRings.IsValid())
+			DestinationRings.RetractRings();
+	}
 
 }

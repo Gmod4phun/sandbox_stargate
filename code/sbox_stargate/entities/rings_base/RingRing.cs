@@ -24,7 +24,7 @@ public partial class RingRing : Prop {
 
 		EnableHitboxes = false;
 		PhysicsEnabled = false;
-		RenderAlpha = 0;
+		RenderColor = RenderColor.WithAlpha(0);
 
 		Transmit = TransmitType.Always;
 		SetModel( "models/gmod4phun/stargate/rings_ancient/ring_ancient.vmdl" );
@@ -47,7 +47,7 @@ public partial class RingRing : Prop {
 	}
 
 	public void MoveUp() {
-		RenderAlpha = 1;
+		RenderColor = RenderColor.WithAlpha(1);
 		Retract = false;
 		Move();
 	}
