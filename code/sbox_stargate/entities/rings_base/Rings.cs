@@ -34,6 +34,19 @@ public partial class Rings : AnimEntity, IUse
 		}
 	}
 
+	public const string Symbols = "0123456789";
+
+	public static bool IsAddressValid( string address ) {
+
+		foreach ( char sym in address )
+		{
+			if ( !Symbols.Contains( sym ) ) return false; // only valid symbols
+			if ( address.Count( c => c == sym ) > 1 ) return false; // only one occurence
+		}
+
+		return true;
+	}
+
 	public override void Spawn() {
 		Tags.Add( "no_rings_teleport" );
 	}
@@ -79,6 +92,40 @@ public partial class Rings : AnimEntity, IUse
 		DestinationRings = null;
 	}
 
+	public Particles PlayTeleportEffect() {
+		var particlePos = Vector3.Zero;
+		var particleVelocity = Vector3.Zero;
+		var destEndPosZ = Math.Floor(DestinationRings.Transform.PointToWorld(DestinationRings.EndPos).z);
+		var selfEndPosZ = Math.Floor(Transform.PointToWorld(EndPos).z);
+		if (IsUpsideDown) {
+			if (destEndPosZ >= selfEndPosZ) {
+				particlePos = Transform.PointToWorld(ChildRings[^1].LocalPosition);
+				particleVelocity = Rotation.Down * -110;
+			} else if (destEndPosZ < selfEndPosZ) {
+				// particlePos = Transform.PointToWorld(ChildRings[0].LocalPosition);
+				particlePos = Position;
+				particleVelocity = Rotation.Up * 110;
+			}
+		} else {
+			if (destEndPosZ <= selfEndPosZ) {
+				particlePos = Transform.PointToWorld(EndPos) - Rotation.Down * 50;
+				particleVelocity = Rotation.Up * -110;
+			} else if (destEndPosZ > selfEndPosZ) {
+				// particlePos = Transform.PointToWorld(EndPos) + Rotation.Down * 50;
+				particlePos = Position;
+				particleVelocity = Rotation.Up * 110;
+			}
+		}
+		var a = Rotation.Angles();
+		
+		var particle = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", particlePos);
+		particle.SetPosition(1, particleVelocity);
+		particle.SetPosition(2, new Vector3(a.roll, a.pitch, a.yaw));
+		particle.SetPosition(3, new Vector3(Scale, 0, 0));
+
+		return particle;
+	}
+
 	public async virtual void DeployRings(bool withTeleport = false) {
 
 		Busy = true;
@@ -116,12 +163,12 @@ public partial class Rings : AnimEntity, IUse
 			r.Parent = this;
 			r.SetParent(this);
 			r.isUpsideDown = isUpDown;
-			r.Position = isUpDown ? Position + Rotation.Up * 15 : Position;
+			r.Position = Position;
 			r.Rotation = Rotation;
 			r.Scale = Scale;
 			r.Transmit = TransmitType.Always;
 			
-			r.desiredPos = Transform.PointToLocal( endPos ).z;
+			r.desiredPos = Transform.PointToLocal( endPos );
 
 			ChildRings.Add(r);
 		}
@@ -136,7 +183,7 @@ public partial class Rings : AnimEntity, IUse
 
 			await Task.Delay(times[y]);
 
-			_ = r.MoveUp();
+			r.MoveUp();
 
 			y++;
 		}
@@ -179,23 +226,8 @@ public partial class Rings : AnimEntity, IUse
 			}
 		}
 
-		var particlePos = IsUpsideDown ? Transform.PointToWorld(ChildRings[^1].LocalPosition) : Transform.PointToWorld(EndPos) - Rotation.Down * 50;
-		var particleVelocity = IsUpsideDown ? Rotation.Down * -110 : Rotation.Down * 110;
-
-		var particle = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", particlePos);//Transform.PointToWorld(EndPos) - Rotation.Down * 50);
-		particle.SetPosition(1, particleVelocity);
-		var a = Rotation.Angles();
-		particle.SetPosition(2, new Vector3(a.roll, a.pitch, a.yaw));
-		particle.SetPosition(3, new Vector3(Scale, 0, 0));
-
-		particlePos = DestinationRings.IsUpsideDown ? DestinationRings.Transform.PointToWorld(DestinationRings.ChildRings[^1].LocalPosition) : DestinationRings.Transform.PointToWorld(DestinationRings.EndPos) - DestinationRings.Rotation.Down * 50;
-		particleVelocity = DestinationRings.IsUpsideDown ? DestinationRings.Rotation.Down * -110 : DestinationRings.Rotation.Down * 110;
-		a = DestinationRings.Rotation.Angles();
-
-		var	particle2 = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", particlePos);
-		particle2.SetPosition(1, particleVelocity);
-		particle2.SetPosition(2, new Vector3(a.roll, a.pitch, a.yaw));
-		particle2.SetPosition(3, new Vector3(DestinationRings.Scale, 0, 0));
+		var particle = PlayTeleportEffect();
+		var particle2 = DestinationRings.PlayTeleportEffect();
 
 
 		var worldEndPos = Transform.PointToWorld(EndPos);
@@ -225,6 +257,8 @@ public partial class Rings : AnimEntity, IUse
 		particle.Destroy();
 		particle2.Destroy();
 
+		await Task.Delay(500);
+
 		RetractRings();
 		DestinationRings.RetractRings();
 
@@ -235,7 +269,7 @@ public partial class Rings : AnimEntity, IUse
 
 		PlaySound("ring_transporter3");
 
-		int[] times = {200, 200, 300, 500, 200 };
+		int[] times = {400, 200, 300, 500, 200 };
 
 		var tRings = ChildRings;
 		tRings.Reverse();
@@ -246,7 +280,7 @@ public partial class Rings : AnimEntity, IUse
 
 			r.desiredPos = LocalPosition.z;
 
-			_ = r.Refract();
+			r.Refract();
 
 			i++;
 		}
