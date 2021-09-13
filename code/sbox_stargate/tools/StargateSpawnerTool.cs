@@ -85,7 +85,7 @@
 						return;
 					}
 
-					var gate = new StargateMilkyWayTest();
+					var gate = new StargateMilkyWay();
 
 					gate.Position = tr.EndPos + gate.SpawnOffset;
 					gate.Rotation = new Angles( 0, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();

@@ -9,7 +9,7 @@
 			"sounds/gmod4phun/stargate/sg1/lock_3.vsnd",
 		]
 		UI = false
-		Volume = 1.0
+		Volume = 0.5
 		VolumeRandom = 0.0
 		Pitch = 1.0
 		PitchRandom = 0.0

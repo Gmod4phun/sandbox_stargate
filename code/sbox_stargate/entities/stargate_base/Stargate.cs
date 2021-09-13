@@ -47,6 +47,7 @@ public abstract partial class Stargate : Prop, IUse
 	public bool Closing { get => CurGateState is GateState.CLOSING; }
 
 	public string DialingAddress { get; set; } = "";
+	public int ActiveChevrons = 0;
 
 	// VARIABLE RESET
 	public virtual void ResetGateVariablesToIdle()
@@ -58,6 +59,7 @@ public abstract partial class Stargate : Prop, IUse
 		CurGateState = GateState.IDLE;
 		CurDialType = DialType.FAST;
 		DialingAddress = "";
+		ActiveChevrons = 0;
 	}
 
 	// USABILITY

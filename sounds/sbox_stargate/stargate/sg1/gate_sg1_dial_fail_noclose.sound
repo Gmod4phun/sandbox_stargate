@@ -4,13 +4,7 @@
 	{
 		sounds = 
 		[
-			"sounds/gmod4phun/stargate/chevron_incoming.vsnd",
+			"sounds/sbox_stargate/stargate/sg1/gate_sg1_dial_fail_noclose.vsnd",
 		]
-		UI = false
-		Volume = 0.5
-		VolumeRandom = 0.0
-		Pitch = 1.0
-		PitchRandom = 0.0
-		DistanceMax = 1000.0
 	}
 }
