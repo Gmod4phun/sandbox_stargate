@@ -114,7 +114,7 @@ public partial class StargateMilkyWay : Stargate
 	{
 		base.OnStopDialingBegin();
 
-		Sound.FromEntity( (ActiveChevrons > 0 || CurDialType is DialType.DHD) ? "dial_fail_sg1" : "gate_sg1_dial_fail_noclose", this );
+		PlaySound( this, (ActiveChevrons > 0 || CurDialType is DialType.DHD) ? "dial_fail_sg1" : "gate_sg1_dial_fail_noclose" );
 
 		if ( Ring.IsValid() && Ring.IsMoving ) Ring.SpinDown();
 	}
@@ -130,7 +130,7 @@ public partial class StargateMilkyWay : Stargate
 	{
 		base.OnStargateBeginOpen();
 
-		Sound.FromEntity( "gate_open_sg1", this );
+		PlaySound(this, "gate_open_sg1" );
 	}
 
 	public override void OnStargateOpened()
@@ -142,7 +142,7 @@ public partial class StargateMilkyWay : Stargate
 	{
 		base.OnStargateBeginClose();
 
-		Sound.FromEntity( "gate_close", this );
+		PlaySound( this, "gate_close" );
 	}
 
 	public override void OnStargateClosed()
@@ -216,6 +216,7 @@ public partial class StargateMilkyWay : Stargate
 				wasTargetReadyOnStart = true;
 				target.BeginInboundFast( Address, target.Address.Length );
 				OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
+				OtherGate.OtherGate = this;
 			}
 
 			Ring.SpinUp(); // start rotating ring
@@ -242,6 +243,7 @@ public partial class StargateMilkyWay : Stargate
 				{
 					chev.TurnOn();
 					chev.ChevronSound( "chevron_sg1_open" );
+					ActiveChevrons++;
 				}
 
 				if ( i == addrLen - 1 ) Ring.SpinDown(); // stop rotating ring when the last looped chevron locks
@@ -266,6 +268,7 @@ public partial class StargateMilkyWay : Stargate
 				topChev.ChevronSound( "chevron_sg1_open", 0.2f );
 				topChev.ChevronAnim( "unlock", 1f );
 				topChev.ChevronSound( "chevron_sg1_close", 1.05f );
+				ActiveChevrons++;
 			}
 
 			await Task.DelaySeconds( chevronAfterLastDelay ); // wait after the last chevron, then open the gate or fail dial (if gate became invalid/was busy)
@@ -313,6 +316,12 @@ public partial class StargateMilkyWay : Stargate
 
 			for ( var i = 1; i < numChevs; i++ )
 			{
+				if ( !OtherGate.IsValid() )
+				{
+					StopDialing();
+					return;
+				}
+
 				if ( ShouldStopDialing ) return; // check if we should stop dialing or not
 
 				var chev = GetChevronBasedOnAddressLength( i, numChevs );
@@ -320,6 +329,7 @@ public partial class StargateMilkyWay : Stargate
 				{
 					chev.TurnOn();
 					chev.ChevronSound( "chevron_sg1_open" );
+					ActiveChevrons++;
 				}
 
 				await Task.DelaySeconds( chevronDelay ); // each chevron delay
@@ -332,6 +342,7 @@ public partial class StargateMilkyWay : Stargate
 			{
 				topChev.TurnOn();
 				topChev.ChevronSound( "chevron_sg1_open" );
+				ActiveChevrons++;
 			}
 		}
 		catch ( Exception )

@@ -342,6 +342,14 @@ public abstract partial class Stargate : Prop, IUse
 		Log.Info( $"Unlocked {sym}, DialingAddress = '{DialingAddress}'" );
 	}
 
+	public void CloseIfNoOtherGate()
+	{
+		if ( Open && !OtherGate.IsValid() )
+		{
+			DoStargateClose();
+		}
+	}
+
 	// THINK
 
 	public void AutoCloseThink()
@@ -357,6 +365,7 @@ public abstract partial class Stargate : Prop, IUse
 	public void StargateTick()
 	{
 		AutoCloseThink();
+		CloseIfNoOtherGate();
 	}
 
 

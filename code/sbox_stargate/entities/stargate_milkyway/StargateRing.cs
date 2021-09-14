@@ -36,11 +36,11 @@ public partial class StargateRing : PlatformEntity
 	private float StoppedAccelAngle = 0f;
 
 	private string StartSoundName = "gate_roll_long";
-	private string LoopSoundName = "gate_sg1_ring_loop";
+	//private string LoopSoundName = "gate_sg1_ring_loop";
 	private string StopSoundName = "gate_sg1_ring_stop";
 
 	private Sound? StartSoundInstance;
-	private Sound? LoopSoundInstance;
+	//private Sound? LoopSoundInstance;
 	private Sound? StopSoundInstance;
 
 	public override void Spawn()
@@ -55,11 +55,6 @@ public partial class StargateRing : PlatformEntity
 		MoveDir = Rotation.Up.EulerAngles;
 		MoveDistance = 360;
 
-		//StartMoveSound = "gate_roll_long";
-		//StartMoveSound = "gate_sg1_ring_start";
-		//MovingSound = "gate_sg1_ring_loop";
-		//StopMoveSound = "gate_sg1_ring_stop";
-
 		base.Spawn();
 
 		EnableAllCollisions = false;
@@ -68,7 +63,7 @@ public partial class StargateRing : PlatformEntity
 	protected override void OnDestroy()
 	{
 		if ( StartSoundInstance.HasValue ) StartSoundInstance.Value.Stop();
-		if ( LoopSoundInstance.HasValue ) LoopSoundInstance.Value.Stop();
+		//if ( LoopSoundInstance.HasValue ) LoopSoundInstance.Value.Stop();
 		if ( StopSoundInstance.HasValue ) StopSoundInstance.Value.Stop();
 
 		base.OnDestroy();
@@ -110,6 +105,7 @@ public partial class StargateRing : PlatformEntity
 		StopSoundInstance = PlaySound( StopSoundName );
 	}
 
+	/*
 	public async void StopLoopSound( float delay = 0 )
 	{
 		if (delay > 0)
@@ -132,6 +128,7 @@ public partial class StargateRing : PlatformEntity
 		StopLoopSound();
 		LoopSoundInstance = PlaySound( LoopSoundName );
 	}
+	*/
 
 	// spinup/spindown - starts or stops rotating the ring
 	public void SpinUp()
@@ -253,7 +250,7 @@ public partial class StargateRing : PlatformEntity
 			{
 				RingCurSpeed = RingMaxSpeed;
 				ShouldAcc = false;
-				StoppedAccelAngle = MathF.Abs( RingAngle - StartedAccelAngle );
+				StoppedAccelAngle = MathF.Abs( RingAngle - StartedAccelAngle ) + 0.5f;
 				CurStopAtAngle = TargetRingAngle - (StoppedAccelAngle * RingDirection * (RingAccelStep / RingDeccelStep));
 			}
 		}
@@ -309,7 +306,7 @@ public partial class StargateRing : PlatformEntity
 			i++;
 		}
 
-		if (Gate.IsValid())	DebugOverlay.Text( Position, Gate.ShouldStopDialing.ToString(), Color.White );
+		DebugOverlay.Text( Position, (RingAngle % 360f).ToString(), Color.White );
 	}
 
 	[Event.Frame]
