@@ -35,7 +35,8 @@ public partial class Rings : AnimEntity, IUse
 	}
 
 	public bool RingsDeployed { get; protected set; } = false;
-	public const string Symbols = "0123456789";
+	// public const string Symbols = "0123456789";
+	public const string Symbols = "12345";
 
 	public static bool IsAddressValid( string address ) {
 
@@ -71,6 +72,34 @@ public partial class Rings : AnimEntity, IUse
 		return generatedAddress;
 	}
 
+	public static Rings GetClosestRing( Vector3 position, Rings[] exclude = null, float maxDistance = -1f ) {
+
+		var allRings = Entity.All.OfType<Rings>();
+
+		Rings final = null;
+		float dist = float.MaxValue;
+
+		foreach ( Rings r in allRings ) {
+			if (exclude is not null && exclude.Contains(r))
+				continue;
+
+			var currDistance = position.Distance(r.Position);
+			if (maxDistance != -1 && currDistance > maxDistance)
+				continue;
+			if (currDistance < dist) {
+				final = r;
+				dist = currDistance;
+			}
+		}
+
+		return final;
+
+	}
+
+	public Rings GetClosestRing() {
+		return Rings.GetClosestRing( Position, new Rings[] { this } );
+	}
+
 	public override void Spawn() {
 		Tags.Add( "no_rings_teleport" );
 
@@ -90,19 +119,36 @@ public partial class Rings : AnimEntity, IUse
 
 	[ServerCmd]
 	public void DialClosest() {
+
+		Rings ring = GetClosestRing();
+		if (ring is not null && ring.IsValid())
+			DialRing(ring);
+	}
+
+	[ServerCmd]
+	public void DialAddress( string address ) {
+		if (IsClient) return;
+
+		var other = Entity.All.OfType<Rings>().Where(x => x.Address == address).FirstOrDefault();
+		if (other is not null && other.IsValid())
+			DialRing(other);
+	}
+
+	public void DialRing( Rings ring ) {
 		if (IsClient) return;
 		if (Busy) return;
+		if (ring == this) return;
 
 		Busy = true;
+		if (ring.IsValid() && !ring.Busy) {
+			ring.Busy = true;
+			DestinationRings = ring;
+			ring.DestinationRings = this;
 
-		var other = Entity.All.OfType<Rings>().Where(x => x != this && !x.Busy).FirstOrDefault();
-		if (other.IsValid()) {
-			other.Busy = true;
-			DestinationRings = other;
-			other.DestinationRings = this;
-			// other.DeployRings();
+			DeployRings(true);
 		}
-		DeployRings(true);
+		else
+			Busy = false;
 	}
 
 	public virtual void OnRingReturn() {
