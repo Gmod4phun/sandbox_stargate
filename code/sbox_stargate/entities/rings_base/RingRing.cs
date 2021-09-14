@@ -4,7 +4,7 @@ using Sandbox;
 
 public partial class RingRing : Prop {
 
-	public Rings RingPlatform;
+	public Rings RingParent;
 
 	public bool isUpsideDown = false;
 
@@ -14,7 +14,9 @@ public partial class RingRing : Prop {
 			return reachedPos;
 		}
 	}
-	public float desiredPos;
+	public Vector3 desiredPos;
+
+	public bool Retract = false;
 
 	public override void Spawn() {
 		base.Spawn();
@@ -28,51 +30,35 @@ public partial class RingRing : Prop {
 		SetModel( "models/gmod4phun/stargate/rings_ancient/ring_ancient.vmdl" );
 	}
 
-	public async Task<bool> MoveUp(int num) {
-		RenderColor = RenderColor.WithAlpha( 1 );
-		reachedPos = false;
-		while (!reachedPos) {
+	public override void MoveFinished() {
+		reachedPos = true;
 
-			if (!this.IsValid())
-				break;
-
-			var speed = (desiredPos - LocalPosition.z) / 10;
-			LocalPosition += new Vector3(0, 0, speed);
-			
-			if (Math.Abs(LocalPosition.z - desiredPos) < 5) {
-				reachedPos = true;
-				break;
-			}
-
-			await Task.Delay(1);
+		if (Retract) {
+			RingParent.OnRingReturn();
+			Delete();
 		}
-
-		return true;
 	}
 
-	public async Task<bool> Refract() {
-		reachedPos = false;
-		while (!reachedPos) {
+	public override void MoveBlocked( Entity ent ) {
+		var dmg = new DamageInfo();
+		dmg.Attacker = RingParent;
+		dmg.Damage = 200;
+		ent.TakeDamage( dmg );
+	}
 
-			if (!this.IsValid())
-				break;
+	public void MoveUp() {
+		RenderColor = RenderColor.WithAlpha(1);
+		Retract = false;
+		Move();
+	}
 
-			var speed = (Math.Abs((desiredPos - LocalPosition.z)) / 10) + 0.1f;
-			LocalPosition -= new Vector3(0, 0, speed);
+	public void Move() {
+		MoveTo(Retract ? RingParent.Position : RingParent.Transform.PointToWorld(desiredPos), 0.2f);
+	}
 
-			if (LocalPosition.z <= 4) {
-				reachedPos = true;
-				break;
-			}
-
-			await Task.Delay(1);
-		}
-
-		RingPlatform.OnRingReturn();
-
-		Delete();
-
-		return true;
+	public void Refract() {
+		Retract = true;
+		Move();
 	}
 
 }

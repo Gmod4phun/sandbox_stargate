@@ -1,6 +1,3 @@
-using System.Linq;
-using System;
-using System.Collections.Generic;
 using Sandbox;
 
 [Library( "ent_rings_ancient", Title = "Rings (Ancient)", Spawnable = true, Group = "Stargate" )]
