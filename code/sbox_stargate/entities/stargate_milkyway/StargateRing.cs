@@ -17,7 +17,9 @@ public partial class StargateRing : PlatformEntity
 	[Net]
 	public float RingAngle { get; private set; } = 0.0f;
 	[Net]
-	public char GateDialingSymbol { get; private set; } = '!';
+	public char CurDialingSymbol { get; private set; } = '!';
+	[Net]
+	public string CurRingSymbol { get; private set; } = "";
 	public float TargetRingAngle { get; private set; } = 0.0f;
 
 	private float RingCurSpeed = 0f;
@@ -203,7 +205,7 @@ public partial class StargateRing : PlatformEntity
 	public async Task<bool> RotateRingToSymbolAsync( char sym, int angOffset = 0 )
 	{
 		RotateRingToSymbol( sym, angOffset );
-		GateDialingSymbol = sym;
+		CurDialingSymbol = sym;
 
 		await Task.DelaySeconds( Global.TickInterval ); // wait, otherwise it hasnt started moving yet and can cause issues
 
@@ -222,8 +224,16 @@ public partial class StargateRing : PlatformEntity
 		return true;
 	}
 
-	[Event.Tick.Server]
-	public void Think()
+	public void RingSymbolThink() // keeps track of the current symbol under the top chevron
+	{
+		var symRange = 360f / RingSymbols.Length;
+		var symCoverage = (RingAngle + symRange/2f).UnsignedMod( symRange );
+		var symIndex = ((int) Math.Round(-RingAngle / ( symRange ))).UnsignedMod( RingSymbols.Length );
+		
+		CurRingSymbol = (symCoverage < 8 && symCoverage > 1) ? RingSymbols[symIndex].ToString() : "";
+	}
+
+	public void RingRotationThink()
 	{
 		if ( !Gate.IsValid() ) return;
 
@@ -274,12 +284,11 @@ public partial class StargateRing : PlatformEntity
 
 		SetSpeed( RingCurSpeed );
 
-		if (ShouldStopAtAngle && IsMoving)
+		if ( ShouldStopAtAngle && IsMoving )
 		{
 			if ( !ShouldAcc && !ShouldDecc )
 			{
-				var angDiff = MathF.Abs( CurrentRotation - CurStopAtAngle );
-				if (angDiff < 1f)
+				if ( MathF.Abs( CurrentRotation - CurStopAtAngle ) < 1f ) // if the angle difference is smal enough, start spindown
 				{
 					SpinDown();
 					ShouldStopAtAngle = false;
@@ -289,6 +298,13 @@ public partial class StargateRing : PlatformEntity
 
 		RingAngle = CurrentRotation;
 		RingDirection = IsMovingForwards ? -1 : 1;
+	}
+
+	[Event.Tick.Server]
+	public void Think()
+	{
+		RingRotationThink();
+		RingSymbolThink();
 	}
 
 	// DEBUG
@@ -302,11 +318,11 @@ public partial class StargateRing : PlatformEntity
 			var rotAng = ang.WithRoll( ang.roll - (i * deg) );
 			var newRot = rotAng.ToRotation();
 			var pos = Position + newRot.Forward * 4 + newRot.Up * 117.5f;
-			DebugOverlay.Text( pos, sym.ToString(), sym == GateDialingSymbol ? Color.Green : Color.Yellow );
+			DebugOverlay.Text( pos, sym.ToString(), sym == CurDialingSymbol ? Color.Green : Color.Yellow );
 			i++;
 		}
 
-		DebugOverlay.Text( Position, (RingAngle % 360f).ToString(), Color.White );
+		DebugOverlay.Text( Position, CurRingSymbol, Color.White );
 	}
 
 	[Event.Frame]

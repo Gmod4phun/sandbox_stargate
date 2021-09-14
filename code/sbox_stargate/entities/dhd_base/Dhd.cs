@@ -240,7 +240,7 @@ public abstract partial class Dhd : Prop
 				var target = Stargate.FindByAddress( sequence );
 				if ( target.IsValid() && target != Gate && target.IsStargateReadyForInboundDHD() && Gate.CanStargateOpen() )
 				{
-					PlaySound( "dhd_dial" );
+					Stargate.PlaySound( this, "dhd_dial" );
 
 					Gate.CurGateState = Stargate.GateState.IDLE; // temporarily make it idle so it can 'begin' dialing
 					Gate.BeginOpenByDHD(sequence);
@@ -294,7 +294,7 @@ public abstract partial class Dhd : Prop
 
 				PressedActions.Add( action );
 				PlayButtonPressAnim( button );
-				PlaySound("dhd_sg1_press");
+				Stargate.PlaySound(this, "dhd_sg1_press");
 
 				Gate.TimeSinceDHDAction = 0;
 			}

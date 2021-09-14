@@ -528,12 +528,6 @@ public partial class StargateMilkyWay : Stargate
 			CurGateState = GateState.DIALING;
 			CurDialType = DialType.DHD;
 
-			if ( !IsValidAddress( address ) )
-			{
-				StopDialing();
-				return;
-			}
-
 			await Task.DelaySeconds( 0.35f );
 
 			var otherGate = FindByAddress( address );
