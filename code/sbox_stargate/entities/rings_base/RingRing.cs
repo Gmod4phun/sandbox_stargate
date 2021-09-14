@@ -4,7 +4,7 @@ using Sandbox;
 
 public partial class RingRing : Prop {
 
-	public Rings Parent;
+	public Rings RingParent;
 
 	public bool isUpsideDown = false;
 
@@ -34,14 +34,14 @@ public partial class RingRing : Prop {
 		reachedPos = true;
 
 		if (Retract) {
-			Parent.OnRingReturn();
+			RingParent.OnRingReturn();
 			Delete();
 		}
 	}
 
 	public override void MoveBlocked( Entity ent ) {
 		var dmg = new DamageInfo();
-		dmg.Attacker = Parent;
+		dmg.Attacker = RingParent;
 		dmg.Damage = 200;
 		ent.TakeDamage( dmg );
 	}
@@ -53,7 +53,7 @@ public partial class RingRing : Prop {
 	}
 
 	public void Move() {
-		MoveTo(Retract ? Parent.Position : Parent.Transform.PointToWorld(desiredPos), 0.2f);
+		MoveTo(Retract ? RingParent.Position : RingParent.Transform.PointToWorld(desiredPos), 0.2f);
 	}
 
 	public void Refract() {
