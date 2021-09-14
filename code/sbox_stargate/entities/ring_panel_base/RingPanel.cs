@@ -6,6 +6,8 @@ public partial class RingPanel : ModelEntity, IUse
 
 	protected List<Transform> Buttons = new();
 	protected string ComposedAddress = "";
+	protected TimeSince TimeSinceButtonPressed = 0;
+	protected float ButtonPressDelay = 0.35f;
 
 	protected virtual int DialButtonNumber { get; }
 	protected virtual string[] ButtonsSounds { get; } = {
@@ -16,22 +18,24 @@ public partial class RingPanel : ModelEntity, IUse
 	protected void GetButtonsPos() {
 		Buttons.Clear();
 		for (int i = 1; i <= 6; i++) {
-			var btnTr = GetBoneTransform( $"button{i}", true );
+			Transform? btnTr = GetBoneTransform( $"button{i}", true );
 
-			if (btnTr == null)
+			if ( !btnTr.HasValue )
 			{
 				Buttons.Clear();
 				throw new System.Exception($"Unable to find {i} button bone on ring panel {GetType()}");
 			}
-
-			Buttons.Add(btnTr);
+			else
+			{
+				Buttons.Add( (Transform)btnTr );
+			}
 		}
 	}
 
 	protected async void ToggleButton(int id) {
 		SetMaterialGroup(id);
 		PlaySound(id != DialButtonNumber ? ButtonsSounds[1] : ButtonsSounds[0]);
-		await Task.Delay(350);
+		await Task.DelaySeconds( ButtonPressDelay );
 		SetMaterialGroup(0);
 	}
 
@@ -44,6 +48,8 @@ public partial class RingPanel : ModelEntity, IUse
 	{
 		if ( ent is not SandboxPlayer )
 			return false;
+
+		if ( TimeSinceButtonPressed < ButtonPressDelay ) return false;
 
 		var tra = Trace.Ray(ent.EyePos, ent.EyePos + ent.EyeRot.Forward * 250)
 			.Ignore(ent)
@@ -61,6 +67,7 @@ public partial class RingPanel : ModelEntity, IUse
 
 				if (dist <= 1.65f) {
 					ToggleButton(Buttons.IndexOf(btn) + 1);
+					TimeSinceButtonPressed = 0;
 
 					if (i + 1 == DialButtonNumber)
 					{
@@ -89,5 +96,16 @@ public partial class RingPanel : ModelEntity, IUse
 		}
 		
 		return false;
+	}
+
+	public void ButtonResetThink()
+	{
+		if ( TimeSinceButtonPressed > 5 && ComposedAddress != "" ) ComposedAddress = "";
+	}
+
+	[Event.Tick.Server]
+	public void Think()
+	{
+		ButtonResetThink();
 	}
 }
