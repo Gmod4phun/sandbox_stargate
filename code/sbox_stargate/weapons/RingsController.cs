@@ -23,8 +23,12 @@ public partial class StargateRingsController : Weapon
 	{
 		TimeSincePrimaryAttack = 0;
 
-		var ring = Entity.All.OfType<Rings>().FirstOrDefault();
+		using (Prediction.Off()) {
+			var ring = Rings.GetClosestRing(Owner.Position, null, 500f);
+			if (ring is null || !ring.IsValid())
+				return;
 
-		ring.DialClosest();
+			ring.DialClosest();
+		}
 	}
 }

@@ -119,7 +119,8 @@ public partial class Rings : AnimEntity, IUse
 
 	[ServerCmd]
 	public void DialClosest() {
-
+		if ( IsClient )
+			return;
 		Rings ring = GetClosestRing();
 		if (ring is not null && ring.IsValid())
 			DialRing(ring);
