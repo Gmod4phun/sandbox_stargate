@@ -170,8 +170,8 @@ public partial class StargateMilkyWay : Stargate
 	{
 		if ( chev.IsValid() )
 		{
-			chev.ChevronSound( "chevron_sg1_open" );
-			chev.ChevronSound( "chevron_sg1_close", 0.75f );
+			PlaySound( chev, "chevron_sg1_open" );
+			PlaySound( chev, "chevron_sg1_close", 0.75f );
 			chev.ChevronAnim( "lock" );
 			chev.ChevronAnim( "unlock", 0.8f );
 
@@ -242,7 +242,7 @@ public partial class StargateMilkyWay : Stargate
 				if ( chev.IsValid() )
 				{
 					chev.TurnOn();
-					chev.ChevronSound( "chevron_sg1_open" );
+					PlaySound( chev, "chevron_sg1_open" );
 					ActiveChevrons++;
 				}
 
@@ -263,11 +263,12 @@ public partial class StargateMilkyWay : Stargate
 			if ( topChev.IsValid() )
 			{
 				if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) topChev.TurnOn();
-				//topChev.ChevronLockUnlockLong();
+
 				topChev.ChevronAnim( "lock" );
-				topChev.ChevronSound( "chevron_sg1_open", 0.2f );
+				PlaySound( topChev, "chevron_sg1_open", 0.2f );
 				topChev.ChevronAnim( "unlock", 1f );
-				topChev.ChevronSound( "chevron_sg1_close", 1.05f );
+				PlaySound( topChev, "chevron_sg1_close", 1.05f );
+
 				ActiveChevrons++;
 			}
 
@@ -328,7 +329,7 @@ public partial class StargateMilkyWay : Stargate
 				if ( chev.IsValid() )
 				{
 					chev.TurnOn();
-					chev.ChevronSound( "chevron_sg1_open" );
+					PlaySound( chev, "chevron_sg1_open" );
 					ActiveChevrons++;
 				}
 
@@ -341,7 +342,7 @@ public partial class StargateMilkyWay : Stargate
 			if ( topChev.IsValid() )
 			{
 				topChev.TurnOn();
-				topChev.ChevronSound( "chevron_sg1_open" );
+				PlaySound( topChev, "chevron_sg1_open" );
 				ActiveChevrons++;
 			}
 		}
@@ -461,7 +462,7 @@ public partial class StargateMilkyWay : Stargate
 				if ( chev.IsValid() )
 				{
 					chev.TurnOn();
-					if ( i == 1 ) chev.ChevronSound( "chevron_incoming" ); // play once to avoid insta earrape
+					if ( i == 1 ) PlaySound( chev, "chevron_sg1_open" ); // play once to avoid insta earrape
 				}
 				
 			}
@@ -502,7 +503,7 @@ public partial class StargateMilkyWay : Stargate
 				if ( chev.IsValid() )
 				{
 					chev.TurnOn();
-					if ( i == 1 ) chev.ChevronSound( "chevron_incoming" ); // play once to avoid insta earrape
+					if ( i == 1 ) PlaySound( chev, "chevron_sg1_open" ); // play once to avoid insta earrape
 				}
 			}
 
@@ -552,11 +553,7 @@ public partial class StargateMilkyWay : Stargate
 		}
 		catch ( Exception )
 		{
-			if ( this.IsValid() )
-			{
-				Log.Info( "exceptson" );
-				StopDialing();
-			}
+			if ( this.IsValid() ) StopDialing();
 		}
 	}
 
@@ -577,7 +574,7 @@ public partial class StargateMilkyWay : Stargate
 				if ( chev.IsValid() )
 				{
 					chev.TurnOn();
-					if ( i == 1 ) chev.ChevronSound( "chevron_sg1_open" ); // play once to avoid insta earrape
+					if ( i == 1 ) PlaySound( chev, "chevron_sg1_open" ); // play once to avoid insta earrape
 				}
 
 			}
@@ -599,7 +596,7 @@ public partial class StargateMilkyWay : Stargate
 		EncodedChevronsOrdered.Add( chev );
 
 		chev?.TurnOn(0.1f);
-		chev?.ChevronSound( "chevron_sg1_open", 0.15f );
+		PlaySound( chev, "chevron_sg1_open", 0.15f );
 	}
 
 	public override void DoChevronLock( char sym ) // only the top chevron locks, always
@@ -609,19 +606,13 @@ public partial class StargateMilkyWay : Stargate
 		var chev = GetTopChevron();
 		EncodedChevronsOrdered.Add( chev );
 
-		chev?.ChevronSound( "chevron_sg1_open", 0.15f );
-		chev?.ChevronSound( "chevron_sg1_close", 1.05f );
+		PlaySound( chev, "chevron_sg1_open", 0.15f );
+		PlaySound( chev, "chevron_sg1_close", 1.05f );
 		chev?.ChevronAnim( "lock", 0.2f );
 		chev?.ChevronAnim( "unlock", 1f );
 
 		var gate = FindByAddress( DialingAddress );
-		if (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD())
-		{
-			chev?.TurnOn(0.5f);
-			
-			//gate.BeginInboundDHD(Address, DialingAddress.Length);
-			//OtherGate = gate;
-		}
+		if (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD()) chev?.TurnOn(0.5f);
 	}
 
 	public override void DoChevronUnlock( char sym )

@@ -46,17 +46,6 @@ public partial class Chevron : AnimEntity
 		CurrentSequence.Name = name;
 	}
 
-	public async void ChevronSound(string name, float delay = 0)
-	{
-		if ( delay > 0 )
-		{
-			await Task.DelaySeconds( delay );
-			if ( !this.IsValid() ) return;
-		}
-
-		Sound.FromEntity( name, this );
-	}
-
 	public async void TurnOn(float delay = 0)
 	{
 		if ( delay > 0 )
