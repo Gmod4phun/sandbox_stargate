@@ -271,6 +271,8 @@ public abstract partial class Dhd : Prop
 
 				PressedActions.Remove( action );
 				PlayButtonPressAnim( button );
+
+				Gate.TimeSinceDHDAction = 0;
 			}
 			else // otherwise activate it
 			{
@@ -293,10 +295,10 @@ public abstract partial class Dhd : Prop
 				PressedActions.Add( action );
 				PlayButtonPressAnim( button );
 				PlaySound("dhd_sg1_press");
+
+				Gate.TimeSinceDHDAction = 0;
 			}
 		}
-
-
 	}
 
 	[Event.Tick.Server]

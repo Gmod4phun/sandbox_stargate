@@ -49,6 +49,9 @@ public abstract partial class Stargate : Prop, IUse
 	public string DialingAddress { get; set; } = "";
 	public int ActiveChevrons = 0;
 
+	public TimeSince TimeSinceDHDAction = 0f;
+	public float DhdDialShutdownTime = 20f;
+
 	// VARIABLE RESET
 	public virtual void ResetGateVariablesToIdle()
 	{
@@ -342,16 +345,7 @@ public abstract partial class Stargate : Prop, IUse
 		Log.Info( $"Unlocked {sym}, DialingAddress = '{DialingAddress}'" );
 	}
 
-	public void CloseIfNoOtherGate()
-	{
-		if ( Open && !OtherGate.IsValid() )
-		{
-			DoStargateClose();
-		}
-	}
-
 	// THINK
-
 	public void AutoCloseThink()
 	{
 		if ( AutoClose && AutoCloseTime != -1 && AutoCloseTime <= Time.Now && CanStargateClose() )
@@ -361,11 +355,28 @@ public abstract partial class Stargate : Prop, IUse
 		}
 	}
 
+	public void CloseIfNoOtherGate()
+	{
+		if ( Open && !OtherGate.IsValid() )
+		{
+			DoStargateClose();
+		}
+	}
+
+	public void DhdDialTimerThink()
+	{
+		if ( Dialing && CurDialType is DialType.DHD && TimeSinceDHDAction > DhdDialShutdownTime )
+		{
+			StopDialing();
+		}
+	}
+
 	[Event( "server.tick" )]
 	public void StargateTick()
 	{
 		AutoCloseThink();
 		CloseIfNoOtherGate();
+		DhdDialTimerThink();
 	}
 
 
