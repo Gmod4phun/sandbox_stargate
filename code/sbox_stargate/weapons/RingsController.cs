@@ -24,7 +24,15 @@ public partial class StargateRingsController : Weapon
 		TimeSincePrimaryAttack = 0;
 
 		using (Prediction.Off()) {
-			var ring = Rings.GetClosestRing(Owner.Position, null, 500f);
+			Rings ring;
+
+			var tr = Trace.Ray(Owner.EyePos, Owner.EyePos + Owner.EyeRot.Forward * 500f).Ignore(Owner).Run();
+
+			if (tr.Hit && tr.Entity is Rings)
+				ring = tr.Entity as Rings;
+			else
+				ring = Rings.GetClosestRing(Owner.Position, null, 500f);
+
 			if (ring is null || !ring.IsValid())
 				return;
 
