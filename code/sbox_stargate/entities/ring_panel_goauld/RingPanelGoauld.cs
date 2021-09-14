@@ -18,7 +18,9 @@ public partial class RingPanelGoauld : RingPanel {
 
 		Transmit = TransmitType.Always;
 		SetModel( "models/gmod4phun/stargate/rings_panel/goauld/goauld.vmdl" );
-		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
+		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, false );
+
+		PhysicsBody.BodyType = PhysicsBodyType.Static;
 	}
 
 }

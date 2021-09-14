@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Sandbox;
 
-public partial class RingPanel : AnimEntity, IUse
+public partial class RingPanel : ModelEntity, IUse
 {
 
 	protected List<Transform> Buttons = new();
