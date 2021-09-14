@@ -106,7 +106,7 @@ public partial class Rings : AnimEntity, IUse
 
 			RingRing r = new();
 
-			r.Parent = this;
+			r.RingPlatform = this;
 			r.SetParent(this);
 			r.isUpsideDown = isUpDown;
 			r.Position = isUpDown ? Position + Rotation.Up * 15 : Position;

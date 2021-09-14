@@ -101,6 +101,13 @@ public partial class EventHorizon : AnimEntity
 	// CLIENT ANIM CONTROL
 
 	[ClientRpc]
+	public void TeleportScreenOverlay()
+	{
+		var hud = Local.Hud;
+		hud?.AddChild<EventHorizonScreenOverlay>();
+	}
+
+	[ClientRpc]
 	public void EstablishClientAnim()
 	{
 		curFrame = minFrame;
@@ -181,7 +188,7 @@ public partial class EventHorizon : AnimEntity
 	{
 		// draw the EH at 0.6 alpha when looking at it from behind -- doesnt work in thirdperson at the moment
 		var pawn = Local.Pawn;
-		if ( pawn.IsValid() ) RenderAlpha = IsPawnBehindEventHorizon(pawn) ? 0.6f : 1f;
+		if ( pawn.IsValid() ) RenderColor = RenderColor.WithAlpha(IsPawnBehindEventHorizon(pawn) ? 0.6f : 1f);
 	}
 
 	// TELEPORT
@@ -212,6 +219,9 @@ public partial class EventHorizon : AnimEntity
 
 		if (ent is SandboxPlayer ply)
 		{
+
+			TeleportScreenOverlay( To.Single( ply ) );
+
 			var oldController = ply.DevController;
 			using ( Prediction.Off() ) ply.DevController = new EventHorizonController();
 

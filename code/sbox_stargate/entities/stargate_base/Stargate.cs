@@ -9,7 +9,6 @@ public abstract partial class Stargate : Prop, IUse
 {
 	public Vector3 SpawnOffset = new( 0, 0, 90 );
 
-	public StargateRing Ring;
 	public List<Chevron> Chevrons = new();
 
 	public EventHorizon EventHorizon;
@@ -33,7 +32,9 @@ public abstract partial class Stargate : Prop, IUse
 
 	public bool Busy { get; set; } = false; // this is pretty much used anytime the gate is busy to do anything (usually during animations/transitions)
 	public bool Inbound { get; set; } = false;
-	public bool ShouldStopDialing = false;
+
+	[Net]
+	public bool ShouldStopDialing { get; set; } = false;
 	public GateState CurGateState { get; set; } = GateState.IDLE;
 	public DialType CurDialType { get; set; } = DialType.FAST;
 
@@ -46,6 +47,10 @@ public abstract partial class Stargate : Prop, IUse
 	public bool Closing { get => CurGateState is GateState.CLOSING; }
 
 	public string DialingAddress { get; set; } = "";
+	public int ActiveChevrons = 0;
+
+	public TimeSince TimeSinceDHDAction = 0f;
+	public float DhdDialShutdownTime = 20f;
 
 	// VARIABLE RESET
 	public virtual void ResetGateVariablesToIdle()
@@ -57,6 +62,7 @@ public abstract partial class Stargate : Prop, IUse
 		CurGateState = GateState.IDLE;
 		CurDialType = DialType.FAST;
 		DialingAddress = "";
+		ActiveChevrons = 0;
 	}
 
 	// USABILITY
@@ -340,7 +346,6 @@ public abstract partial class Stargate : Prop, IUse
 	}
 
 	// THINK
-
 	public void AutoCloseThink()
 	{
 		if ( AutoClose && AutoCloseTime != -1 && AutoCloseTime <= Time.Now && CanStargateClose() )
@@ -350,10 +355,28 @@ public abstract partial class Stargate : Prop, IUse
 		}
 	}
 
+	public void CloseIfNoOtherGate()
+	{
+		if ( Open && !OtherGate.IsValid() )
+		{
+			DoStargateClose();
+		}
+	}
+
+	public void DhdDialTimerThink()
+	{
+		if ( Dialing && CurDialType is DialType.DHD && TimeSinceDHDAction > DhdDialShutdownTime )
+		{
+			StopDialing();
+		}
+	}
+
 	[Event( "server.tick" )]
 	public void StargateTick()
 	{
 		AutoCloseThink();
+		CloseIfNoOtherGate();
+		DhdDialTimerThink();
 	}
 
 

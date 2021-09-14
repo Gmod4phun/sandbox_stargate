@@ -131,7 +131,7 @@
 					CreateHitEffects( tr.EndPos );
 
 
-					if ( tr.Entity is StargateMilkyWay gate )
+					if ( tr.Entity is Stargate gate )
 					{
 						if ( gate.Busy ) return;
 

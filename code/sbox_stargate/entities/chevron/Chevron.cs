@@ -35,12 +35,7 @@ public partial class Chevron : AnimEntity
 		Light.Enabled = On;
 	}
 
-	public void ChevronAnim(string name)
-	{
-		CurrentSequence.Name = name;
-	}
-
-	public async void ChevronSound(string name, float delay = 0)
+	public async void ChevronAnim(string name, float delay = 0)
 	{
 		if ( delay > 0 )
 		{
@@ -48,32 +43,7 @@ public partial class Chevron : AnimEntity
 			if ( !this.IsValid() ) return;
 		}
 
-		Sound.FromEntity( name, this );
-	}
-
-	public void ChevronLock()
-	{
-		ChevronAnim( "lock" );
-	}
-
-	public void ChevronUnlock()
-	{
-		ChevronAnim( "unlock" );
-	}
-
-	public void ChevronLockUnlock()
-	{
-		ChevronAnim( "lock_unlock" );
-	}
-
-	public void ChevronLockUnlockLong()
-	{
-		ChevronAnim( "lock_unlock_long" );
-	}
-
-	public void ChevronLockUnlockMovie()
-	{
-		ChevronAnim( "lock_unlock_movie" );
+		CurrentSequence.Name = name;
 	}
 
 	public async void TurnOn(float delay = 0)

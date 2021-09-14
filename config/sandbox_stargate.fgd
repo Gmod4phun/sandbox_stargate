@@ -1,5 +1,5 @@
 // 
-// SandboxGame : Sandbox.Game 
+// SandboxGame
 // 
 @PointClass = sandbox : ""
 [
@@ -9,7 +9,7 @@
 ]
 
 // 
-// Tool : Carriable 
+// Tool
 // 
 @PointClass = weapon_tool : ""
 [
@@ -21,7 +21,7 @@
 ]
 
 // 
-// BalloonEntity : Sandbox.Prop 
+// BalloonEntity
 // 
 @PointClass model() = ent_balloon : ""
 [
@@ -49,7 +49,7 @@
 ]
 
 // 
-// BouncyBallEntity : Sandbox.Prop 
+// BouncyBallEntity
 // 
 @PointClass model() = ent_bouncyball : ""
 [
@@ -77,7 +77,7 @@
 ]
 
 // 
-// DirectionalGravity : Sandbox.Prop 
+// DirectionalGravity
 // 
 @PointClass model() = directional_gravity : ""
 [
@@ -105,7 +105,7 @@
 ]
 
 // 
-// DroneEntity : Sandbox.Prop 
+// DroneEntity
 // 
 @PointClass model() = ent_drone : ""
 [
@@ -133,7 +133,7 @@
 ]
 
 // 
-// LampEntity : Sandbox.SpotLightEntity 
+// LampEntity
 // 
 @PointClass = ent_lamp : ""
 [
@@ -152,7 +152,7 @@
 ]
 
 // 
-// LightEntity : Sandbox.PointLightEntity 
+// LightEntity
 // 
 @PointClass = ent_light : ""
 [
@@ -171,7 +171,7 @@
 ]
 
 // 
-// NoiseTest : Sandbox.Prop 
+// NoiseTest
 // 
 @PointClass model() = noise_test : ""
 [
@@ -199,7 +199,7 @@
 ]
 
 // 
-// ThrusterEntity : Sandbox.Prop 
+// ThrusterEntity
 // 
 @PointClass model() = ent_thruster : ""
 [
@@ -227,7 +227,7 @@
 ]
 
 // 
-// WheelEntity : Sandbox.Prop 
+// WheelEntity
 // 
 @PointClass model() = ent_wheel : ""
 [
@@ -255,7 +255,7 @@
 ]
 
 // 
-// GravGun : Carriable 
+// GravGun
 // 
 @PointClass = gravgun : ""
 [
@@ -267,7 +267,7 @@
 ]
 
 // 
-// PhysGun : Carriable 
+// PhysGun
 // 
 @PointClass = physgun : ""
 [
@@ -279,7 +279,7 @@
 ]
 
 // 
-// Flashlight : Weapon 
+// Flashlight
 // 
 @PointClass = weapon_flashlight : ""
 [
@@ -291,7 +291,7 @@
 ]
 
 // 
-// Pistol : Weapon 
+// Pistol
 // 
 @PointClass = weapon_pistol : ""
 [
@@ -303,7 +303,7 @@
 ]
 
 // 
-// Shotgun : Weapon 
+// Shotgun
 // 
 @PointClass = weapon_shotgun : ""
 [
@@ -315,7 +315,7 @@
 ]
 
 // 
-// SMG : Weapon 
+// SMG
 // 
 @PointClass = weapon_smg : ""
 [
@@ -327,7 +327,7 @@
 ]
 
 // 
-// CarEntity : Sandbox.Prop 
+// CarEntity
 // 
 @PointClass model() = ent_car : ""
 [
@@ -355,7 +355,7 @@
 ]
 
 // 
-// StargateNoxHands : Weapon 
+// StargateNoxHands
 // 
 @PointClass = weapon_stargate_noxhands : "Instant dialling of the gate, without kawoosh effect."
 [
@@ -367,7 +367,7 @@
 ]
 
 // 
-// DhdMilkyWay : Dhd 
+// DhdMilkyWay
 // 
 @PointClass model() = ent_dhd_milkyway : ""
 [
@@ -396,7 +396,7 @@
 ]
 
 // 
-// RingsAncient : Rings 
+// RingsAncient
 // 
 @PointClass = ent_rings_ancient : ""
 [
@@ -408,7 +408,7 @@
 ]
 
 // 
-// RingsGoauld : Rings 
+// RingsGoauld
 // 
 @PointClass = ent_rings_goauld : ""
 [
@@ -420,7 +420,7 @@
 ]
 
 // 
-// StargateMilkyWay : Stargate 
+// StargateMilkyWay
 // 
 @PointClass model() = ent_stargate_milkyway : ""
 [
@@ -445,51 +445,5 @@
 	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
 
 	output OnDamaged(void) : "Fired when the entity gets damaged"
-]
-
-// 
-// StargateRingTest : Sandbox.PlatformEntity 
-// 
-@PointClass tags( SupportsSolids ) model() drawangles( movedir, movedir_islocal ) = ent_stargate_ringtest : ""
-[
-	model(studio) [report]: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) [ group="Render Properties" ] : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) [ group="Render Properties" ] : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
-	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
-	renderamt(integer) [ group="Render Properties" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
-	targetname(target_source) : "Name" : : "The name that other entities refer to this entity by."
-	parentname(target_destination) [ group="Hierarchy" ] : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
-	movedir(angle) : "Move Direction" :  : "Specifies the direction to move in when the platform is used, or axis of rotation for rotating platforms."
-	movedir_islocal(boolean) : "Move Direction is Expressed in Local Space" : 1 : "If checked, the movement direction angle is in local space and should be rotated by the entity's angles after spawning."
-	movedir_type(choices) : "Movement Type" : 3 : "Movement type of the platform. Moving: Moving linearly and reversing direction at final position if Looping is enabled. Rotating: Rotating and reversing direction at final rotation if Looping is enabled. Rotating Continious: Rotating continiously past Move Distance. OnReached outputs are fired every Move Distance degrees." =
-	[
-		3 : "Moving"
-		1 : "Rotating"
-		4 : "Rotating Continious"
-	]
-	movedistance(float) : "Move Distance" : 100 : "How much to move in the move direction, or rotate around the axis for rotating move type."
-	speed(float) : "Speed" : 64 : "The speed to move/rotate with."
-	timetohold(float) : "Time To Hold" : 0 : "If set to above 0, the amount of time to wait before automatically toggling direction."
-	spawnsettings(flags) : "Spawn Settings" : : "Settings that are only applicable when the entity spawns" =
-	[
-		1 : "Starts Moving" : 1
-		2 : "Loop Movement" : 0
-	]
-	startmovesound(sound) [ group="Sounds" ] : "Start Move Sound" :  : "Sound to play when starting to move"
-	stopmovesound(sound) [ group="Sounds" ] : "Stop Move Sound" :  : "Sound to play when we stopped moving"
-	moving_sound(sound) [ group="Sounds" ] : "Moving Sound" :  : "Sound to play while platform is moving."
-	enable_shadows(boolean) [ group="Render Properties" ] : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
-
-	input StartMoving(void) : "Start moving in platform's current move direction"
-	input StartMovingForward(void) : "Set the move direction to forwards and start moving"
-	input StartMovingBackwards(void) : "Set the move direction to backwards and start moving"
-	input ReverseMoving(void) : "Reverse current move direction. Will NOT start moving if stopped"
-	input StopMoving(void) : "Stop moving, preserving move direction"
-	input ToggleMoving(void) : "Toggle moving, preserving move direction"
-	input SetSpeed(float) : "Sets the move speed"
-	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
-
-	output OnReachedStart(void) : "Fired when the platform reaches its beginning location"
-	output OnReachedEnd(void) : "Fired when the platform reaches its end location (startPos + dir * distance)"
 ]
 
