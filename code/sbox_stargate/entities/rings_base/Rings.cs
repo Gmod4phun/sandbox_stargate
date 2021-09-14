@@ -113,7 +113,7 @@ public partial class Rings : AnimEntity, IUse
 
 	public virtual bool OnUse( Entity user )
 	{
-		DialClosest();
+		// Make & show a rings menu
 		return false;
 	}
 
@@ -134,6 +134,7 @@ public partial class Rings : AnimEntity, IUse
 			DialRing(other);
 	}
 
+	[ServerCmd]
 	public void DialRing( Rings ring ) {
 		if (IsClient) return;
 		if (Busy) return;
