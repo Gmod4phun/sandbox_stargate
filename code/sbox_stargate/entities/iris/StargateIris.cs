@@ -13,7 +13,7 @@ public partial class StargateIris : AnimEntity
 	{
 		base.Spawn();
 
-		SetModel( "models/gmod4phun/stargate/iris/iris.vmdl" );
+		SetModel( "models/sbox_stargate/iris/iris.vmdl" );
 		SetupPhysicsFromModel( PhysicsMotionType.Static, true );
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
 		SetMaterialGroup(1);

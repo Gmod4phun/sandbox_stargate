@@ -59,13 +59,13 @@ public abstract partial class Dhd : Prop
 		// SYMBOL BUTTONS
 		for ( var i = 0; i < ButtonSymbols.Length; i++ )
 		{
-			var modelName = $"models/gmod4phun/stargate/dhd/trigger_buttons/dhd_trigger_button_{i + 1}.vmdl";
+			var modelName = $"models/sbox_stargate/dhd/trigger_buttons/dhd_trigger_button_{i + 1}.vmdl";
 			var actionName = ButtonSymbols[i].ToString();
 			CreateSingleButtonTrigger( modelName, actionName );
 		}
 
 		// CENTER DIAL BUTTON
-		CreateSingleButtonTrigger( "models/gmod4phun/stargate/dhd/trigger_buttons/dhd_trigger_button_39.vmdl", "DIAL" );
+		CreateSingleButtonTrigger( "models/sbox_stargate/dhd/trigger_buttons/dhd_trigger_button_39.vmdl", "DIAL" );
 	}
 
 	public virtual void CreateSingleButton(string model, string action, DhdButtonTrigger buttonTrigger, int bodygroup, int subgroup) // visible model of buttons that turn on/off and animate
@@ -95,7 +95,7 @@ public abstract partial class Dhd : Prop
 		foreach ( var trigger in ButtonTriggers )
 		{
 			// uses a single model that has all buttons as bodygroups, that way animations/matgroups for all buttons can be edited at once
-			CreateSingleButton( "models/gmod4phun/stargate/dhd/dhd_buttons.vmdl", trigger.Key, trigger.Value, 1, i++);
+			CreateSingleButton( "models/sbox_stargate/dhd/dhd_buttons.vmdl", trigger.Key, trigger.Value, 1, i++);
 		}
 	}
 

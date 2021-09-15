@@ -5,7 +5,7 @@
 	{
 		PreviewEntity previewModel;
 
-		private string Model => "models/gmod4phun/stargate/dhd/dhd.vmdl";
+		private string Model => "models/sbox_stargate/dhd/dhd.vmdl";
 		protected override bool IsPreviewTraceValid( TraceResult tr )
 		{
 			if ( !base.IsPreviewTraceValid( tr ) )

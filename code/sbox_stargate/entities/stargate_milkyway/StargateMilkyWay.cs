@@ -19,7 +19,7 @@ public partial class StargateMilkyWay : Stargate
 		base.Spawn();
 
 		Transmit = TransmitType.Always;
-		SetModel( "models/gmod4phun/stargate/gate_sg1/gate_sg1.vmdl" );
+		SetModel( "models/sbox_stargate/gate_sg1/gate_sg1.vmdl" );
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
 

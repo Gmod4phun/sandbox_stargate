@@ -7,7 +7,7 @@
 
 		static string address = "";
 
-		private string Model => "models/gmod4phun/stargate/gate_sg1/gate_sg1.vmdl";
+		private string Model => "models/sbox_stargate/gate_sg1/gate_sg1.vmdl";
 
 		protected override bool IsPreviewTraceValid( TraceResult tr )
 		{

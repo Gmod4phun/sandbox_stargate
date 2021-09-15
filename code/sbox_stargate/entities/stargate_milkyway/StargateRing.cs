@@ -49,7 +49,7 @@ public partial class StargateRing : PlatformEntity
 	{
 		Transmit = TransmitType.Always;
 
-		SetModel( "models/gmod4phun/stargate/gate_sg1/ring_sg1.vmdl" );
+		SetModel( "models/sbox_stargate/gate_sg1/ring_sg1.vmdl" );
 
 		SpawnSettings = Flags.LoopMovement;
 		MoveDirType = PlatformMoveType.RotatingContinious;

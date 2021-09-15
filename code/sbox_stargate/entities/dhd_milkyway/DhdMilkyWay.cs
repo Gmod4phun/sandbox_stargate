@@ -10,7 +10,7 @@ public partial class DhdMilkyWay : Dhd
 		base.Spawn();
 
 		Transmit = TransmitType.Always;
-		SetModel( "models/gmod4phun/stargate/dhd/dhd.vmdl" );
+		SetModel( "models/sbox_stargate/dhd/dhd.vmdl" );
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
 

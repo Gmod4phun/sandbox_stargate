@@ -10,7 +10,7 @@ public partial class RingPanelGoauld : RingPanel {
 		base.Spawn();
 
 		Transmit = TransmitType.Always;
-		SetModel( "models/gmod4phun/stargate/rings_panel/goauld/ring_panel_goauld.vmdl" );
+		SetModel( "models/sbox_stargate/rings_panel/goauld/ring_panel_goauld.vmdl" );
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, false );
 
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
@@ -23,7 +23,7 @@ public partial class RingPanelGoauld : RingPanel {
 		for ( var i = 1; i <= 6; i++ )
 		{
 			var button = new RingPanelButton();
-			button.SetModel( $"models/gmod4phun/stargate/rings_panel/goauld/ring_panel_goauld_button_{i}.vmdl" );
+			button.SetModel( $"models/sbox_stargate/rings_panel/goauld/ring_panel_goauld_button_{i}.vmdl" );
 			button.SetupPhysicsFromModel( PhysicsMotionType.Static, true ); // needs to have physics for traces
 			button.PhysicsBody.BodyType = PhysicsBodyType.Static;
 			button.EnableAllCollisions = false; // no collissions needed

@@ -4,7 +4,7 @@
 	public partial class StargateIrisTool : BaseTool
 	{
 		PreviewEntity previewModel;
-		private string Model => "models/gmod4phun/stargate/iris/iris.vmdl";
+		private string Model => "models/sbox_stargate/iris/iris.vmdl";
 
 		protected override bool IsPreviewTraceValid( TraceResult tr )
 		{

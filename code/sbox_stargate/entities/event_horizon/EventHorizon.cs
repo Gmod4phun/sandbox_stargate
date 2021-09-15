@@ -43,7 +43,7 @@ public partial class EventHorizon : AnimEntity
 		base.Spawn();
 		Transmit = TransmitType.Always;
 
-		SetModel( "models/gmod4phun/stargate/event_horizon/event_horizon.vmdl" );
+		SetModel( "models/sbox_stargate/event_horizon/event_horizon.vmdl" );
 		SetMaterialGroup( 1 );
 		SetupPhysicsFromModel( PhysicsMotionType.Static, true );
 		PhysicsBody.BodyType = PhysicsBodyType.Static;

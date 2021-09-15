@@ -15,7 +15,7 @@ public partial class Chevron : AnimEntity
 		base.Spawn();
 		Transmit = TransmitType.Always;
 
-		SetModel( "models/gmod4phun/stargate/gate_sg1/chevron.vmdl" );
+		SetModel( "models/sbox_stargate/gate_sg1/chevron.vmdl" );
 
 		CreateLight();
 	}

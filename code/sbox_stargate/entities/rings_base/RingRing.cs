@@ -27,7 +27,7 @@ public partial class RingRing : Prop {
 		RenderColor = RenderColor.WithAlpha(0);
 
 		Transmit = TransmitType.Always;
-		SetModel( "models/gmod4phun/stargate/rings_ancient/ring_ancient.vmdl" );
+		SetModel( "models/sbox_stargate/rings_ancient/ring_ancient.vmdl" );
 	}
 
 	public override void MoveFinished() {

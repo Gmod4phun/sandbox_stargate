@@ -10,7 +10,7 @@ public partial class RingPanelAncient : RingPanel {
 		base.Spawn();
 
 		Transmit = TransmitType.Always;
-		SetModel( "models/gmod4phun/stargate/rings_panel/ancient/ring_panel_ancient.vmdl" );
+		SetModel( "models/sbox_stargate/rings_panel/ancient/ring_panel_ancient.vmdl" );
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, false );
 
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
@@ -23,7 +23,7 @@ public partial class RingPanelAncient : RingPanel {
 		for ( var i = 1; i <= 9; i++ )
 		{
 			var button = new RingPanelButton();
-			button.SetModel( $"models/gmod4phun/stargate/rings_panel/ancient/ring_panel_ancient_button_{i}.vmdl" );
+			button.SetModel( $"models/sbox_stargate/rings_panel/ancient/ring_panel_ancient_button_{i}.vmdl" );
 			button.SetupPhysicsFromModel( PhysicsMotionType.Static, true ); // needs to have physics for traces
 			button.PhysicsBody.BodyType = PhysicsBodyType.Static;
 			button.EnableAllCollisions = false; // no collissions needed

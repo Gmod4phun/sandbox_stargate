@@ -8,7 +8,7 @@ public partial class RingsGoauld : Rings {
 		base.Spawn();
 
 		Transmit = TransmitType.Always;
-		SetModel( "models/gmod4phun/stargate/rings_ancient/ring_ancient.vmdl" );
+		SetModel( "models/sbox_stargate/rings_ancient/ring_ancient.vmdl" );
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 	}
 
