@@ -1,4 +1,5 @@
 ﻿
+using System.Linq;
 using Sandbox;
 using Sandbox.UI;
 using Sandbox.UI.Construct;
@@ -24,16 +25,27 @@ public partial class SpawnMenu : Panel
 			tabs.AddClass( "tabs" );
 
 			var body = left.Add.Panel( "body" );
-
 			{
+
 				var props = body.AddChild<SpawnList>();
 				tabs.SelectedButton = tabs.AddButtonActive( "Props", ( b ) => props.SetClass( "active", b ) );
 
 				var ents = body.AddChild<EntityList>();
 				tabs.AddButtonActive( "Entities", ( b ) => ents.SetClass( "active", b ) );
 
-				var stargate = body.AddChild<StargateList>();
-				tabs.AddButtonActive( "Stargate", ( b ) => stargate.SetClass( "active", b ) );
+				var childs = Library.GetAllAttributes<ILeftSpawnMenuTab>().ToArray();
+
+				foreach ( LibraryAttribute t in childs ) {
+					if (t.Name == "ILeftSpawnMenuTab")
+						continue;
+					
+					var e = Library.Create<Panel>(t.Name);
+					body.AddChild(e);
+					tabs.SelectedButton = tabs.AddButtonActive( t.Title, ( b ) => e.SetClass( "active", b ) );
+				}
+
+				// var stargate = body.AddChild<StargateList>();
+				// tabs.AddButtonActive( "Stargate", ( b ) => stargate.SetClass( "active", b ) );
 			}
 		}
 
@@ -83,6 +95,7 @@ public partial class SpawnMenu : Panel
 	{
 		base.Tick();
 
+		// Parent.SetClass( "spawnmenuopen", true );
 		Parent.SetClass( "spawnmenuopen", Input.Down( InputButton.Menu ) );
 	}
 

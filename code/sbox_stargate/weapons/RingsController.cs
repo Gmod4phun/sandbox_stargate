@@ -1,7 +1,7 @@
 using Sandbox;
 using System.Linq;
 
-[Library( "weapon_stargate_ringscontroller", Title = "Rings Controller", Description = "", Spawnable = true, Group = "Stargate" )]
+[Library( "weapon_stargate_ringscontroller", Title = "Rings Controller", Description = "", Spawnable = true, Group = "Stargate.Weapons" )]
 public partial class StargateRingsController : Weapon
 {
 	//later add a hand model
