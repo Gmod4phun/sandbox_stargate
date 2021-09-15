@@ -7,46 +7,11 @@ public partial class DhdButtonTrigger : AnimEntity, IUse
 	public Dhd DHD;
 	public DhdButton Button;
 
-	private DhdButtonPanel Panel;
-
 	public override void Spawn()
 	{
 		base.Spawn();
 		Transmit = TransmitType.Always;
 		Health = 100;
-	}
-
-	public void UpdatePanelPos()
-	{
-		if ( Panel is null ) return;
-
-		var bone = GetBoneTransform( "dhd_buttons" );
-		var boneRot = bone.Rotation;
-		var rot = Transform.RotationToWorld( boneRot );
-
-		rot = rot.RotateAroundAxis( boneRot.Right, -10 );
-
-		var pos = Transform.PointToWorld( GetModel().RenderBounds.Center ) + rot.Up * 0.8f;
-
-		var panelRot = rot.RotateAroundAxis( boneRot.Up, 180 ).RotateAroundAxis( boneRot.Right, -90 );
-
-		Panel.Position = pos;
-		Panel.Rotation = panelRot;
-
-		//DebugOverlay.Line( pos, pos + rot.Up * 8, 0, false );
-	}
-
-	public void CreatePanel()
-	{
-		Panel?.Delete();
-		Panel = new DhdButtonPanel( Action );
-		UpdatePanelPos();
-	}
-
-	public override void ClientSpawn()
-	{
-		base.ClientSpawn();
-		//CreatePanel();
 	}
 
 	public virtual bool OnUse(Entity ent)
@@ -75,8 +40,6 @@ public partial class DhdButtonTrigger : AnimEntity, IUse
 		base.OnDestroy();
 
 		if ( Button.IsValid() ) Button.Delete();
-
-		Panel?.Delete();
 	}
 
 	public override void TakeDamage( DamageInfo info )
@@ -93,14 +56,13 @@ public partial class DhdButtonTrigger : AnimEntity, IUse
 		if ( Action.Length > 0 )
 		{
 			var pos = Transform.PointToWorld( GetModel().RenderBounds.Center );
-			DebugOverlay.Text( pos, Action, Color.Green );
+			DebugOverlay.Text( pos, Action, Color.Green, 0, 100 );
 		}
 	}
 
 	[Event.Frame]
 	public void DhdButtonTriggerThink()
 	{
-		if ( Local.Pawn.IsValid() && Local.Pawn.Position.Distance(Position) < 580) DrawSymbols();
-		//UpdatePanelPos();
+		DrawSymbols();
 	}
 }
