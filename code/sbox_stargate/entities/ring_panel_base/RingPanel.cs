@@ -9,15 +9,18 @@ public partial class RingPanel : ModelEntity, IUse
 	protected TimeSince TimeSinceButtonPressed = 0;
 	protected float ButtonPressDelay = 0.35f;
 
-	protected virtual int DialButtonNumber { get; }
+	protected virtual int DialButtonNumber { get; } = 6;
+	protected virtual int AmountOfButtons { get; } = 6;
 	protected virtual string[] ButtonsSounds { get; } = {
 		"goauld_button1",
 		"goauld_button2"
 	};
 
+	protected virtual float TraceDistance { get; } = 1.65f;
+
 	protected void GetButtonsPos() {
 		Buttons.Clear();
-		for (int i = 1; i <= 6; i++) {
+		for (int i = 1; i <= AmountOfButtons; i++) {
 			Transform? btnTr = GetBoneTransform( $"button{i}", true );
 
 			if ( !btnTr.HasValue )
@@ -65,7 +68,7 @@ public partial class RingPanel : ModelEntity, IUse
 				Transform btn = Buttons[i];
 				var dist = tra.EndPos.Distance(btn.Position);
 
-				if (dist <= 1.65f) {
+				if (dist <= TraceDistance) {
 					ToggleButton(Buttons.IndexOf(btn) + 1);
 					TimeSinceButtonPressed = 0;
 
