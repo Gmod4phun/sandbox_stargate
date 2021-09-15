@@ -273,7 +273,8 @@ public partial class Rings : AnimEntity, IUse
 			r.SetParent(this);
 			r.isUpsideDown = isUpDown;
 			r.Position = Position;
-			r.Rotation = Rotation.RotateAroundAxis(Vector3.Left, 180f);
+			r.Rotation = Rotation;
+			if (r.isUpsideDown)	r.Rotation = Rotation.RotateAroundAxis(Vector3.Left, 180f);
 			r.Scale = Scale;
 			r.Transmit = TransmitType.Always;
 			
