@@ -8,8 +8,8 @@ public partial class RingPanelAncient : RingPanel {
 	protected override int AmountOfButtons => 9;
 
 	protected override string[] ButtonsSounds { get; } = {
-		"goauld_button1",
-		"goauld_button2"
+		"ancient_button1",
+		"ancient_button2"
 	};
 
 	protected override float TraceDistance => 1.4f;
