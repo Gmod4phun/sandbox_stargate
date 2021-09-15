@@ -1,0 +1,255 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "Skeleton"
+				children = 
+				[
+					{
+						_class = "Bone"
+						name = "button1"
+						origin = [ -1.055327, 1.517648, 19.326809 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+					{
+						_class = "Bone"
+						name = "button2"
+						origin = [ -1.055327, -1.419388, 19.326809 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+					{
+						_class = "Bone"
+						name = "button3"
+						origin = [ -1.055327, -0.023729, 15.693602 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+					{
+						_class = "Bone"
+						name = "button4"
+						origin = [ -1.055327, 1.517648, 11.941016 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+					{
+						_class = "Bone"
+						name = "button5"
+						origin = [ -1.055327, -1.419388, 11.880295 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+					{
+						_class = "Bone"
+						name = "button6"
+						origin = [ -1.055327, -0.023729, 8.235618 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+					{
+						_class = "Bone"
+						name = "button7"
+						origin = [ -1.055327, 2.501343, 4.609038 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+					{
+						_class = "Bone"
+						name = "button8"
+						origin = [ -1.055327, -0.03427, 4.609038 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+					{
+						_class = "Bone"
+						name = "button9"
+						origin = [ -1.055327, -2.538916, 4.609038 ]
+						angles = [ 0.0, 0.0, 0.0 ]
+						do_not_discard = true
+					},
+				]
+			},
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps = 
+						[
+							{
+								from = "ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+							},
+							{
+								from = "ancient_panel.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_panel.vmat"
+							},
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+					{
+						_class = "MaterialGroup"
+						name = "1"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_1.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "2"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_2.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "3"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_3.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "4"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_4.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "5"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_5.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "6"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_6.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "7"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_7.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "8"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_8.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "9"
+						remaps = 
+						[
+							{
+								from = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons.vmat"
+								to = "models/gmod4phun/stargate/rings_panel/ancient/ancient_buttons_9.vmat"
+							},
+						]
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children = 
+				[
+					{
+						_class = "PhysicsHullFile"
+						name = "ancient_panel_physics"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_prop = "default"
+						recenter_on_parent_bone = false
+						offset_origin = [ 0.0, 0.0, 0.0 ]
+						offset_angles = [ 0.0, 0.0, 0.0 ]
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						filename = "models/gmod4phun/stargate/rings_panel/ancient/src/ancient_panel_physics.smd"
+						import_scale = 1.0
+						faceMergeAngle = 10.0
+						maxHullVertices = 0
+						import_mode = "SingleHull"
+						optimization_algorithm = "QEM"
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						filename = "models/gmod4phun/stargate/rings_panel/ancient/src/ancient.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 180.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+	}
+}
