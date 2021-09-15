@@ -14,6 +14,18 @@ public partial class RingPanelAncient : RingPanel {
 
 	protected override float TraceDistance => 1.4f;
 
+	protected override float[][] ButtonsPositions => new float[][] {
+		new float[2] {49.5f, 30f},
+		new float[2] {49.5f, 61f},
+		new float[2] {86f, 46f},
+		new float[2] {122.5f, 30f},
+		new float[2] {122.5f, 61f},
+		new float[2] {159, 46f},
+		new float[2] {195.5f, 22f},
+		new float[2] {195.5f, 46.5f},
+		new float[2] {198.5f, 66f},
+	};
+
 	public override void Spawn()
 	{
 		base.Spawn();
@@ -24,5 +36,4 @@ public partial class RingPanelAncient : RingPanel {
 
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
 	}
-
 }

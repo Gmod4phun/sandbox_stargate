@@ -12,6 +12,15 @@ public partial class RingPanelGoauld : RingPanel {
 		"goauld_button2"
 	};
 
+	protected override float[][] ButtonsPositions => new float[][] {
+		new float[2] {121f, 13.5f},
+		new float[2] {121f, 79f},
+		new float[2] {151f, 13.5f},
+		new float[2] {151f, 79f},
+		new float[2] {181f, 13.5f},
+		new float[2] {184f, 74f},
+	};
+
 	public override void Spawn()
 	{
 		base.Spawn();

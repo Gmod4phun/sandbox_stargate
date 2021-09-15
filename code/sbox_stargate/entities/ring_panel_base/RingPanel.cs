@@ -18,6 +18,10 @@ public partial class RingPanel : ModelEntity, IUse
 
 	protected virtual float TraceDistance { get; } = 1.65f;
 
+	protected virtual float[][] ButtonsPositions { get; }
+
+	public RingWorldPanel WorldPanel { get; protected set; }
+
 	protected void GetButtonsPos() {
 		Buttons.Clear();
 		for (int i = 1; i <= AmountOfButtons; i++) {
@@ -33,6 +37,24 @@ public partial class RingPanel : ModelEntity, IUse
 				Buttons.Add( (Transform)btnTr );
 			}
 		}
+	}
+
+	public async override void ClientSpawn() {
+
+		base.ClientSpawn();
+
+		await GameTask.NextPhysicsFrame();
+
+		WorldPanel = new RingWorldPanel();
+		WorldPanel.SetAmount(AmountOfButtons, ButtonsPositions);
+		WorldPanel.Position = Position;
+		WorldPanel.Rotation = Rotation;
+	}
+
+	protected override void OnDestroy() {
+		base.OnDestroy();
+		if ( IsClient )
+			WorldPanel?.Delete(true);
 	}
 
 	protected async void ToggleButton(int id) {
@@ -110,5 +132,26 @@ public partial class RingPanel : ModelEntity, IUse
 	public void Think()
 	{
 		ButtonResetThink();
+	}
+
+	[Event.Frame]
+	public void OnFrame() {
+		if (WorldPanel == null)
+			return;
+
+		WorldPanel.Position = Position + Rotation.Forward * (CollisionBounds.Maxs.x + 0.1f);
+		WorldPanel.Rotation = Rotation;
+	}
+
+	[Event.Hotload]
+	public async void OnLoad() {
+		GetButtonsPos();
+		if ( !IsClient )
+			return;
+		WorldPanel?.Delete(true);
+		await GameTask.NextPhysicsFrame();
+		WorldPanel = new RingWorldPanel();
+		
+		WorldPanel.SetAmount(AmountOfButtons, ButtonsPositions);
 	}
 }
