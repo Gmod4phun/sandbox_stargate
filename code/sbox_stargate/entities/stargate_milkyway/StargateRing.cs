@@ -322,12 +322,14 @@ public partial class StargateRing : PlatformEntity
 			i++;
 		}
 
-		DebugOverlay.Text( Position, CurRingSymbol, Color.White );
+		DebugOverlay.Text( Position, CurRingSymbol, Color.White, 0, 512 );
 	}
 
+	/*
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
-		if ( Local.Pawn.IsValid() && Local.Pawn.Position.Distance( Position ) < 800 ) DrawSymbols();
+		DrawSymbols();
 	}
+	*/
 }

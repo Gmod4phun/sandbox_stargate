@@ -1,7 +1,7 @@
 using System.Linq;
 using Sandbox;
 
-[Library( "ent_rings_goauld", Title = "Rings (Goa'uld)", Spawnable = true, Group = "Stargate" )]
+[Library( "ent_rings_goauld", Title = "Rings (Goa'uld)", Spawnable = true, Group = "Stargate.Stargate" )]
 public partial class RingsGoauld : Rings {
 	public override void Spawn()
 	{
@@ -12,4 +12,6 @@ public partial class RingsGoauld : Rings {
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 	}
 
+	protected override void HideBase() {}
+	protected override void ShowBase() {}
 }

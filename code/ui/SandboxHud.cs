@@ -4,6 +4,9 @@ using Sandbox.UI;
 [Library]
 public partial class SandboxHud : HudEntity<RootPanel>
 {
+
+	public static SpawnMenu SpawnMenuInstance { get; private set; }
+
 	public SandboxHud()
 	{
 		if ( !IsClient )
@@ -20,6 +23,16 @@ public partial class SandboxHud : HudEntity<RootPanel>
 		RootPanel.AddChild<Health>();
 		RootPanel.AddChild<InventoryBar>();
 		RootPanel.AddChild<CurrentTool>();
-		RootPanel.AddChild<SpawnMenu>();
+		SpawnMenuInstance = RootPanel.AddChild<SpawnMenu>();
+	}
+
+	[Event.Hotload]
+	public async void ReloadSpawnMenu() {
+		if ( !IsClient )
+			return;
+
+		SpawnMenuInstance?.Delete(true);
+		await Task.Delay(250);
+		SpawnMenuInstance = RootPanel.AddChild<SpawnMenu>();
 	}
 }
