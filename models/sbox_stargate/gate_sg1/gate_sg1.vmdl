@@ -85,7 +85,7 @@
 					{
 						_class = "RenderMeshFile"
 						name = "base_movie"
-						filename = "models/sbox_stargate/gate_sg1/src/base_movie_edit.smd"
+						filename = "models/sbox_stargate/gate_sg1/src/base_movie_new.smd"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
