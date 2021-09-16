@@ -175,10 +175,8 @@ public partial class Stargate : Prop, IUse
 
 	public static async void PlaySound( Entity ent, string name, float delay = 0 )
 	{
-		if ( delay > 0 )
-		{
-			await ent.Task.DelaySeconds( delay );
-		}
+		if ( !ent.IsValid() ) return;
+		if ( delay > 0 ) await ent.Task.DelaySeconds( delay );
 		if ( !ent.IsValid() ) return;
 
 		Sound.FromEntity( name, ent );

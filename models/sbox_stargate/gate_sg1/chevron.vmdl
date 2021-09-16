@@ -41,6 +41,17 @@
 							},
 						]
 					},
+					{
+						_class = "MaterialGroup"
+						name = "Off_Movie"
+						remaps = 
+						[
+							{
+								from = "models/sbox_stargate/gate_sg1/light_front_sg1_off.vmat"
+								to = "models/sbox_stargate/gate_sg1/light_back_sg1.vmat"
+							},
+						]
+					},
 				]
 			},
 			{

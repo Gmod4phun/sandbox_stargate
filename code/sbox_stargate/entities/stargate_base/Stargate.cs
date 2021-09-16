@@ -17,6 +17,16 @@ public abstract partial class Stargate : Prop, IUse
 
 	public float AutoCloseTime = -1;
 
+	public Dictionary<string, string> SoundDict = new()
+	{
+		{ "gate_open", "baseValue" },
+		{ "gate_close", "baseValue" },
+		{ "chevron_open", "baseValue" },
+		{ "chevron_close", "baseValue" },
+		{ "dial_fail", "baseValue" },
+		{ "dial_fail_noclose", "baseValue" },
+	};
+
 	[Net]
 	public string Address { get; set; } = "";
 	[Net]
@@ -51,6 +61,13 @@ public abstract partial class Stargate : Prop, IUse
 
 	public TimeSince TimeSinceDHDAction = 0f;
 	public float DhdDialShutdownTime = 20f;
+
+
+	// SOUNDS
+	public virtual string GetSound( string key )
+	{
+		return SoundDict.GetValueOrDefault( key, "" );
+	}
 
 	// VARIABLE RESET
 	public virtual void ResetGateVariablesToIdle()
@@ -149,7 +166,6 @@ public abstract partial class Stargate : Prop, IUse
 			OtherGate.DoStargateClose();
 		}
 	}
-
 
 	// DIALING -- please don't touch any of these, dialing is heavy WIP
 

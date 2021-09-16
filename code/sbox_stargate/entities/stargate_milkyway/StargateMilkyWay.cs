@@ -8,9 +8,24 @@ using Sandbox;
 [Library( "ent_stargate_milkyway", Title = "Stargate (Milky Way)", Spawnable = true, Group = "Stargate.Stargate" )]
 public partial class StargateMilkyWay : Stargate
 {
-
 	public StargateRing Ring;
 	public List<Chevron> EncodedChevronsOrdered = new ();
+
+	public bool MovieDialingType = false; // when enabled, encodes the symbol under each chevron like in the movie
+	public bool ChevronLightup = true;
+
+	public StargateMilkyWay()
+	{
+		SoundDict = new()
+		{
+			{ "gate_open", "gate_open_sg1" },
+			{ "gate_close", "gate_close" },
+			{ "chevron_open", "chevron_sg1_open" },
+			{ "chevron_close", "chevron_sg1_close" },
+			{ "dial_fail", "dial_fail_sg1" },
+			{ "dial_fail_noclose", "gate_sg1_dial_fail_noclose" }
+		};
+	}
 
 	// SPAWN
 
@@ -56,13 +71,14 @@ public partial class StargateMilkyWay : Stargate
 
 	// CHEVRONS
 
-	public Chevron CreateChevron( int n )
+	public virtual Chevron CreateChevron( int n )
 	{
 		var chev = new Chevron();
 		chev.Position = Position;
 		chev.Rotation = Rotation.Angles().WithRoll( -ChevronAngles[n-1] ).ToRotation();
 		chev.SetParent( this );
 		chev.Transmit = TransmitType.Always;
+		chev.Gate = this;
 		return chev;
 	}
 
@@ -114,7 +130,7 @@ public partial class StargateMilkyWay : Stargate
 	{
 		base.OnStopDialingBegin();
 
-		PlaySound( this, (ActiveChevrons > 0 || CurDialType is DialType.DHD) ? "dial_fail_sg1" : "gate_sg1_dial_fail_noclose" );
+		PlaySound( this, (ActiveChevrons > 0 || CurDialType is DialType.DHD) ? GetSound( "dial_fail" ) : GetSound( "dial_fail_noclose" ) );
 
 		if ( Ring.IsValid() && Ring.IsMoving ) Ring.SpinDown();
 	}
@@ -130,7 +146,7 @@ public partial class StargateMilkyWay : Stargate
 	{
 		base.OnStargateBeginOpen();
 
-		PlaySound(this, "gate_open_sg1" );
+		PlaySound( this, GetSound( "gate_open" ) );
 	}
 
 	public override void OnStargateOpened()
@@ -142,7 +158,7 @@ public partial class StargateMilkyWay : Stargate
 	{
 		base.OnStargateBeginClose();
 
-		PlaySound( this, "gate_close" );
+		PlaySound( this, GetSound( "gate_close" ) );
 	}
 
 	public override void OnStargateClosed()
@@ -150,6 +166,7 @@ public partial class StargateMilkyWay : Stargate
 		base.OnStargateClosed();
 
 		SetChevronsGlowState( false );
+		ChevronAnimUnlockAll();
 	}
 
 	public async override Task DoStargateReset()
@@ -164,16 +181,15 @@ public partial class StargateMilkyWay : Stargate
 		SetChevronsGlowState( false );
 	}
 
+
 	// CHEVRON ANIMS & SOUNDS
 
-	public void TopChevronEncode(Chevron chev, bool lightup = true, bool keeplit = false)
+	public void ChevronAnimLockUnlock(Chevron chev, bool lightup = true, bool keeplit = false)
 	{
 		if ( chev.IsValid() )
 		{
-			PlaySound( chev, "chevron_sg1_open" );
-			PlaySound( chev, "chevron_sg1_close", 0.75f );
-			chev.ChevronAnim( "lock" );
-			chev.ChevronAnim( "unlock", 0.8f );
+			chev.ChevronOpen();
+			chev.ChevronClose( 0.75f );
 
 			if ( lightup )
 			{
@@ -183,14 +199,55 @@ public partial class StargateMilkyWay : Stargate
 		}
 	}
 
-	public void ChevronEncode( Chevron chev, bool lightup = true )
+	public void ChevronAnimLock( Chevron chev, float delay = 0, bool turnon = false )
 	{
 		if ( chev.IsValid() )
 		{
-			if ( lightup )
-			{
-				chev.TurnOn( 0.5f );
-			}
+			chev.ChevronOpen( delay );
+			if ( turnon ) chev.TurnOn( delay );
+		}
+	}
+
+	public void ChevronAnimUnlock( Chevron chev, float delay = 0, bool turnoff = false )
+	{
+		if ( chev.IsValid() )
+		{
+			chev.ChevronClose( delay );
+			if ( turnoff ) chev.TurnOff( delay );
+		}
+	}
+
+	public void ChevronActivate( Chevron chev, float delay = 0, bool turnon = false )
+	{
+		if ( chev.IsValid() )
+		{
+			Stargate.PlaySound( chev, GetSound( "chevron_open" ), delay );
+			if ( turnon ) chev.TurnOn( delay );
+		}
+	}
+
+	public void ChevronDeactivate( Chevron chev, float delay = 0, bool turnoff = false )
+	{
+		if ( chev.IsValid() )
+		{
+			Stargate.PlaySound( chev, GetSound( "chevron_close" ), delay );
+			if ( turnoff ) chev.TurnOff( delay );
+		}
+	}
+
+	public void ChevronAnimLockAll( int num, float delay = 0, bool turnon = false )
+	{
+		for ( int i = 1; i <= num; i++ )
+		{
+			ChevronAnimLock( GetChevronBasedOnAddressLength( i, num ), delay, turnon );
+		}
+	}
+
+	public void ChevronAnimUnlockAll( float delay = 0, bool turnoff = false )
+	{
+		foreach ( var chev in Chevrons )
+		{
+			if ( chev.Open ) ChevronAnimUnlock( chev, delay, turnoff );
 		}
 	}
 
@@ -241,8 +298,15 @@ public partial class StargateMilkyWay : Stargate
 				var chev = GetChevronBasedOnAddressLength( i, addrLen );
 				if ( chev.IsValid() )
 				{
-					chev.TurnOn();
-					PlaySound( chev, "chevron_sg1_open" );
+					if (MovieDialingType)
+					{
+						ChevronAnimLock( chev, 0, ChevronLightup );
+					}
+					else
+					{
+						ChevronActivate( chev, 0, ChevronLightup );
+					}
+
 					ActiveChevrons++;
 				}
 
@@ -262,12 +326,20 @@ public partial class StargateMilkyWay : Stargate
 			var topChev = GetChevron( 7 ); // lock last (top) chevron
 			if ( topChev.IsValid() )
 			{
-				if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) topChev.TurnOn();
+				if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() )
+				{
+					if ( ChevronLightup ) topChev.TurnOn( 0.25f );
+				}
 
-				topChev.ChevronAnim( "lock" );
-				PlaySound( topChev, "chevron_sg1_open", 0.2f );
-				topChev.ChevronAnim( "unlock", 1f );
-				PlaySound( topChev, "chevron_sg1_close", 1.05f );
+				if ( MovieDialingType )
+				{
+					ChevronAnimLock( topChev, 0.2f );
+				}
+				else
+				{
+					ChevronAnimLock( topChev, 0.2f );
+					ChevronAnimUnlock( topChev, 1f );
+				}
 
 				ActiveChevrons++;
 			}
@@ -328,21 +400,35 @@ public partial class StargateMilkyWay : Stargate
 				var chev = GetChevronBasedOnAddressLength( i, numChevs );
 				if ( chev.IsValid() )
 				{
-					chev.TurnOn();
-					PlaySound( chev, "chevron_sg1_open" );
+					if (MovieDialingType)
+					{
+						ChevronAnimLock( chev, 0, ChevronLightup );
+					}
+					else
+					{
+						ChevronActivate( chev, 0, ChevronLightup);
+					}
+
 					ActiveChevrons++;
 				}
 
 				await Task.DelaySeconds( chevronDelay ); // each chevron delay
 			}
 
-			await Task.DelaySeconds( chevronBeforeLastDelay ); // wait before locking the last chevron
+			await Task.DelaySeconds( chevronBeforeLastDelay - 0.4f); // wait before locking the last chevron
 
 			var topChev = GetChevron( 7 );
 			if ( topChev.IsValid() )
 			{
-				topChev.TurnOn();
-				PlaySound( topChev, "chevron_sg1_open" );
+				if (MovieDialingType)
+				{
+					ChevronAnimLock( topChev, 0, ChevronLightup );
+				}
+				else
+				{
+					ChevronActivate( topChev, 0, ChevronLightup );
+				}
+
 				ActiveChevrons++;
 			}
 		}
@@ -378,30 +464,45 @@ public partial class StargateMilkyWay : Stargate
 				var isLastChev = (chevNum == address.Length);
 
 				// try to encode each symbol
-				var success = await RotateRingToSymbol( sym ); // wait for ring to rotate to the target symbol
+				var offset = MovieDialingType ? -ChevronAngles[chevNum - 1] : 0;
+				var success = await RotateRingToSymbol( sym, offset ); // wait for ring to rotate to the target symbol
 				if ( !success || ShouldStopDialing )
 				{
 					ResetGateVariablesToIdle();
 					return;
 				}
 
-				await Task.DelaySeconds( 0.65f ); // wait a bit
+				await Task.DelaySeconds( MovieDialingType ? 0.15f : 0.65f ); // wait a bit
 
 				if ( isLastChev ) target = FindByAddress( address ); // if its last chevron, try to find the target gate
 
 				// go do chevron stuff
-
 				var chev = GetChevronBasedOnAddressLength( chevNum, address.Length );
 				var topChev = GetChevron( 7 );
 
 				if ( !isLastChev )
 				{
-					TopChevronEncode( topChev );
-					ChevronEncode( chev );
+					if (MovieDialingType)
+					{
+						ChevronAnimLockUnlock( chev, ChevronLightup, true );
+					}
+					else
+					{
+						ChevronAnimLockUnlock( topChev, ChevronLightup );
+						//ChevronActivate( chev, 0.5f, ChevronLightup );
+						if (ChevronLightup) chev.TurnOn( 0.5f );
+					}
 				}
 				else
 				{
-					TopChevronEncode( topChev, (isLastChev && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow()), true );
+					if (MovieDialingType)
+					{
+						ChevronAnimLockAll( chevNum, 0, ChevronLightup );
+					}
+					else
+					{
+						ChevronAnimLockUnlock( topChev, (isLastChev && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() && ChevronLightup), true );
+					}
 				}
 
 				ActiveChevrons++;
@@ -420,7 +521,7 @@ public partial class StargateMilkyWay : Stargate
 					readyForOpen = true;
 				}
 
-				await Task.DelaySeconds( 1.5f ); // wait a bit
+				await Task.DelaySeconds( isLastChev && MovieDialingType ? 0.5f: 1.5f ); // wait a bit
 
 				chevNum++;
 			}
@@ -456,16 +557,23 @@ public partial class StargateMilkyWay : Stargate
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
-			for ( var i = 1; i <= numChevs; i++ )
+			if (MovieDialingType)
 			{
-				var chev = GetChevronBasedOnAddressLength( i, numChevs );
-				if ( chev.IsValid() )
-				{
-					chev.TurnOn();
-					if ( i == 1 ) PlaySound( chev, "chevron_sg1_open" ); // play once to avoid insta earrape
-				}
-				
+				ChevronAnimLockAll( numChevs, 0, ChevronLightup );
 			}
+			else
+			{
+				for ( var i = 1; i <= numChevs; i++ )
+				{
+					var chev = GetChevronBasedOnAddressLength( i, numChevs );
+					if ( chev.IsValid() )
+					{
+						ChevronActivate( chev, 0, ChevronLightup );
+					}
+				}
+			}
+
+			ActiveChevrons = numChevs;
 		}
 		catch ( Exception )
 		{
@@ -503,7 +611,7 @@ public partial class StargateMilkyWay : Stargate
 				if ( chev.IsValid() )
 				{
 					chev.TurnOn();
-					if ( i == 1 ) PlaySound( chev, "chevron_sg1_open" ); // play once to avoid insta earrape
+					PlaySound( chev, GetSound( "chevron_open" ) );
 				}
 			}
 
@@ -567,8 +675,9 @@ public partial class StargateMilkyWay : Stargate
 				var chev = GetChevronBasedOnAddressLength( i, numChevs );
 				if ( chev.IsValid() )
 				{
-					chev.TurnOn();
-					if ( i == 1 ) PlaySound( chev, "chevron_sg1_open" ); // play once to avoid insta earrape
+					//chev.TurnOn();
+					//PlaySound( chev, GetSound( "chevron_open" ) );
+					ChevronActivate( chev, 0, ChevronLightup );
 				}
 
 			}
@@ -584,13 +693,18 @@ public partial class StargateMilkyWay : Stargate
 	{
 		base.DoChevronEncode( sym );
 
-		//var clampLen = DialingAddress.Length.Clamp( 7, 9 );
-
 		var chev = GetChevronBasedOnAddressLength(DialingAddress.Length, 9 );
 		EncodedChevronsOrdered.Add( chev );
 
-		chev?.TurnOn(0.1f);
-		PlaySound( chev, "chevron_sg1_open", 0.15f );
+		if (MovieDialingType)
+		{
+			ChevronAnimLock( chev, 0.15f, ChevronLightup );
+		}
+		else
+		{
+			ChevronActivate( chev, 0.15f, ChevronLightup );
+		}
+		
 	}
 
 	public override void DoChevronLock( char sym ) // only the top chevron locks, always
@@ -600,13 +714,17 @@ public partial class StargateMilkyWay : Stargate
 		var chev = GetTopChevron();
 		EncodedChevronsOrdered.Add( chev );
 
-		PlaySound( chev, "chevron_sg1_open", 0.15f );
-		PlaySound( chev, "chevron_sg1_close", 1.05f );
-		chev?.ChevronAnim( "lock", 0.2f );
-		chev?.ChevronAnim( "unlock", 1f );
-
 		var gate = FindByAddress( DialingAddress );
-		if (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD()) chev?.TurnOn(0.5f);
+		var valid = (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD() && ChevronLightup);
+
+		if (MovieDialingType)
+		{
+			ChevronAnimLock( chev, 0, valid );
+		}
+		else
+		{
+			ChevronAnimLockUnlock( chev, valid, true );
+		} 
 	}
 
 	public override void DoChevronUnlock( char sym )
@@ -616,7 +734,14 @@ public partial class StargateMilkyWay : Stargate
 		var chev = EncodedChevronsOrdered.Last();
 		EncodedChevronsOrdered.Remove( chev );
 
-		chev?.TurnOff();
+		if (MovieDialingType)
+		{
+			ChevronAnimUnlock(chev, 0, true);
+		}
+		else
+		{
+			ChevronDeactivate( chev, 0, true );
+		}
 	}
 
 }

@@ -37,9 +37,9 @@ public partial class StargateRing : PlatformEntity
 	private float StartedAccelAngle = 0f;
 	private float StoppedAccelAngle = 0f;
 
-	private string StartSoundName = "gate_roll_long";
+	public string StartSoundName = "gate_roll_long";
 	//private string LoopSoundName = "gate_sg1_ring_loop";
-	private string StopSoundName = "gate_sg1_ring_stop";
+	public string StopSoundName = "gate_sg1_ring_stop";
 
 	private Sound? StartSoundInstance;
 	//private Sound? LoopSoundInstance;
@@ -325,11 +325,9 @@ public partial class StargateRing : PlatformEntity
 		DebugOverlay.Text( Position, CurRingSymbol, Color.White, 0, 512 );
 	}
 
-	/*
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
 		DrawSymbols();
 	}
-	*/
 }

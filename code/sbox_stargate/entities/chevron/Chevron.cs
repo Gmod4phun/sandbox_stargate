@@ -7,8 +7,19 @@ using Sandbox;
 
 public partial class Chevron : AnimEntity
 {
-	public bool On;
+	public bool On = false;
+	public bool Open = false;
+	public bool UsesDynamicLight = true;
+
+	public Stargate Gate;
+
 	public PointLightEntity Light;
+
+	public Dictionary<string, int> ChevronStateSkins = new()
+	{
+		{ "Off", 0 },
+		{ "On", 1 }
+	};
 
 	public override void Spawn()
 	{
@@ -34,6 +45,15 @@ public partial class Chevron : AnimEntity
 		Light.Range = 12f;
 		Light.Enabled = On;
 	}
+
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+
+		if ( Light.IsValid() ) Light.Delete();
+	}
+
+	// ANIMS
 
 	public async void ChevronAnim(string name, float delay = 0)
 	{
@@ -67,21 +87,38 @@ public partial class Chevron : AnimEntity
 
 		On = false;
 	}
+	public async void SetOpen( bool open, float delay = 0 )
+	{
+		if ( delay > 0 )
+		{
+			await Task.DelaySeconds( delay );
+			if ( !this.IsValid() ) return;
+		}
 
+		Open = open;
+	}
+
+	public void ChevronOpen( float delay = 0 )
+	{
+		ChevronAnim( "lock", delay );
+		Stargate.PlaySound( this, Gate.GetSound( "chevron_open" ), delay );
+		Log.Info("chev open anim and sound");
+		SetOpen( true, delay );
+	}
+
+	public void ChevronClose( float delay = 0 )
+	{
+		ChevronAnim( "unlock", delay );
+		Stargate.PlaySound( this, Gate.GetSound( "chevron_close" ), delay );
+		SetOpen( false, delay );
+	}
 
 	[Event( "server.tick" )]
 	public void ChevronThink( )
 	{
-		var group = On ? 1 : 0;
+		var group = ChevronStateSkins.GetValueOrDefault(On ? "On" : "Off", 0);
 		if ( GetMaterialGroup() != group ) SetMaterialGroup( group );
-
-		if ( Light.IsValid() ) Light.Enabled = On;
+		if ( Light.IsValid() ) Light.Enabled = UsesDynamicLight && On;
 	}
 
-	protected override void OnDestroy()
-	{
-		base.OnDestroy();
-
-		if ( Light.IsValid() ) Light.Delete();
-	}
 }
