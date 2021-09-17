@@ -15,7 +15,7 @@
 						[
 							{
 								from = "effect_02.vmat"
-								to = "models/sbox_stargate/event_horizon/event_horizon.vmat"
+								to = "models/sbox_stargate/event_horizon/event_horizon_new.vmat"
 							},
 						]
 						use_global_default = false
@@ -27,7 +27,7 @@
 						remaps = 
 						[
 							{
-								from = "models/sbox_stargate/event_horizon/event_horizon.vmat"
+								from = "models/sbox_stargate/event_horizon/event_horizon_new.vmat"
 								to = "models/sbox_stargate/event_horizon/event_horizon_establish.vmat"
 							},
 						]
