@@ -65,6 +65,8 @@ public abstract partial class Stargate : Prop, IUse
 
 	public IStargateRamp Ramp = null;
 
+	public bool DontOverrideStargatePos = false;
+
 
 	// SOUNDS
 	public virtual string GetSound( string key )
@@ -126,7 +128,7 @@ public abstract partial class Stargate : Prop, IUse
 			this.SetParent(ramp);
 			Ramp = iramp;
 		}
-		else
+		else if (!DontOverrideStargatePos)
 		{
 			Position += new Vector3(0, 0, 90);
 			var a = Rotation.Angles();
