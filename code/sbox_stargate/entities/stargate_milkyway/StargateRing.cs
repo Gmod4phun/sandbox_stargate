@@ -38,12 +38,14 @@ public partial class StargateRing : PlatformEntity
 	private float StoppedAccelAngle = 0f;
 
 	public string StartSoundName = "gate_roll_long";
-	//private string LoopSoundName = "gate_sg1_ring_loop";
 	public string StopSoundName = "gate_sg1_ring_stop";
 
 	private Sound? StartSoundInstance;
-	//private Sound? LoopSoundInstance;
 	private Sound? StopSoundInstance;
+
+	public bool StopSoundOnSpinDown = false; // play the stopsound on spindown, or on spin stop
+
+	public bool EarthPointOfOrigin { get; set; } = false;
 
 	public override void Spawn()
 	{
@@ -65,7 +67,6 @@ public partial class StargateRing : PlatformEntity
 	protected override void OnDestroy()
 	{
 		if ( StartSoundInstance.HasValue ) StartSoundInstance.Value.Stop();
-		//if ( LoopSoundInstance.HasValue ) LoopSoundInstance.Value.Stop();
 		if ( StopSoundInstance.HasValue ) StopSoundInstance.Value.Stop();
 
 		base.OnDestroy();
@@ -87,7 +88,10 @@ public partial class StargateRing : PlatformEntity
 	// sounds
 	public void StopStartSound()
 	{
-		if ( StartSoundInstance.HasValue ) StartSoundInstance.Value.Stop();
+		if ( StartSoundInstance.HasValue )
+		{
+			StartSoundInstance.Value.SetVolume( 0 );
+		}
 	}
 
 	public void PlayStartSound()
@@ -98,7 +102,7 @@ public partial class StargateRing : PlatformEntity
 
 	public void StopStopSound()
 	{
-		if ( StopSoundInstance.HasValue ) StopSoundInstance.Value.Stop();
+		if ( StopSoundInstance.HasValue ) StopSoundInstance.Value.SetVolume( 0 );
 	}
 
 	public void PlayStopSound()
@@ -106,31 +110,6 @@ public partial class StargateRing : PlatformEntity
 		StopStopSound();
 		StopSoundInstance = PlaySound( StopSoundName );
 	}
-
-	/*
-	public async void StopLoopSound( float delay = 0 )
-	{
-		if (delay > 0)
-		{
-			await Task.DelaySeconds( delay );
-			if ( !this.IsValid() ) return;
-		}
-
-		if ( LoopSoundInstance.HasValue ) LoopSoundInstance.Value.Stop();
-	}
-
-	public async void PlayLoopSound( float delay = 0 )
-	{
-		if ( delay > 0 )
-		{
-			await Task.DelaySeconds( delay );
-			if ( !this.IsValid() ) return;
-		}
-
-		StopLoopSound();
-		LoopSoundInstance = PlaySound( LoopSoundName );
-	}
-	*/
 
 	// spinup/spindown - starts or stops rotating the ring
 	public void SpinUp()
@@ -143,6 +122,12 @@ public partial class StargateRing : PlatformEntity
 	{
 		ShouldAcc = false;
 		ShouldDecc = true;
+
+		if ( StopSoundOnSpinDown )
+		{
+			PlayStopSound();
+			StopStartSound();
+		}
 	}
 
 	public void OnStart()
@@ -152,9 +137,14 @@ public partial class StargateRing : PlatformEntity
 
 	public void OnStop()
 	{
-		if (Gate.IsValid() && Gate.Dialing) { PlayStopSound(); }
-		
-		StopStartSound();
+		if (Gate.IsValid() && Gate.Dialing)
+		{
+			if ( !StopSoundOnSpinDown )
+			{
+				PlayStopSound();
+				StopStartSound();
+			}
+		}
 	}
 
 	// rotate to angle/symbol
@@ -173,6 +163,8 @@ public partial class StargateRing : PlatformEntity
 	// helper calcs
 	public float GetDesiredRingAngleForSymbol( char sym, int angOffset = 0 )
 	{
+		if ( sym is '#' && EarthPointOfOrigin ) sym = '?';
+
 		// get the symbol's position on the ring
 		var symPos = GetSymbolPosition( sym );
 
@@ -328,6 +320,6 @@ public partial class StargateRing : PlatformEntity
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
-		DrawSymbols();
+		//DrawSymbols();
 	}
 }
