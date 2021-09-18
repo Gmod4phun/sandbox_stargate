@@ -43,7 +43,9 @@ public partial class StargateRing : PlatformEntity
 	private Sound? StartSoundInstance;
 	private Sound? StopSoundInstance;
 
-	public bool StopSoundOnSpinDown = false; // play the stopsound on spindown, or on spin stop 
+	public bool StopSoundOnSpinDown = false; // play the stopsound on spindown, or on spin stop
+
+	public bool EarthPointOfOrigin { get; set; } = false;
 
 	public override void Spawn()
 	{
@@ -161,6 +163,8 @@ public partial class StargateRing : PlatformEntity
 	// helper calcs
 	public float GetDesiredRingAngleForSymbol( char sym, int angOffset = 0 )
 	{
+		if ( sym is '#' && EarthPointOfOrigin ) sym = '?';
+
 		// get the symbol's position on the ring
 		var symPos = GetSymbolPosition( sym );
 
@@ -316,6 +320,6 @@ public partial class StargateRing : PlatformEntity
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
-		DrawSymbols();
+		//DrawSymbols();
 	}
 }

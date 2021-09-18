@@ -35,6 +35,9 @@ public partial class StargateMovie : StargateMilkyWay
 		Ring.StartSoundName = "gate_movie_ring_roll";
 		Ring.StopSoundName = "";
 		Ring.StopSoundOnSpinDown = true;
+
+		Ring.SetBodyGroup( 0, 1 );
+		Ring.EarthPointOfOrigin = true;
 	}
 
 	// CHEVRONS
