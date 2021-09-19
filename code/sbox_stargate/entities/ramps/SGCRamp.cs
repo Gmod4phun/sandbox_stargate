@@ -6,6 +6,8 @@ using System.Collections.Generic;
 [Library( "ent_sgc_ramp", Title = "SGC Ramp", Spawnable = true, Group = "Stargate" )]
 public partial class SGCRamp : ModelEntity, IStargateRamp
 {
+	[Net]
+	public Vector3 SpawnOffset { get; private set; } = new( 0, 0, 148 );
 
 	public int AmountOfGates => 1;
 
@@ -19,7 +21,8 @@ public partial class SGCRamp : ModelEntity, IStargateRamp
 
 	public List<Stargate> Gate { get; set; } = new();
 
-	public override void Spawn() {
+	public override void Spawn()
+	{
 
 		base.Spawn();
 
@@ -27,18 +30,5 @@ public partial class SGCRamp : ModelEntity, IStargateRamp
 
 		SetModel("models/sbox_stargate/ramps/sgc_ramp/sgc_ramp.vmdl");
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
-
-		async void activate() {
-			await GameTask.NextPhysicsFrame();
-
-			var a = Rotation.Angles();
-			a.yaw += 180;
-
-			Rotation = a.ToRotation();
-			Position += new Vector3(0, 0, 148);
-			ResetInterpolation();
-		}
-
-		activate();
 	}
 }

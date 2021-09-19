@@ -8,7 +8,8 @@ using Sandbox;
 
 public abstract partial class Stargate : Prop, IUse
 {
-	public Vector3 SpawnOffset = new( 0, 0, 90 );
+	[Net]
+	public Vector3 SpawnOffset { get; private set; }= new( 0, 0, 90 );
 
 	public List<Chevron> Chevrons = new();
 
@@ -104,38 +105,6 @@ public abstract partial class Stargate : Prop, IUse
 	public override void Spawn()
 	{
 		base.Spawn();
-
-		OnActivate();
-	}
-
-	private async void OnActivate()
-	{
-
-		await GameTask.NextPhysicsFrame();
-
-		var ramps = Entity.All.OfType<IStargateRamp>().Where( x => x.Gate.Count < x.AmountOfGates );
-		Entity ramp = ramps.Any() ? ramps.First() as Entity : null;
-
-		if ( ramp is not null && ramp.IsValid() )
-		{
-			IStargateRamp iramp = ramp as IStargateRamp;
-			int gateIndex = Math.Max(0, iramp.Gate.Count - 1);
-			Position = ramp.Transform.PointToWorld( iramp.StargatePositionOffset[gateIndex] );
-			Rotation = ramp.Transform.RotationToWorld( iramp.StargateRotationOffset[gateIndex].ToRotation() );
-
-			iramp.Gate.Add(this);
-
-			this.SetParent(ramp);
-			Ramp = iramp;
-		}
-		else if (!DontOverrideStargatePos)
-		{
-			Position += new Vector3(0, 0, 90);
-			var a = Rotation.Angles();
-			a.yaw += 180;
-			Rotation = a.ToRotation();
-		}
-
 	}
 
 	// EVENT HORIZON

@@ -67,11 +67,13 @@ partial class SandboxGame : Game
 		if ( attribute == null || !attribute.Spawnable )
 			return;
 
-		var tr = Trace.Ray( owner.EyePos, owner.EyePos + owner.EyeRot.Forward * 200 )
+		var tr = Trace.Ray( owner.EyePos, owner.EyePos + owner.EyeRot.Forward * 4096 )
 			.UseHitboxes()
 			.Ignore( owner )
 			.Size( 2 )
 			.Run();
+
+		if ( !tr.Hit ) return;
 
 		var ent = Library.Create<Entity>( entName );
 		if ( ent is BaseCarriable && owner.Inventory != null )
@@ -81,7 +83,19 @@ partial class SandboxGame : Game
 		}
 
 		ent.Position = tr.EndPos;
-		ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw, 0 ) );
+
+		if ( attribute.Group != null && attribute.Group.Contains("Stargate")) // spawn offsets for Stargate stuff
+		{
+			var type = ent.GetType();
+			var property = type.GetProperty( "SpawnOffset" );
+			if (property != null)
+			{
+				var offset = (Vector3) property.GetValue( ent );
+				ent.Position += offset;
+			}
+		}
+
+		ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw + 180f, 0 ) );
 		ent.Owner = owner;
 
 		//Log.Info( $"ent: {ent}" );
