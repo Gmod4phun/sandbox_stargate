@@ -31,13 +31,13 @@ Layer0
 	g_flDirectionalLightmapStrength "1.000"
 
 	//---- Metalness ----
-	g_flMetalness "0.000"
+	g_flMetalness "0.500"
 
 	//---- Normal ----
 	TextureNormal "models/sbox_stargate/gate_sg1/src/tex/glyphs_sg1_normal.tga"
 
 	//---- Roughness ----
-	TextureRoughness "[0.760784 0.760784 0.760784 0.000000]"
+	TextureRoughness "[0.666667 0.666667 0.666667 0.000000]"
 
 	//---- Texture Coordinates ----
 	g_nScaleTexCoordUByModelScaleAxis "0"

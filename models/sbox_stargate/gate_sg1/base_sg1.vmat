@@ -2,10 +2,18 @@
 
 Layer0
 {
-	shader "simple.vfx"
+	shader "complex.vfx"
+
+	//---- PBR ----
+	F_SPECULAR 1
 
 	//---- Rendering ----
 	F_RENDER_BACKFACES 1
+
+	//---- Ambient Occlusion ----
+	g_flAmbientOcclusionDirectDiffuse "0.000"
+	g_flAmbientOcclusionDirectSpecular "0.000"
+	TextureAmbientOcclusion "materials/default/default_ao.tga"
 
 	//---- Color ----
 	g_flModelTintAmount "1.000"
@@ -23,13 +31,13 @@ Layer0
 	g_flDirectionalLightmapStrength "1.000"
 
 	//---- Metalness ----
-	g_flMetalness "0.000"
+	g_flMetalness "0.500"
 
 	//---- Normal ----
 	TextureNormal "models/sbox_stargate/gate_sg1/src/tex/base_sg1_normal.tga"
 
 	//---- Roughness ----
-	TextureRoughness "[0.635294 0.635294 0.635294 1.000000]"
+	TextureRoughness "[0.784314 0.784314 0.784314 1.000000]"
 
 	//---- Texture Coordinates ----
 	g_nScaleTexCoordUByModelScaleAxis "0"
