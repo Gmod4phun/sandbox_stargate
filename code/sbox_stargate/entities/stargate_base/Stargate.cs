@@ -66,9 +66,6 @@ public abstract partial class Stargate : Prop, IUse
 
 	public IStargateRamp Ramp = null;
 
-	public bool DontOverrideStargatePos = false;
-
-
 	// SOUNDS
 	public virtual string GetSound( string key )
 	{
