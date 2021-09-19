@@ -87,6 +87,7 @@ public partial class GateSpawner {
 
 				gate.Address = ent[4];
 				gate.Name = ent[5];
+				gate.DontOverrideStargatePos = true;
 
 				gate.PhysicsEnabled = false;
 				

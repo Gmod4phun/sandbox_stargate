@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,6 +63,10 @@ public abstract partial class Stargate : Prop, IUse
 	public TimeSince TimeSinceDHDAction = 0f;
 	public float DhdDialShutdownTime = 20f;
 
+	public IStargateRamp Ramp = null;
+
+	public bool DontOverrideStargatePos = false;
+
 
 	// SOUNDS
 	public virtual string GetSound( string key )
@@ -99,6 +104,38 @@ public abstract partial class Stargate : Prop, IUse
 	public override void Spawn()
 	{
 		base.Spawn();
+
+		OnActivate();
+	}
+
+	private async void OnActivate()
+	{
+
+		await GameTask.NextPhysicsFrame();
+
+		var ramps = Entity.All.OfType<IStargateRamp>().Where( x => x.Gate.Count < x.AmountOfGates );
+		Entity ramp = ramps.Any() ? ramps.First() as Entity : null;
+
+		if ( ramp is not null && ramp.IsValid() )
+		{
+			IStargateRamp iramp = ramp as IStargateRamp;
+			int gateIndex = Math.Max(0, iramp.Gate.Count - 1);
+			Position = ramp.Transform.PointToWorld( iramp.StargatePositionOffset[gateIndex] );
+			Rotation = ramp.Transform.RotationToWorld( iramp.StargateRotationOffset[gateIndex].ToRotation() );
+
+			iramp.Gate.Add(this);
+
+			this.SetParent(ramp);
+			Ramp = iramp;
+		}
+		else if (!DontOverrideStargatePos)
+		{
+			Position += new Vector3(0, 0, 90);
+			var a = Rotation.Angles();
+			a.yaw += 180;
+			Rotation = a.ToRotation();
+		}
+
 	}
 
 	// EVENT HORIZON
@@ -165,6 +202,9 @@ public abstract partial class Stargate : Prop, IUse
 		{
 			OtherGate.DoStargateClose();
 		}
+
+		if (Ramp is not null)
+			Ramp.Gate.Remove(this);
 	}
 
 	// DIALING -- please don't touch any of these, dialing is heavy WIP
