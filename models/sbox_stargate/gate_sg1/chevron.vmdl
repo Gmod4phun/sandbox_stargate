@@ -52,6 +52,44 @@
 							},
 						]
 					},
+					{
+						_class = "MaterialGroup"
+						name = "Off_Atlantis"
+						remaps = 
+						[
+							{
+								from = "models/sbox_stargate/gate_sg1/chev_sg1.vmat"
+								to = "models/sbox_stargate/gate_atlantis/chev_atlantis.vmat"
+							},
+							{
+								from = "models/sbox_stargate/gate_sg1/light_front_sg1_off.vmat"
+								to = "models/sbox_stargate/gate_atlantis/light_front_atlantis_off.vmat"
+							},
+							{
+								from = "models/sbox_stargate/gate_sg1/light_back_sg1.vmat"
+								to = "models/sbox_stargate/gate_atlantis/light_back_atlantis.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "On_Atlantis"
+						remaps = 
+						[
+							{
+								from = "models/sbox_stargate/gate_sg1/chev_sg1.vmat"
+								to = "models/sbox_stargate/gate_atlantis/chev_atlantis.vmat"
+							},
+							{
+								from = "models/sbox_stargate/gate_sg1/light_front_sg1_off.vmat"
+								to = "models/sbox_stargate/gate_atlantis/light_front_atlantis_on.vmat"
+							},
+							{
+								from = "models/sbox_stargate/gate_sg1/light_back_sg1.vmat"
+								to = "models/sbox_stargate/gate_atlantis/light_back_atlantis.vmat"
+							},
+						]
+					},
 				]
 			},
 			{
