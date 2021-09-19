@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Sandbox;
 
 [Library( "sandbox", Title = "Sandbox Stargate" )]
@@ -83,6 +84,8 @@ partial class SandboxGame : Game
 		}
 
 		ent.Position = tr.EndPos;
+		ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw + 180f, 0 ) );
+		ent.Owner = owner;
 
 		if ( attribute.Group != null && attribute.Group.Contains("Stargate")) // spawn offsets for Stargate stuff
 		{
@@ -95,8 +98,10 @@ partial class SandboxGame : Game
 			}
 		}
 
-		ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw + 180f, 0 ) );
-		ent.Owner = owner;
+		if (ent is Stargate gate) // gate ramps
+		{
+			if (tr.Entity is IStargateRamp ramp) Stargate.PutGateOnRamp( gate, ramp );
+		}
 
 		//Log.Info( $"ent: {ent}" );
 	}

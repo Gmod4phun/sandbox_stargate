@@ -1,4 +1,6 @@
-﻿namespace Sandbox.Tools
+﻿using System;
+
+namespace Sandbox.Tools
 {
 	[Library( "tool_stargate_spawner", Title = "Stargate", Description = "Use wormholes to transport matter\n\nMOUSE1 - Spawn Milky Way gate\nE + MOUSE1 - Spawn Movie gate\nR - copy gate address\n\nMOUSE2 - Close gate/Stop dialling/Fast dial copied address\nSHIFT + MOUSE2 - Slow dial copied address\nCTRL + MOUSE2 - Instant dial copied address\n", Group = "construction" )]
 	public partial class StargateSpawnerTool : BaseTool
@@ -90,6 +92,8 @@
 					gate.Position = tr.EndPos + gate.SpawnOffset;
 					gate.Rotation = new Angles( 0, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
 					gate.Owner = Owner;
+
+					if ( tr.Entity is IStargateRamp ramp ) Stargate.PutGateOnRamp( gate, ramp );
 				}
 
 				if ( Input.Pressed( InputButton.Reload ) )

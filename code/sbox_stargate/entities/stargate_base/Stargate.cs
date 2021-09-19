@@ -162,15 +162,14 @@ public abstract partial class Stargate : Prop, IUse
   
 	protected override void OnDestroy()
 	{
-		base.OnDestroy();
+		if ( Ramp != null ) Ramp.Gate.Remove( this );
 
 		if ( IsServer && OtherGate.IsValid() )
 		{
 			OtherGate.DoStargateClose();
 		}
 
-		if (Ramp is not null)
-			Ramp.Gate.Remove(this);
+		base.OnDestroy();
 	}
 
 	// DIALING -- please don't touch any of these, dialing is heavy WIP

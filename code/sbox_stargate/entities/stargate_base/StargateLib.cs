@@ -181,4 +181,31 @@ public partial class Stargate : Prop, IUse
 
 		Sound.FromEntity( name, ent );
 	}
+
+	/// <summary>
+	/// Attempts to position a Stargate onto a Ramp.
+	/// </summary>
+	/// <returns>Whether or not the Gate was positioned on the Ramp succesfully.</returns>
+	public static bool PutGateOnRamp(Stargate gate, IStargateRamp ramp)
+	{
+		var rampEnt = (Entity) ramp;
+		if ( gate.IsValid() && rampEnt.IsValid() ) // gate ramps
+		{
+			if ( ramp.Gate.Count < ramp.AmountOfGates )
+			{
+				int offsetIndex = ramp.Gate.Count;
+				gate.Position = rampEnt.Transform.PointToWorld( ramp.StargatePositionOffset[offsetIndex] );
+				gate.Rotation = rampEnt.Transform.RotationToWorld( ramp.StargateRotationOffset[offsetIndex].ToRotation() );
+				gate.SetParent( rampEnt );
+				gate.Ramp = ramp;
+
+				ramp.Gate.Add( gate );
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }
