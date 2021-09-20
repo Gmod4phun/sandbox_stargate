@@ -1,0 +1,97 @@
+{
+  "Version": "0.0.1",
+  "Entities": [
+    {
+      "EntityName": "ent_dhd_milkyway",
+      "Position": "-1317.12,2906.848,-0.9997",
+      "Rotation": "0.1189179,0.05381149,-0.9032695,0.4087383"
+    },
+    {
+      "EntityName": "ent_dhd_milkyway",
+      "Position": "1750.458,2090.236,-90.1592",
+      "Rotation": "-0.09679266,0.08756889,0.7352122,0.6651509"
+    },
+    {
+      "EntityName": "ent_dhd_milkyway",
+      "Position": "-3593.798,-78.6327,51",
+      "Rotation": "0.1014843,0.08208571,-0.7708489,0.623502"
+    },
+    {
+      "MovieDialingType": false,
+      "ChevronLightup": true,
+      "Name": "No Way",
+      "Address": "NOWAY1#",
+      "Private": false,
+      "AutoClose": true,
+      "EntityName": "ent_stargate_milkyway",
+      "Position": "-1505.784,3020.586,90.0003",
+      "Rotation": "0,-0,-0.7120265,0.7021527"
+    },
+    {
+      "MovieDialingType": false,
+      "ChevronLightup": true,
+      "Name": "Garden",
+      "Address": "GARDEN#",
+      "Private": false,
+      "AutoClose": true,
+      "EntityName": "ent_stargate_milkyway",
+      "Position": "1902.504,1959.156,1.977",
+      "Rotation": "0,0,0.5660809,0.8243497"
+    },
+    {
+      "MovieDialingType": false,
+      "ChevronLightup": true,
+      "Name": "Waterway",
+      "Address": "WATER1#",
+      "Private": false,
+      "AutoClose": true,
+      "EntityName": "ent_stargate_pegasus",
+      "Position": "1016.254,-3922.026,-50.0003",
+      "Rotation": "0,0,0.721733,0.6921716"
+    },
+    {
+      "MovieDialingType": true,
+      "ChevronLightup": false,
+      "Name": "Hangar",
+      "Address": "HANGR1#",
+      "Private": false,
+      "AutoClose": true,
+      "EntityName": "ent_stargate_movie",
+      "Position": "-3680.159,94.6243,146",
+      "Rotation": "0,-0,-0.9323282,0.3616132"
+    },
+    {
+      "Address": "3145",
+      "EntityName": "ent_rings_ancient",
+      "Position": "-62.46484,-3330.856,210.5347",
+      "Rotation": "0.7013159,-0.7128505,0.000002919269,0.00003649855"
+    },
+    {
+      "EntityName": "ent_rings_panel_ancient",
+      "Position": "-64.22717,-3454.969,63.22817",
+      "Rotation": "0,0,0.702211,0.7119688"
+    },
+    {
+      "Address": "1254",
+      "EntityName": "ent_rings_goauld",
+      "Position": "-5054.534,493.24,400.8388",
+      "Rotation": "0.000003738058,-0.000002063729,0.3907692,0.9204887"
+    },
+    {
+      "EntityName": "ent_rings_panel_goauld",
+      "Position": "-5138.172,426.0987,457.9292",
+      "Rotation": "0,0,0.3245587,0.9458655"
+    },
+    {
+      "Address": "4351",
+      "EntityName": "ent_rings_ancient",
+      "Position": "3498.234,-1516.353,-73.78848",
+      "Rotation": "-0.00108145,0.0002280731,0.9982557,0.05902582"
+    },
+    {
+      "EntityName": "ent_rings_panel_ancient",
+      "Position": "3598.969,-1520.743,-19.98301",
+      "Rotation": "0,0,0.9999466,0.01033017"
+    }
+  ]
+}

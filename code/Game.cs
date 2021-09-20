@@ -6,7 +6,6 @@ using Sandbox;
 partial class SandboxGame : Game
 {
 
-	public GateSpawner gateSpawner;
 	public SandboxGame()
 	{
 		if ( IsServer )
@@ -15,8 +14,7 @@ partial class SandboxGame : Game
 			_ = new SandboxHud();
 
 			// Stargate GateSpawner
-			gateSpawner = new GateSpawner();
-			gateSpawner.LoadGateSpawner();
+			GateSpawner.LoadGateSpawner();
 		}
 	}
 
