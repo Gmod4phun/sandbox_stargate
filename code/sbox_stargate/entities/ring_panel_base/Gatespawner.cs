@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-public partial class RingPanel : IGatespawner
+public partial class RingPanel : IGateSpawner
 {
 	public virtual void FromJson( JsonElement data )
 	{

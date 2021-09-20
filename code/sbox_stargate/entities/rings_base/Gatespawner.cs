@@ -6,7 +6,7 @@ public class RingsBaseJsonModel : JsonModel {
 
 }
 
-public partial class Rings : IGatespawner
+public partial class Rings : IGateSpawner
 {
 	public virtual void FromJson( JsonElement data )
 	{

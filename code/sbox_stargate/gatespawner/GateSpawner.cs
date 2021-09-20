@@ -12,7 +12,7 @@ public partial class GateSpawner {
 			FileSystem.Data.CreateDirectory("gatespawners/");
 
 		var model = new GatespawnerModel();
-		foreach (IGatespawner e in Entity.All.OfType<IGatespawner>()) {
+		foreach (IGateSpawner e in Entity.All.OfType<IGateSpawner>()) {
 			model.Entities.Add(e.ToJson());
 		}
 		FileSystem.Data.WriteAllText($"gatespawners/{fileName}.json", JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true }));
@@ -39,7 +39,7 @@ public partial class GateSpawner {
 			if (e is null || !e.IsValid())
 				continue;
 
-			(e as IGatespawner).FromJson(o);
+			(e as IGateSpawner).FromJson(o);
 		}
 	}
 

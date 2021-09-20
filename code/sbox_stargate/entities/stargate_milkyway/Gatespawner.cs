@@ -16,7 +16,7 @@ public class StargateMilkyWayJsonModel : StargateJsonModel {
 
 }
 
-public partial class StargateMilkyWay : IGatespawner {
+public partial class StargateMilkyWay : IGateSpawner {
 
 	public override object ToJson() {
 

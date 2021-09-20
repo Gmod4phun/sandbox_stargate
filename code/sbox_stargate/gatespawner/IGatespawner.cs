@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-public interface IGatespawner {
+public interface IGateSpawner {
 
 	object ToJson();
 

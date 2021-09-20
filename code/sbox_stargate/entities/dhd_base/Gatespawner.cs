@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-public partial class Dhd : IGatespawner
+public partial class Dhd : IGateSpawner
 {
 	public virtual void FromJson( JsonElement data )
 	{

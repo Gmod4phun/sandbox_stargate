@@ -7,7 +7,7 @@ public class StargateJsonModel : JsonModel {
 	public bool AutoClose { get; set; }
 }
 
-public partial class Stargate : IGatespawner {
+public partial class Stargate : IGateSpawner {
 
 	public virtual object ToJson() {
 		return new StargateJsonModel {
