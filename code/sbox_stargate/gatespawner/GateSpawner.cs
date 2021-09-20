@@ -19,6 +19,8 @@ public partial class GateSpawner {
 	}
 
 	public static void LoadGateSpawner() {
+		UnloadGateSpawner();
+
 		var filepath = $"{Global.MapName}.json";
 
 		bool isData = FileSystem.Data.FileExists($"gatespawners/{filepath}");
@@ -40,7 +42,18 @@ public partial class GateSpawner {
 				continue;
 
 			(e as IGateSpawner).FromJson(o);
+
+			(Game.Current as SandboxGame).GateSpawnerEntites.Add( e );
 		}
+	}
+
+	public static void UnloadGateSpawner()
+	{
+		foreach (var ent in (Game.Current as SandboxGame).GateSpawnerEntites )
+		{
+			if (ent.IsValid()) ent.Delete();
+		}
+		(Game.Current as SandboxGame).GateSpawnerEntites.Clear();
 	}
 
 	[ServerCmd("gatespawner")]
@@ -51,6 +64,9 @@ public partial class GateSpawner {
 				break;
 			case "load":
 				LoadGateSpawner();
+				break;
+			case "unload":
+				UnloadGateSpawner();
 				break;
 		}
 	}

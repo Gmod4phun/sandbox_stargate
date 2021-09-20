@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Sandbox;
 
 [Library( "sandbox", Title = "Sandbox Stargate" )]
 partial class SandboxGame : Game
 {
+	public List<Entity> GateSpawnerEntites = new();
 
 	public SandboxGame()
 	{
