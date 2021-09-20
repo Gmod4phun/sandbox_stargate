@@ -37,6 +37,10 @@
 								from = "glyphs_off_sga.vmat"
 								to = "models/sbox_stargate/gate_atlantis/glyphs_atlantis_off.vmat"
 							},
+							{
+								from = "glyphs_on_sga.vmat"
+								to = "models/sbox_stargate/gate_atlantis/glyphs_atlantis_on.vmat"
+							},
 						]
 						use_global_default = false
 						global_default_material = ""
@@ -81,6 +85,618 @@
 						_class = "RenderMeshFile"
 						name = "base_atlantis"
 						filename = "models/sbox_stargate/gate_atlantis/src/base_atlantis.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym1"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_2.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym2"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_3.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym3"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_4.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym4"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_5.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym5"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_6.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym6"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_7.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym7"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_8.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym8"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_9.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym9"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_10.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym10"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_11.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym11"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_12.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym12"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_13.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym13"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_14.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym14"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_15.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym15"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_16.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym16"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_17.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym17"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_18.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym18"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_19.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym19"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_20.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym20"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_21.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym21"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_22.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym22"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_23.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym23"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_24.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym24"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_25.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym25"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_26.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym26"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_27.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym27"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_28.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym28"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_29.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym29"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_30.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym30"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_31.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym31"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_32.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym32"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_33.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym33"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_34.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym34"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_35.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym35"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_36.smd"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = [  ]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "sym36"
+						filename = "models/sbox_stargate/gate_atlantis/src/atlantis_ring_symbol_1.smd"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -140,7 +756,7 @@
 				[
 					{
 						_class = "BodyGroup"
-						name = "base_atlantis"
+						name = "gate"
 						children = 
 						[
 							{
@@ -150,8 +766,703 @@
 									"base_atlantis",
 								]
 							},
+							{
+								_class = "BodyGroupChoice"
+								meshes = [  ]
+							},
 						]
 						hidden_in_tools = false
+					},
+					{
+						_class = "Folder"
+						name = "symbols"
+						children = 
+						[
+							{
+								_class = "BodyGroup"
+								name = "symbol_1"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym1",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_2"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym2",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_3"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym3",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_4"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym4",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_5"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym5",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_6"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym6",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_7"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym7",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_8"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym8",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_9"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym9",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_10"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym10",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_11"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym11",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_12"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym12",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_13"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym13",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_14"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym14",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_15"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym15",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_16"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym16",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_17"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym17",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_18"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym18",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_19"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym19",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_20"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym20",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_21"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym21",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_22"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym22",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_23"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym23",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_24"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym24",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_25"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym25",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_26"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym26",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_27"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym27",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_28"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym28",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_29"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym29",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_30"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym30",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_31"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym31",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_32"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym32",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_33"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym33",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_34"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym34",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_35"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym35",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+							{
+								_class = "BodyGroup"
+								name = "symbol_36"
+								children = 
+								[
+									{
+										_class = "BodyGroupChoice"
+										meshes = [  ]
+									},
+									{
+										_class = "BodyGroupChoice"
+										meshes = 
+										[
+											"sym36",
+										]
+									},
+								]
+								hidden_in_tools = false
+							},
+						]
 					},
 				]
 			},
