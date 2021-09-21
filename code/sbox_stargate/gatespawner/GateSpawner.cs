@@ -5,6 +5,8 @@ using Sandbox;
 
 public partial class GateSpawner {
 
+	public static List<Entity> GateSpawnerEntites = new();
+
 	public static void CreateGateSpawner() {
 		var fileName = Global.MapName;
 
@@ -19,7 +21,7 @@ public partial class GateSpawner {
 	}
 
 	public static void LoadGateSpawner() {
-		UnloadGateSpawner();
+		UnloadGateSpawner(); // unload it before loading, we dont want to have multiple instances of loaded entities
 
 		var filepath = $"{Global.MapName}.json";
 
@@ -43,17 +45,17 @@ public partial class GateSpawner {
 
 			(e as IGateSpawner).FromJson(o);
 
-			(Game.Current as SandboxGame).GateSpawnerEntites.Add( e );
+			GateSpawnerEntites.Add( e );
 		}
 	}
 
 	public static void UnloadGateSpawner()
 	{
-		foreach (var ent in (Game.Current as SandboxGame).GateSpawnerEntites )
+		foreach (var ent in GateSpawnerEntites )
 		{
 			if (ent.IsValid()) ent.Delete();
 		}
-		(Game.Current as SandboxGame).GateSpawnerEntites.Clear();
+		GateSpawnerEntites.Clear();
 	}
 
 	[ServerCmd("gatespawner")]

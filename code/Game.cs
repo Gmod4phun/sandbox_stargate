@@ -6,8 +6,6 @@ using Sandbox;
 [Library( "sandbox", Title = "Sandbox Stargate" )]
 partial class SandboxGame : Game
 {
-	public List<Entity> GateSpawnerEntites = new();
-
 	public SandboxGame()
 	{
 		if ( IsServer )
