@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 
-public partial class StargateRing : PlatformEntity
+public partial class StargateRingMilkyWay : PlatformEntity
 {
 	// ring variables
 

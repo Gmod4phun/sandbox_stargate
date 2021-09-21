@@ -14,16 +14,16 @@
 						remaps = 
 						[
 							{
-								from = "base_sga.vmat"
-								to = "models/sbox_stargate/gate_atlantis/base_atlantis.vmat"
+								from = "chev_sga.vmat"
+								to = "models/sbox_stargate/gate_atlantis/chev_atlantis.vmat"
 							},
 							{
-								from = "side_sga.vmat"
-								to = "models/sbox_stargate/gate_atlantis/side_atlantis.vmat"
+								from = "glyphs_off_sga.vmat"
+								to = "models/sbox_stargate/gate_atlantis/glyphs_atlantis_off.vmat"
 							},
 							{
-								from = "inner_sga.vmat"
-								to = "models/sbox_stargate/gate_atlantis/inner_atlantis.vmat"
+								from = "glyphs_sga.vmat"
+								to = "models/sbox_stargate/gate_atlantis/ring_atlantis.vmat"
 							},
 						]
 						use_global_default = false
@@ -67,8 +67,7 @@
 				[
 					{
 						_class = "RenderMeshFile"
-						name = "base_atlantis"
-						filename = "models/sbox_stargate/gate_atlantis/src/base_atlantis.smd"
+						filename = "models/sbox_stargate/gate_atlantis/src/ring_atlantis.smd"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0

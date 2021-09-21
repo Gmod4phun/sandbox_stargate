@@ -7,7 +7,7 @@ using Sandbox;
 [Library( "ent_stargate_milkyway", Title = "Stargate (Milky Way)", Spawnable = true, Group = "Stargate.Stargate" )]
 public partial class StargateMilkyWay : Stargate
 {
-	public StargateRing Ring;
+	public StargateRingMilkyWay Ring;
 	public List<Chevron> EncodedChevronsOrdered = new ();
 
 	public bool MovieDialingType = false; // when enabled, encodes the symbol under each chevron like in the movie

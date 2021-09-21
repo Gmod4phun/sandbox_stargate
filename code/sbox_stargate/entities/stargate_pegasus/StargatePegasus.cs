@@ -36,7 +36,7 @@ public partial class StargatePegasus : Stargate
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
 
-		//CreateRing();
+		CreateRing();
 		CreateAllChevrons();
 
 		Group = "P@";
@@ -51,18 +51,13 @@ public partial class StargatePegasus : Stargate
 	}
 
 	// RING
-
-	/*
 	public void CreateRing()
 	{
-		Ring = new ();
-		Ring.Position = Position;
-		Ring.Rotation = Rotation;
-		Ring.SetParent( this );
-		Ring.Gate = this;
-		Ring.Transmit = TransmitType.Always;
+		for (var i = 1; i <= 32; i+=2 )
+		{
+			SetBodyGroup( i, 1 );
+		}
 	}
-	*/
 
 	public async Task<bool> RotateRingToSymbol( char sym, int angOffset = 0 )
 	{
