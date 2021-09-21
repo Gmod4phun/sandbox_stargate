@@ -8,9 +8,8 @@ using Sandbox;
 [Library( "ent_stargate_pegasus", Title = "Stargate (Pegasus)", Spawnable = true, Group = "Stargate.Stargate" )]
 public partial class StargatePegasus : Stargate
 {
+	public StargateRingPegasus Ring;
 	public List<Chevron> EncodedChevronsOrdered = new ();
-
-	public bool ChevronLightup = true;
 
 	public StargatePegasus()
 	{
@@ -40,7 +39,7 @@ public partial class StargatePegasus : Stargate
 		CreateAllChevrons();
 
 		Group = "P@";
-		Address = GenerateRandomAddress(7);
+		Address = "*" + GenerateRandomAddress(7);
 	}
 
 	public override void ResetGateVariablesToIdle()
@@ -53,10 +52,12 @@ public partial class StargatePegasus : Stargate
 	// RING
 	public void CreateRing()
 	{
-		for (var i = 1; i <= 32; i+=2 )
-		{
-			SetBodyGroup( i, 1 );
-		}
+		Ring = new();
+		Ring.Position = Position;
+		Ring.Rotation = Rotation;
+		Ring.SetParent( this );
+		Ring.Gate = this;
+		Ring.Transmit = TransmitType.Always;
 	}
 
 	public async Task<bool> RotateRingToSymbol( char sym, int angOffset = 0 )
@@ -301,7 +302,7 @@ public partial class StargatePegasus : Stargate
 				if ( chev.IsValid() )
 				{
 
-					ChevronActivate( chev, 0, ChevronLightup );
+					ChevronActivate( chev, 0, true );
 
 					ActiveChevrons++;
 				}
@@ -322,7 +323,7 @@ public partial class StargatePegasus : Stargate
 			{
 				if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() )
 				{
-					if ( ChevronLightup ) topChev.TurnOn( 0.25f );
+					topChev.TurnOn( 0.25f );
 				}
 
 				ChevronAnimLock( topChev, 0.2f );
@@ -388,7 +389,7 @@ public partial class StargatePegasus : Stargate
 				if ( chev.IsValid() )
 				{
 
-					ChevronActivate( chev, 0, ChevronLightup);
+					ChevronActivate( chev, 0, true);
 
 					ActiveChevrons++;
 				}
@@ -401,7 +402,7 @@ public partial class StargatePegasus : Stargate
 			var topChev = GetChevron( 7 );
 			if ( topChev.IsValid() )
 			{
-				ChevronActivate( topChev, 0, ChevronLightup );
+				ChevronActivate( topChev, 0, true );
 
 				ActiveChevrons++;
 			}
@@ -456,13 +457,13 @@ public partial class StargatePegasus : Stargate
 				if ( !isLastChev )
 				{
 
-					ChevronAnimLockUnlock( topChev, ChevronLightup );
+					ChevronAnimLockUnlock( topChev );
 					//ChevronActivate( chev, 0.5f, ChevronLightup );
-					if (ChevronLightup) chev.TurnOn( 0.5f );
+					chev.TurnOn( 0.5f );
 				}
 				else
 				{
-					ChevronAnimLockUnlock( topChev, (isLastChev && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() && ChevronLightup), true );
+					ChevronAnimLockUnlock( topChev, (isLastChev && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow()), true );
 				}
 
 				ActiveChevrons++;
@@ -522,7 +523,7 @@ public partial class StargatePegasus : Stargate
 				var chev = GetChevronBasedOnAddressLength( i, numChevs );
 				if ( chev.IsValid() )
 				{
-					ChevronActivate( chev, 0, ChevronLightup );
+					ChevronActivate( chev, 0, true );
 				}
 			}
 
@@ -630,7 +631,7 @@ public partial class StargatePegasus : Stargate
 				{
 					//chev.TurnOn();
 					//PlaySound( chev, GetSound( "chevron_open" ) );
-					ChevronActivate( chev, 0, ChevronLightup );
+					ChevronActivate( chev, 0, true );
 				}
 
 			}
@@ -649,7 +650,7 @@ public partial class StargatePegasus : Stargate
 		var chev = GetChevronBasedOnAddressLength(DialingAddress.Length, 9 );
 		EncodedChevronsOrdered.Add( chev );
 
-		ChevronActivate( chev, 0.15f, ChevronLightup );
+		ChevronActivate( chev, 0.15f, true );
 		
 	}
 
@@ -661,7 +662,7 @@ public partial class StargatePegasus : Stargate
 		EncodedChevronsOrdered.Add( chev );
 
 		var gate = FindByAddress( DialingAddress );
-		var valid = (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD() && ChevronLightup);
+		var valid = (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD());
 
 		ChevronAnimLockUnlock( chev, valid, true );
 	}
