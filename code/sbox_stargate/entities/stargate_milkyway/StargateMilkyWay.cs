@@ -40,8 +40,8 @@ public partial class StargateMilkyWay : Stargate
 		CreateRing();
 		CreateAllChevrons();
 
-		Group = "M@";
-		Address = GenerateRandomAddress(7);
+		GateGroup = "M@";
+		GateAddress = GenerateRandomAddress(7);
 	}
 
 	public override void ResetGateVariablesToIdle()
@@ -270,7 +270,7 @@ public partial class StargateMilkyWay : Stargate
 			if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFast() )
 			{
 				wasTargetReadyOnStart = true;
-				target.BeginInboundFast( Address, target.Address.Length );
+				target.BeginInboundFast( GateAddress, target.GateAddress.Length );
 				OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
 				OtherGate.OtherGate = this;
 			}
@@ -602,7 +602,7 @@ public partial class StargateMilkyWay : Stargate
 				return;
 			}
 
-			otherGate.BeginInboundSlow( Address );
+			otherGate.BeginInboundSlow( GateAddress );
 
 			for ( var i = 1; i <= address.Length; i++ )
 			{
@@ -640,7 +640,7 @@ public partial class StargateMilkyWay : Stargate
 			var otherGate = FindByAddress( address );
 			if ( otherGate.IsValid() && otherGate != this && otherGate.IsStargateReadyForInboundDHD() )
 			{
-				otherGate.BeginInboundDHD( Address, DialingAddress.Length );
+				otherGate.BeginInboundDHD( GateAddress, DialingAddress.Length );
 			}
 			else
 			{

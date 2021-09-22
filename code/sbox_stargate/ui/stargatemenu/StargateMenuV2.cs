@@ -117,9 +117,9 @@ public class StargateMenuV2 : Panel {
 
 	[Event("stargate.refreshgateinformation")]
 	private void RefreshGateInformation() {
-		GateAddress = Gate.Address;
-		GateName = Gate.Name;
-		GateGroup = Gate.Group;
+		GateAddress = Gate.GateAddress;
+		GateName = Gate.GateName;
+		GateGroup = Gate.GateGroup;
 		AutoClose = Gate.AutoClose;
 		IsPrivate = Gate.Private;
 	}
@@ -151,27 +151,27 @@ public class StargateMenuV2 : Panel {
 				var panel = cell.Add.Panel( "row" );
 				panel.AllowChildSelection = true;
 				var td = panel.Add.Panel( "td stargate-font concept" );
-				td.AddChild<Label>().Text = gate.Address;
+				td.AddChild<Label>().Text = gate.GateAddress;
 				td = panel.Add.Panel( "td" );
-				td.AddChild<Label>().Text = gate.Address;
+				td.AddChild<Label>().Text = gate.GateAddress;
 				td = panel.Add.Panel( "td" );
-				td.AddChild<Label>().Text = gate.Name;
+				td.AddChild<Label>().Text = gate.GateName;
 
 				panel.AddEventListener( "onclick", () => {
-					DialAddress = gate.Address;
+					DialAddress = gate.GateAddress;
 				});
 
 				panel.AddEventListener( "ondoubleclick", () => {
-					DialAddress = gate.Address;
+					DialAddress = gate.GateAddress;
 					OpenGate();
 				});
 			};
 		}
 
-		List<Stargate> gates = Entity.All.OfType<Stargate>().Where(x => x.Address != Gate.Address && !x.Private).ToList();
+		List<Stargate> gates = Entity.All.OfType<Stargate>().Where(x => x.GateAddress != Gate.GateAddress && !x.Private).ToList();
 
 		if (SearchFilter != null && SearchFilter != "") {
-			gates = gates.Where( x => x.Address.Contains(SearchFilter) || (x.Name != null && x.Name != "" && x.Name.Contains(SearchFilter)) ).ToList();
+			gates = gates.Where( x => x.GateAddress.Contains(SearchFilter) || (x.GateName != null && x.GateName != "" && x.GateName.Contains(SearchFilter)) ).ToList();
 		}
 
 		foreach (Stargate gate in gates) {

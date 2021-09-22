@@ -38,8 +38,8 @@ public partial class StargatePegasus : Stargate
 		CreateRing();
 		CreateAllChevrons();
 
-		Group = "P@";
-		Address = "*" + GenerateRandomAddress(7);
+		GateGroup = "P@";
+		GateAddress = "*" + GenerateRandomAddress(7);
 	}
 
 	public override void ResetGateVariablesToIdle()
@@ -276,7 +276,7 @@ public partial class StargatePegasus : Stargate
 			if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFast() )
 			{
 				wasTargetReadyOnStart = true;
-				target.BeginInboundFast( Address, target.Address.Length );
+				target.BeginInboundFast( GateAddress, target.GateAddress.Length );
 				OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
 				OtherGate.OtherGate = this;
 			}
@@ -557,7 +557,7 @@ public partial class StargatePegasus : Stargate
 				return;
 			}
 
-			otherGate.BeginInboundSlow( Address );
+			otherGate.BeginInboundSlow( GateAddress );
 
 			for ( var i = 1; i <= address.Length; i++ )
 			{
@@ -595,7 +595,7 @@ public partial class StargatePegasus : Stargate
 			var otherGate = FindByAddress( address );
 			if ( otherGate.IsValid() && otherGate != this && otherGate.IsStargateReadyForInboundDHD() )
 			{
-				otherGate.BeginInboundDHD( Address, DialingAddress.Length );
+				otherGate.BeginInboundDHD( GateAddress, DialingAddress.Length );
 			}
 			else
 			{

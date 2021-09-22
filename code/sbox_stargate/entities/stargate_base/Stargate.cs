@@ -30,13 +30,13 @@ public abstract partial class Stargate : Prop, IUse
 	};
 
 	[Net]
-	public string Address { get; set; } = "";
+	public string GateAddress { get; set; } = "";
 	[Net]
-	public string Group { get { return Group; } set { if ( value.Length != GroupLength ) return; Group = value; } }
+	public string GateGroup { get { return GateGroup; } set { if ( value.Length != GateGroupLength ) return; GateGroup = value; } }
 	[Net]
-	public int GroupLength  { get; set; } = 2;
+	public int GateGroupLength  { get; set; } = 2;
 	[Net]
-	public string Name { get; set; } = "";
+	public string GateName { get; set; } = "";
 	[Net]
 	public bool AutoClose { get; set; } = true;
 	[Net]
@@ -469,10 +469,10 @@ public abstract partial class Stargate : Prop, IUse
 	[ServerCmd]
 	public static void RequestAddressChange(int gateID, string address) {
 		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
-			if (g.Address == address || !IsValidAddress( address ))
+			if (g.GateAddress == address || !IsValidAddress( address ))
 				return;
 
-			g.Address = address;
+			g.GateAddress = address;
 
 			g.RefreshGateInformation();
 		}
@@ -481,10 +481,10 @@ public abstract partial class Stargate : Prop, IUse
 	[ServerCmd]
 	public static void RequestNameChange(int gateID, string name) {
 		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
-			if (g.Name == name)
+			if (g.GateName == name)
 				return;
 
-			g.Name = name;
+			g.GateName = name;
 
 			g.RefreshGateInformation();
 		}

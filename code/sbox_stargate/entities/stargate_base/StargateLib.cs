@@ -78,7 +78,7 @@ public partial class Stargate : Prop, IUse
 	{
 		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
 		{
-			if ( gate.Address.Equals( address ) ) return gate;
+			if ( gate.GateAddress.Equals( address ) ) return gate;
 		}
 		return null;
 	}

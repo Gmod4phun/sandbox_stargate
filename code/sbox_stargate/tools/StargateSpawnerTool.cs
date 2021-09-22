@@ -112,7 +112,7 @@ namespace Sandbox.Tools
 
 					if ( tr.Entity is Stargate gate)
 					{
-						address = gate.Address;
+						address = gate.GateAddress;
 						Log.Info( $"Copied this gates address: {address}" );
 						return;
 					}
