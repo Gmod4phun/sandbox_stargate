@@ -20,14 +20,12 @@ public partial class StargateMilkyWay : IGateSpawner {
 
 	public override object ToJson() {
 
-		var parent = base.ToJson();
-		var data = new StargateMilkyWayJsonModel( parent as StargateJsonModel )
+		var parent = (StargateJsonModel) base.ToJson();
+		return new StargateMilkyWayJsonModel( parent )
 		{
 			MovieDialingType = MovieDialingType,
 			ChevronLightup = ChevronLightup
 		};
-
-		return data;
 	}
 
 	public override void FromJson(System.Text.Json.JsonElement data) {

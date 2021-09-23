@@ -6,6 +6,7 @@ public class StargateJsonModel : JsonModel {
 	public string Group { get; set; }
 	public bool Private { get; set; }
 	public bool AutoClose { get; set; }
+	public bool Local { get; set; }
 }
 
 public partial class Stargate : IGateSpawner {
@@ -19,7 +20,8 @@ public partial class Stargate : IGateSpawner {
 			Address = GateAddress,
 			Group = GateGroup,
 			Private = GatePrivate,
-			AutoClose = AutoClose
+			AutoClose = AutoClose,
+			Local = GateLocal
 		};
 
 	}
@@ -32,7 +34,7 @@ public partial class Stargate : IGateSpawner {
 		GateGroup = data.GetProperty( nameof( StargateJsonModel.Group ) ).ToString();
 		GatePrivate = data.GetProperty( nameof (StargateJsonModel.Private) ).GetBoolean();
 		AutoClose = data.GetProperty( nameof (StargateJsonModel.AutoClose) ).GetBoolean();
-
+		GateLocal = data.GetProperty( nameof( StargateJsonModel.Local ) ).GetBoolean();
 	}
 
 }
