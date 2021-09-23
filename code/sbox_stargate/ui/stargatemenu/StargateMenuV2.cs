@@ -114,7 +114,7 @@ public class StargateMenuV2 : Panel {
 
 			_searchFilter = value;
 
-			FillGates("true");
+			FillGatesHTML("true");
 		}
 	}
 
@@ -215,6 +215,7 @@ public class StargateMenuV2 : Panel {
 			};
 		}
 
+		// list gates that arent private
 		List<Stargate> gates = Entity.All.OfType<Stargate>().Where(x => x.GateAddress != Gate.GateAddress && !x.GatePrivate).ToList();
 
 		if (SearchFilter != null && SearchFilter != "") {
@@ -222,13 +223,20 @@ public class StargateMenuV2 : Panel {
 		}
 
 		foreach (Stargate gate in gates) {
-			table.Rows.AddItem(gate);
+			if ( Gate.GateLocal && Gate.GateGroup != gate.GateGroup ) continue;
+
+			// only show other gate if both gates have same group, or a different group but both are not local
+			if ( (Gate.GateGroup == gate.GateGroup) || (Gate.GateGroup != gate.GateGroup && !Gate.GateLocal && !gate.GateLocal) )
+			{
+				table.Rows.AddItem( gate );
+			}
 		}
 	}
 
 	// Needed for HTML Template
-	public void FillGates(string refresh = "false") {
-		FillGates(refresh == "true");
+	public void FillGatesHTML( string refresh = "false" )
+	{
+		FillGates( refresh == "true" );
 	}
 
 	public void OpenGate() {
