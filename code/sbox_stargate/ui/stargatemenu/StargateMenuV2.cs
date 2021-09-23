@@ -10,6 +10,7 @@ using static Stargate;
 public class StargateMenuV2 : Panel {
 
 	private Stargate Gate;
+	private Dhd DHD;
 
 	private string _gateAddress = "";
 	public string GateAddress {
@@ -120,13 +121,17 @@ public class StargateMenuV2 : Panel {
 
 	private Titlebar menuBar;
 
-	public StargateMenuV2() {
+	public StargateMenuV2(Stargate gate, Dhd dhd = null) {
 
 		StyleSheet.Load( "sbox_stargate/ui/stargatemenu/StargateMenuV2.scss" );
 
 		menuBar = AddChild<Titlebar>();
 		menuBar.SetTitle(true, "Stargate");
 		menuBar.SetCloseButton( true, "X", () => CloseMenu() );
+
+		SetGate( gate );
+
+		DHD = dhd;
 	}
 
 	public void CloseMenu()
@@ -146,8 +151,17 @@ public class StargateMenuV2 : Panel {
 			return;
 		}
 
-		var dist = Local.Pawn.Position.Distance( Gate.Position );
-		if ( dist > 220 * Gate.Scale ) CloseMenu();
+		if ( !DHD.IsValid() )
+		{
+			var dist = Local.Pawn.Position.Distance( Gate.Position );
+			if ( dist > 220 * Gate.Scale ) CloseMenu();
+		}
+		else
+		{
+			var dist = Local.Pawn.Position.Distance( DHD.Position );
+			if ( dist > 80 * DHD.Scale ) CloseMenu();
+		}
+
 	}
 
 	public void SetGate(Stargate gate) {

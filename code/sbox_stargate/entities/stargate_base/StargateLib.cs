@@ -169,7 +169,11 @@ public partial class Stargate : Prop, IUse
 		else if ( addrLen == 8 ) // 8 chevron connection - different group
 		{
 			if ( otherGroup[0] != gate.GateGroup[0] ) target = FindByAddress8Chev( address );
-			if ( IsUniverseGate( target ) ) target = null; // make it invalid if for some reason we got a universe gate
+			if ( target.IsValid() )
+			{
+				if ( IsUniverseGate( target ) ) target = null; // make it invalid if for some reason we got a universe gate
+				if ( gate.GateLocal || target.GateLocal ) target = null;
+			}
 		}
 		else // classic 7 chevron connection - must have same group
 		{

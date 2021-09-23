@@ -14,12 +14,12 @@ public partial class DhdButtonTrigger : AnimEntity, IUse
 		Health = 100;
 	}
 
-	public virtual bool OnUse(Entity ent)
+	public virtual bool OnUse(Entity user)
 	{
 		if ( Time.Now < DHD.lastPressTime + DHD.pressDelay ) return false;
 
 		DHD.lastPressTime = Time.Now;
-		DHD.TriggerAction( Action );
+		DHD.TriggerAction( Action, user );
 
 		return false;
 	}

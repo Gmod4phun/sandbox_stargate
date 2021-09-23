@@ -406,14 +406,14 @@ public abstract partial class Stargate : Prop, IUse
 	// UI Related stuff
 
 	[ClientRpc]
-	public void OpenStargateMenu()
+	public void OpenStargateMenu(Dhd dhd = null)
 	{
 		var hud = Local.Hud;
 		var count = 0;
 		foreach ( StargateMenuV2 menu in hud.ChildrenOfType<StargateMenuV2>() ) count++;
 
 		// this makes sure if we already have the menu open, we cant open it again
-		if ( count == 0 ) hud.AddChild<StargateMenuV2>().SetGate( this );
+		if ( count == 0 ) hud.AddChild( new StargateMenuV2( this, dhd ) );
 	}
 
 	[ClientRpc]

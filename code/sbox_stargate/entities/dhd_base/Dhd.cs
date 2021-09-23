@@ -181,7 +181,7 @@ public abstract partial class Dhd : Prop
 		}
 	}
 
-	public void TriggerAction( string action ) // this gets called from the Button Trigger after pressing it
+	public void TriggerAction( string action, Entity user ) // this gets called from the Button Trigger after pressing it
 	{
 		if ( !Gate.IsValid() || Gate.Busy || Gate.Inbound ) return; // if we have no gate to control or we are busy, we cant do anything
 
@@ -204,7 +204,7 @@ public abstract partial class Dhd : Prop
 		{
 			if ( Gate.Idle ) // if gate is idle, open dial menu
 			{
-				//Gate.OpenStargateMenu(); // TODO - make the menu stay open
+				Gate.OpenStargateMenu( To.Single( user ), this );
 				return;
 			}
 
@@ -237,13 +237,13 @@ public abstract partial class Dhd : Prop
 
 				PlayButtonPressAnim( button );
 
-				var target = Stargate.FindByFullAddress( sequence );
+				var target = Stargate.FindDestinationGateByDialingAddress( Gate, sequence );
 				if ( target.IsValid() && target != Gate && target.IsStargateReadyForInboundDHD() && Gate.CanStargateOpen() )
 				{
 					Stargate.PlaySound( this, "dhd_dial" );
 
 					Gate.CurGateState = Stargate.GateState.IDLE; // temporarily make it idle so it can 'begin' dialing
-					Gate.BeginOpenByDHD(sequence);
+					Gate.BeginOpenByDHD( sequence );
 				}
 				else
 				{

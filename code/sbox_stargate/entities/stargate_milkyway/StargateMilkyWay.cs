@@ -478,7 +478,7 @@ public partial class StargateMilkyWay : Stargate
 
 				await Task.DelaySeconds( MovieDialingType ? 0.15f : 0.65f ); // wait a bit
 
-				if ( isLastChev ) target = FindByFullAddress( address ); // if its last chevron, try to find the target gate
+				if ( isLastChev ) target = FindDestinationGateByDialingAddress( this, address ); // if its last chevron, try to find the target gate
 
 				// go do chevron stuff
 				var chev = GetChevronBasedOnAddressLength( chevNum, address.Length );
@@ -602,7 +602,7 @@ public partial class StargateMilkyWay : Stargate
 				return;
 			}
 
-			var otherGate = FindByFullAddress( address );
+			var otherGate = FindDestinationGateByDialingAddress( this, address );
 			if ( !otherGate.IsValid() || otherGate == this || !otherGate.IsStargateReadyForInboundInstantSlow() )
 			{
 				StopDialing();
@@ -644,10 +644,10 @@ public partial class StargateMilkyWay : Stargate
 
 			await Task.DelaySeconds( 0.35f );
 
-			var otherGate = FindByFullAddress( address );
+			var otherGate = FindDestinationGateByDialingAddress( this, address );
 			if ( otherGate.IsValid() && otherGate != this && otherGate.IsStargateReadyForInboundDHD() )
 			{
-				otherGate.BeginInboundDHD( GateAddress );
+				otherGate.BeginInboundDHD( address );
 			}
 			else
 			{
@@ -722,7 +722,7 @@ public partial class StargateMilkyWay : Stargate
 		var chev = GetTopChevron();
 		EncodedChevronsOrdered.Add( chev );
 
-		var gate = FindByFullAddress( DialingAddress );
+		var gate = FindDestinationGateByDialingAddress( this, DialingAddress );
 		var valid = (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD() && ChevronLightup);
 
 		if (MovieDialingType)
