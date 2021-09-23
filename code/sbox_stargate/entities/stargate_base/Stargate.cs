@@ -273,13 +273,13 @@ public abstract partial class Stargate : Prop, IUse
 	public virtual void BeginDialInstant( string address ) { } // instant gate open, with kawoosh
 	public virtual void BeginDialNox( string address ) { } // instant gate open without kawoosh - asgard/ancient/nox style 
 
-	public virtual void BeginInboundFast( string address ) { }
-	public virtual void BeginInboundSlow( string address ) { } // this can be used with Instant dial, too
+	public virtual void BeginInboundFast( int numChevs ) { }
+	public virtual void BeginInboundSlow( int numChevs ) { } // this can be used with Instant dial, too
 
 
 	// DHD DIAL
 	public virtual void BeginOpenByDHD( string address ) { } // when dhd dial button is pressed
-	public virtual void BeginInboundDHD( string address ) { } // when a dhd dialing gate locks onto another gate
+	public virtual void BeginInboundDHD( int numChevs ) { } // when a dhd dialing gate locks onto another gate
 
 	public async void StopDialing()
 	{

@@ -265,14 +265,13 @@ public partial class StargateMilkyWay : Stargate
 			if ( !IsValidFullAddress( address ) ) { StopDialing(); return; }
 
 			Stargate target = FindDestinationGateByDialingAddress(this, address);
-
 			var wasTargetReadyOnStart = false; // if target gate was not available on dial start, dont bother doing anything at the end
 
 			if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFast() )
 			{
 				wasTargetReadyOnStart = true;
 
-				target.BeginInboundFast( GetSelfAddressBasedOnOtherAddress(this, address) );
+				target.BeginInboundFast( GetSelfAddressBasedOnOtherAddress(this, address).Length );
 
 				OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
 				OtherGate.OtherGate = this;
@@ -369,7 +368,7 @@ public partial class StargateMilkyWay : Stargate
 	}
 
 	// FAST INBOUND
-	public async override void BeginInboundFast( string address )
+	public async override void BeginInboundFast( int numChevs )
 	{
 		if ( !IsStargateReadyForInboundFast() ) return;
 
@@ -380,18 +379,16 @@ public partial class StargateMilkyWay : Stargate
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
-			var addrLen = address.Length;
-
 			// duration of the dial until the gate starts opening - let's stick to 7 seconds for total (just like GMod stargates)
 			// default values are for 7 chevron sequence
-			var chevronsStartDelay = (addrLen == 9) ? 0.25f : ((addrLen == 8) ? 0.40f : 0.50f);
-			var chevronsLoopDuration = (addrLen == 9) ? 6.75f : ((addrLen == 8) ? 6.60f : 6.75f);
-			var chevronBeforeLastDelay = (addrLen == 9) ? 0.50f : ((addrLen == 8) ? 0.60f : 0.50f);
-			var chevronDelay = chevronsLoopDuration / (addrLen);
+			var chevronsStartDelay = (numChevs == 9) ? 0.25f : ((numChevs == 8) ? 0.40f : 0.50f);
+			var chevronsLoopDuration = (numChevs == 9) ? 6.75f : ((numChevs == 8) ? 6.60f : 6.75f);
+			var chevronBeforeLastDelay = (numChevs == 9) ? 0.50f : ((numChevs == 8) ? 0.60f : 0.50f);
+			var chevronDelay = chevronsLoopDuration / (numChevs);
 
 			await Task.DelaySeconds( chevronsStartDelay ); // wait 0.5 sec and start locking chevrons
 
-			for ( var i = 1; i < addrLen; i++ )
+			for ( var i = 1; i < numChevs; i++ )
 			{
 				if ( !OtherGate.IsValid() )
 				{
@@ -401,7 +398,7 @@ public partial class StargateMilkyWay : Stargate
 
 				if ( ShouldStopDialing ) return; // check if we should stop dialing or not
 
-				var chev = GetChevronBasedOnAddressLength( i, addrLen );
+				var chev = GetChevronBasedOnAddressLength( i, numChevs );
 				if ( chev.IsValid() )
 				{
 					if (MovieDialingType)
@@ -521,7 +518,7 @@ public partial class StargateMilkyWay : Stargate
 
 				if ( isLastChev && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() )
 				{
-					target.BeginInboundSlow( address );
+					target.BeginInboundSlow( address.Length );
 					readyForOpen = true;
 				}
 
@@ -550,7 +547,7 @@ public partial class StargateMilkyWay : Stargate
 	}
 
 	// SLOW INBOUND
-	public async override void BeginInboundSlow( string address )
+	public async override void BeginInboundSlow( int numChevs )
 	{
 		if ( !IsStargateReadyForInboundInstantSlow() ) return;
 
@@ -560,8 +557,6 @@ public partial class StargateMilkyWay : Stargate
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
-
-			var numChevs = address.Length;
 
 			if (MovieDialingType)
 			{
@@ -609,7 +604,7 @@ public partial class StargateMilkyWay : Stargate
 				return;
 			}
 
-			otherGate.BeginInboundSlow( GateAddress );
+			otherGate.BeginInboundSlow( address.Length );
 
 			for ( var i = 1; i <= address.Length; i++ )
 			{
@@ -647,7 +642,7 @@ public partial class StargateMilkyWay : Stargate
 			var otherGate = FindDestinationGateByDialingAddress( this, address );
 			if ( otherGate.IsValid() && otherGate != this && otherGate.IsStargateReadyForInboundDHD() )
 			{
-				otherGate.BeginInboundDHD( address );
+				otherGate.BeginInboundDHD( address.Length );
 			}
 			else
 			{
@@ -665,7 +660,7 @@ public partial class StargateMilkyWay : Stargate
 		}
 	}
 
-	public async override void BeginInboundDHD( string address )
+	public async override void BeginInboundDHD( int numChevs )
 	{
 		if ( !IsStargateReadyForInboundDHD() ) return;
 
@@ -676,18 +671,10 @@ public partial class StargateMilkyWay : Stargate
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
-			var numChevs = address.Length;
-
 			for ( var i = 1; i <= numChevs; i++ )
 			{
 				var chev = GetChevronBasedOnAddressLength( i, numChevs );
-				if ( chev.IsValid() )
-				{
-					//chev.TurnOn();
-					//PlaySound( chev, GetSound( "chevron_open" ) );
-					ChevronActivate( chev, 0, ChevronLightup );
-				}
-
+				ChevronActivate( chev, 0, ChevronLightup );
 			}
 		}
 		catch ( Exception )

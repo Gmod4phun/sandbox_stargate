@@ -7,7 +7,7 @@ namespace Sandbox.Tools
 	{
 		PreviewEntity previewModel;
 
-		static string address = "";
+		static Stargate CopiedGate = null;
 
 		private string Model => "models/sbox_stargate/gate_sg1/gate_sg1.vmdl";
 
@@ -112,8 +112,7 @@ namespace Sandbox.Tools
 
 					if ( tr.Entity is Stargate gate)
 					{
-						address = gate.GateAddress;
-						Log.Info( $"Copied this gates address: {address}" );
+						CopiedGate = gate;
 						return;
 					}
 
@@ -147,17 +146,20 @@ namespace Sandbox.Tools
 						{
 							if ( !gate.Dialing )
 							{
+								var finalAddress = Stargate.GetOtherGateAddressForMenu( gate, CopiedGate );
+								Log.Info( $"Dialing {finalAddress}" );
+
 								if (Input.Down(InputButton.Run))
 								{
-									gate.BeginDialSlow( address );
+									gate.BeginDialSlow( finalAddress );
 								}
 								else if (Input.Down(InputButton.Duck))
 								{
-									gate.BeginDialInstant( address );
+									gate.BeginDialInstant( finalAddress );
 								}
 								else
 								{
-									gate.BeginDialFast( address );
+									gate.BeginDialFast( finalAddress );
 								}
 							}
 							else

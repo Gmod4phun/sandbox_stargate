@@ -92,7 +92,6 @@ public partial class StargateRingPegasus : ModelEntity
 			{
 				var symIndex = counterclockwise ? (start - i) : start + i;
 				var symPrevIndex = counterclockwise ? (symIndex + 1) : symIndex - 1;
-				//var symNextindex = counterclockwise ? (symIndex - 1) : symIndex + 1;
 
 				SetSymbolState( symIndex, true );
 				if ( !DialSequenceActiveSymbols.Contains( symPrevIndex.UnsignedMod(36) ) ) SetSymbolState( symPrevIndex, false );
@@ -119,31 +118,52 @@ public partial class StargateRingPegasus : ModelEntity
 		DialSequenceActiveSymbols.Clear();
 	}
 
-	public async void RollSymbolsInbound(float time = 5.5f)
+	public async void RollSymbolsInbound( float time, float startDelay = 0, int chevCount = 7)
 	{
-		ResetSymbols();
-
-		var delay = time / 36f;
-		var chevDelay = delay / 2f;
-
-		var chevNum = 1;
-		for ( int i = 0; i <= 35; i++ )
+		try
 		{
-			SetSymbolState( i, true );
+			if ( startDelay > 0 ) await Task.DelaySeconds( startDelay );
 
-			if ( i == 3 ) Gate.ChevronActivate( Gate.GetChevron( 1 ), chevDelay, true );
-			if ( i == 7 ) Gate.ChevronActivate( Gate.GetChevron( 2 ), chevDelay, true );
-			if ( i == 11 ) Gate.ChevronActivate( Gate.GetChevron( 3 ), chevDelay, true );
-			//if ( i == 15 ) Gate.ChevronActivate( Gate.GetChevron( 8 ), chevDelay, true );
-			//if ( i == 19 ) Gate.ChevronActivate( Gate.GetChevron( 9 ), chevDelay, true );
-			if ( i == 23 ) Gate.ChevronActivate( Gate.GetChevron( 4 ), chevDelay, true );
-			if ( i == 27 ) Gate.ChevronActivate( Gate.GetChevron( 5 ), chevDelay, true );
-			if ( i == 31 ) Gate.ChevronActivate( Gate.GetChevron( 6 ), chevDelay, true );
-			if ( i == 35 ) Gate.ChevronActivate( Gate.GetChevron( 7 ), chevDelay, true );
+			ResetSymbols();
 
-			await Task.DelaySeconds( delay );
+			Stargate.PlaySound( Gate, Gate.GetSound( "gate_roll_fast" ) );
+
+			await Task.DelaySeconds( 0.7f );
+
+			var delay = time / 36f;
+			var chevDelay = delay / 2f;
+
+			for ( int i = 0; i <= 35; i++ )
+			{
+				if ( Gate.ShouldStopDialing )
+				{
+					Gate.StopDialing();
+					return;
+				}
+
+				SetSymbolState( i, true );
+
+				if ( i == 3 ) Gate.ChevronActivate( Gate.GetChevron( 1 ), chevDelay, true );
+				if ( i == 7 ) Gate.ChevronActivate( Gate.GetChevron( 2 ), chevDelay, true );
+				if ( i == 11 ) Gate.ChevronActivate( Gate.GetChevron( 3 ), chevDelay, true );
+				if ( chevCount > 7 )
+				{
+					if ( i == 15 ) Gate.ChevronActivate( Gate.GetChevron( 8 ), chevDelay, true );
+					if ( chevCount > 8 ) if ( i == 19 ) Gate.ChevronActivate( Gate.GetChevron( 9 ), chevDelay, true );
+				}
+
+				if ( i == 23 ) Gate.ChevronActivate( Gate.GetChevron( 4 ), chevDelay, true );
+				if ( i == 27 ) Gate.ChevronActivate( Gate.GetChevron( 5 ), chevDelay, true );
+				if ( i == 31 ) Gate.ChevronActivate( Gate.GetChevron( 6 ), chevDelay, true );
+				if ( i == 35 ) Gate.ChevronActivate( Gate.GetChevron( 7 ), chevDelay, true, true );
+
+				await Task.DelaySeconds( delay );
+			}
 		}
+		catch (Exception)
+		{
 
+		}
 	}
 
 	public async void RollSymbolsDialSlow()

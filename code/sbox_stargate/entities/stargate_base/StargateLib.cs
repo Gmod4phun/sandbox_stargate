@@ -377,7 +377,6 @@ public partial class Stargate : Prop, IUse
 		if ( !ent.IsValid() ) return;
 		if ( delay > 0 ) await ent.Task.DelaySeconds( delay );
 		if ( !ent.IsValid() ) return;
-
 		Sound.FromEntity( name, ent );
 	}
 
