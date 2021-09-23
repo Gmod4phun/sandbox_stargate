@@ -40,7 +40,9 @@ public abstract partial class Stargate : Prop, IUse
 	[Net]
 	public bool AutoClose { get; set; } = true;
 	[Net]
-	public bool Private { get; set; } = false;
+	public bool GatePrivate { get; set; } = false;
+	[Net]
+	public bool GateLocal { get; set; } = true;
 
 	public bool Busy { get; set; } = false; // this is pretty much used anytime the gate is busy to do anything (usually during animations/transitions)
 	public bool Inbound { get; set; } = false;
@@ -271,13 +273,13 @@ public abstract partial class Stargate : Prop, IUse
 	public virtual void BeginDialInstant( string address ) { } // instant gate open, with kawoosh
 	public virtual void BeginDialNox( string address ) { } // instant gate open without kawoosh - asgard/ancient/nox style 
 
-	public virtual void BeginInboundFast( string address, int numChevs = 7 ) { }
-	public virtual void BeginInboundSlow( string address, int numChevs = 7 ) { } // this can be used with Instant dial, too
+	public virtual void BeginInboundFast( string address ) { }
+	public virtual void BeginInboundSlow( string address ) { } // this can be used with Instant dial, too
 
 
 	// DHD DIAL
 	public virtual void BeginOpenByDHD( string address ) { } // when dhd dial button is pressed
-	public virtual void BeginInboundDHD( string address, int numChevs = 7 ) { } // when a dhd dialing gate locks onto another gate
+	public virtual void BeginInboundDHD( string address ) { } // when a dhd dialing gate locks onto another gate
 
 	public async void StopDialing()
 	{
@@ -469,10 +471,24 @@ public abstract partial class Stargate : Prop, IUse
 	[ServerCmd]
 	public static void RequestAddressChange(int gateID, string address) {
 		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
-			if (g.GateAddress == address || !IsValidAddress( address ))
+			if (g.GateAddress == address || !IsValidAddressOnly( address ))
 				return;
 
 			g.GateAddress = address;
+
+			g.RefreshGateInformation();
+		}
+	}
+
+	[ServerCmd]
+	public static void RequestGroupChange( int gateID, string group )
+	{
+		if ( FindByIndex( gateID ) is Stargate g && g.IsValid() )
+		{
+			if ( g.GateGroup == group || !IsValidGroup( group ) )
+				return;
+
+			g.GateGroup = group;
 
 			g.RefreshGateInformation();
 		}
@@ -503,12 +519,26 @@ public abstract partial class Stargate : Prop, IUse
 	}
 
 	[ServerCmd]
-	public static void SetPrivacy(int gateID, bool state) {
+	public static void SetGatePrivate(int gateID, bool state) {
 		if (FindByIndex( gateID ) is Stargate g && g.IsValid()) {
-			if (g.Private == state)
+			if (g.GatePrivate == state)
 				return;
 
-			g.Private = state;
+			g.GatePrivate = state;
+
+			g.RefreshGateInformation();
+		}
+	}
+
+	[ServerCmd]
+	public static void SetGateLocal( int gateID, bool state )
+	{
+		if ( FindByIndex( gateID ) is Stargate g && g.IsValid() )
+		{
+			if ( g.GateLocal == state )
+				return;
+
+			g.GateLocal = state;
 
 			g.RefreshGateInformation();
 		}

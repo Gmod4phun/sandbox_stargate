@@ -20,7 +20,7 @@ public class StargateMenuV2 : Panel {
 			if (_gateAddress == value)
 				return;
 			_gateAddress = value;
-			if (_gateAddress.Length == 7)
+			if (_gateAddress.Length == 6)
 				Stargate.RequestAddressChange(Gate.NetworkIdent, _gateAddress);
 		}
 	}
@@ -38,7 +38,21 @@ public class StargateMenuV2 : Panel {
 		}
 	}
 
-	public string GateGroup { get; set; }
+	private string _gateGroup = "";
+	public string GateGroup
+	{
+		get
+		{
+			return _gateGroup;
+		}
+		set
+		{
+			if ( _gateGroup == value )
+				return;
+			_gateGroup = value;
+			Stargate.RequestGroupChange( Gate.NetworkIdent, _gateGroup );
+		}
+	}
 
 	private bool _isPrivate = false;
 	public bool IsPrivate {
@@ -50,14 +64,29 @@ public class StargateMenuV2 : Panel {
 				return;
 
 			_isPrivate = value;
-
-			Stargate.SetPrivacy(Gate.NetworkIdent, _isPrivate);
+			Stargate.SetGatePrivate( Gate.NetworkIdent, _isPrivate );
 		}
 	}
 
-	public bool IsLocal;
+	private bool _isLocal = false;
+	public bool IsLocal
+	{
+		get
+		{
+			return _isLocal;
+		}
+		set
+		{
+			if ( _isLocal == value )
+				return;
 
-	private bool _autoClose = true;
+			_isLocal = value;
+
+			Stargate.SetGateLocal( Gate.NetworkIdent, _isLocal );
+		}
+	}
+
+	private bool _autoClose = false;
 	public bool AutoClose {
 		get {
 			return _autoClose;
@@ -97,16 +126,28 @@ public class StargateMenuV2 : Panel {
 
 		menuBar = AddChild<Titlebar>();
 		menuBar.SetTitle(true, "Stargate");
-		menuBar.SetCloseButton( true, "×", () => this.Delete() );
+		menuBar.SetCloseButton( true, "X", () => CloseMenu() );
+	}
+
+	public void CloseMenu()
+	{
+		Blur(); // finally, this makes it lose focus
+		Delete( true );
 	}
 
 	public override void Tick()
 	{
 		base.Tick();
-		
+
 		// closes menu if player goes too far -- in the future we will want to freeze player's input
+		if ( !Gate.IsValid() )
+		{
+			CloseMenu();
+			return;
+		}
+
 		var dist = Local.Pawn.Position.Distance( Gate.Position );
-		if ( dist > 220 * Gate.Scale ) Delete();
+		if ( dist > 220 * Gate.Scale ) CloseMenu();
 	}
 
 	public void SetGate(Stargate gate) {
@@ -121,7 +162,8 @@ public class StargateMenuV2 : Panel {
 		GateName = Gate.GateName;
 		GateGroup = Gate.GateGroup;
 		AutoClose = Gate.AutoClose;
-		IsPrivate = Gate.Private;
+		IsPrivate = Gate.GatePrivate;
+		IsLocal = Gate.GateLocal;
 	}
 
 	private Table GetTable() {
@@ -150,25 +192,30 @@ public class StargateMenuV2 : Panel {
 				var gate = (Stargate)data;
 				var panel = cell.Add.Panel( "row" );
 				panel.AllowChildSelection = true;
+
+				var address = GetOtherGateAddressForMenu( Gate, gate );
+
 				var td = panel.Add.Panel( "td stargate-font concept" );
-				td.AddChild<Label>().Text = gate.GateAddress;
+				td.AddChild<Label>().Text = address;
+
 				td = panel.Add.Panel( "td" );
-				td.AddChild<Label>().Text = gate.GateAddress;
+				td.AddChild<Label>().Text = address;
+
 				td = panel.Add.Panel( "td" );
 				td.AddChild<Label>().Text = gate.GateName;
 
 				panel.AddEventListener( "onclick", () => {
-					DialAddress = gate.GateAddress;
+					DialAddress = address;
 				});
 
 				panel.AddEventListener( "ondoubleclick", () => {
-					DialAddress = gate.GateAddress;
+					DialAddress = address;
 					OpenGate();
 				});
 			};
 		}
 
-		List<Stargate> gates = Entity.All.OfType<Stargate>().Where(x => x.GateAddress != Gate.GateAddress && !x.Private).ToList();
+		List<Stargate> gates = Entity.All.OfType<Stargate>().Where(x => x.GateAddress != Gate.GateAddress && !x.GatePrivate).ToList();
 
 		if (SearchFilter != null && SearchFilter != "") {
 			gates = gates.Where( x => x.GateAddress.Contains(SearchFilter) || (x.GateName != null && x.GateName != "" && x.GateName.Contains(SearchFilter)) ).ToList();

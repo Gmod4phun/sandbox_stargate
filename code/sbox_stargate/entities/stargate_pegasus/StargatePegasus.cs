@@ -39,7 +39,7 @@ public partial class StargatePegasus : Stargate
 		CreateAllChevrons();
 
 		GateGroup = "P@";
-		GateAddress = "*" + GenerateRandomAddress(7);
+		GateAddress = GenerateGateAddress( GateGroup );
 	}
 
 	public override void ResetGateVariablesToIdle()
@@ -268,15 +268,15 @@ public partial class StargatePegasus : Stargate
 			CurGateState = GateState.DIALING;
 			CurDialType = DialType.FAST;
 
-			if ( !IsValidAddress( address ) ) { StopDialing(); return; }
+			if ( !IsValidFullAddress( address ) ) { StopDialing(); return; }
 
-			var target = FindByAddress( address );
+			var target = FindByFullAddress( address );
 			var wasTargetReadyOnStart = false; // if target gate was not available on dial start, dont bother doing anything at the end
 
 			if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFast() )
 			{
 				wasTargetReadyOnStart = true;
-				target.BeginInboundFast( GateAddress, target.GateAddress.Length );
+				target.BeginInboundFast( GateAddress );
 				OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
 				OtherGate.OtherGate = this;
 			}
@@ -355,7 +355,7 @@ public partial class StargatePegasus : Stargate
 	}
 
 	// FAST INBOUND
-	public async override void BeginInboundFast( string address, int numChevs = 7 )
+	public async override void BeginInboundFast( string address )
 	{
 		if ( !IsStargateReadyForInboundFast() ) return;
 
@@ -365,6 +365,8 @@ public partial class StargatePegasus : Stargate
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
+
+			var numChevs = address.Length;
 
 			// duration of the dial until the gate starts opening - let's stick to 7 seconds for total (just like GMod stargates)
 			// default values are for 7 chevron sequence
@@ -424,7 +426,7 @@ public partial class StargatePegasus : Stargate
 			CurGateState = GateState.DIALING;
 			CurDialType = DialType.SLOW;
 
-			if ( !IsValidAddress( address ) )
+			if ( !IsValidFullAddress( address ) )
 			{
 				StopDialing();
 				return;
@@ -448,7 +450,7 @@ public partial class StargatePegasus : Stargate
 
 				await Task.DelaySeconds( 0.65f ); // wait a bit
 
-				if ( isLastChev ) target = FindByAddress( address ); // if its last chevron, try to find the target gate
+				if ( isLastChev ) target = FindByFullAddress( address ); // if its last chevron, try to find the target gate
 
 				// go do chevron stuff
 				var chev = GetChevronBasedOnAddressLength( chevNum, address.Length );
@@ -478,7 +480,7 @@ public partial class StargatePegasus : Stargate
 
 				if ( isLastChev && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() )
 				{
-					target.BeginInboundSlow( address, address.Length );
+					target.BeginInboundSlow( address );
 					readyForOpen = true;
 				}
 
@@ -507,7 +509,7 @@ public partial class StargatePegasus : Stargate
 	}
 
 	// SLOW INBOUND
-	public async override void BeginInboundSlow( string address, int numChevs = 7 )
+	public async override void BeginInboundSlow( string address )
 	{
 		if ( !IsStargateReadyForInboundInstantSlow() ) return;
 
@@ -517,6 +519,8 @@ public partial class StargatePegasus : Stargate
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
+
+			var numChevs = address.Length;
 
 			for ( var i = 1; i <= numChevs; i++ )
 			{
@@ -544,13 +548,13 @@ public partial class StargatePegasus : Stargate
 			CurGateState = GateState.DIALING;
 			CurDialType = DialType.INSTANT;
 
-			if ( !IsValidAddress( address ) )
+			if ( !IsValidFullAddress( address ) )
 			{
 				StopDialing();
 				return;
 			}
 
-			var otherGate = FindByAddress( address );
+			var otherGate = FindByFullAddress( address );
 			if ( !otherGate.IsValid() || otherGate == this || !otherGate.IsStargateReadyForInboundInstantSlow() )
 			{
 				StopDialing();
@@ -592,10 +596,10 @@ public partial class StargatePegasus : Stargate
 
 			await Task.DelaySeconds( 0.35f );
 
-			var otherGate = FindByAddress( address );
+			var otherGate = FindByFullAddress( address );
 			if ( otherGate.IsValid() && otherGate != this && otherGate.IsStargateReadyForInboundDHD() )
 			{
-				otherGate.BeginInboundDHD( GateAddress, DialingAddress.Length );
+				otherGate.BeginInboundDHD( GateAddress );
 			}
 			else
 			{
@@ -613,7 +617,7 @@ public partial class StargatePegasus : Stargate
 		}
 	}
 
-	public async override void BeginInboundDHD( string address, int numChevs = 7 )
+	public async override void BeginInboundDHD( string address )
 	{
 		if ( !IsStargateReadyForInboundDHD() ) return;
 
@@ -623,6 +627,8 @@ public partial class StargatePegasus : Stargate
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
+
+			var numChevs = address.Length;
 
 			for ( var i = 1; i <= numChevs; i++ )
 			{
@@ -661,7 +667,7 @@ public partial class StargatePegasus : Stargate
 		var chev = GetTopChevron();
 		EncodedChevronsOrdered.Add( chev );
 
-		var gate = FindByAddress( DialingAddress );
+		var gate = FindByFullAddress( DialingAddress );
 		var valid = (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD());
 
 		ChevronAnimLockUnlock( chev, valid, true );

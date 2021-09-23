@@ -137,7 +137,7 @@ public partial class StargateRingMilkyWay : PlatformEntity
 
 	public void OnStop()
 	{
-		if (Gate.IsValid() && Gate.Dialing)
+		if (Gate.IsValid())
 		{
 			if ( !StopSoundOnSpinDown )
 			{

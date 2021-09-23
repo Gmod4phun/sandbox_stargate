@@ -9,12 +9,13 @@
 
         <div class="input inline">
             <label class="input-label">Group :</label>
-            <select class="small">
+            <textentry @value="GateGroup" style="text-transform: uppercase;"></textentry>
+            <!--<select class="small">
                 <option value="0">M@</option>
                 <option value="1">P@</option>
                 <option value="2">I@</option>
                 <option value="3">O@</option>
-            </select>
+            </select>-->
         </div>
 
         <div class="input inline">
@@ -27,11 +28,11 @@
         </div>
 
         <div class="input inline">
-            <checkbox>Local</checkbox>
+            <checkbox @checked="IsLocal">Local</checkbox>
         </div>
 
         <div class="input inline">
-            <checkbox @checked="AutoClose">Autoclose</checkbox>
+            <checkbox @checked="AutoClose">Auto Close</checkbox>
         </div>
     </div>
 

@@ -24,63 +24,258 @@ public partial class Stargate : Prop, IUse
 	}
 
 	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@"; // we wont use * and ? for now, since they arent on the DHD
-	public const string SymbolsNoOrigins = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@";
+	public const string SymbolsForAddress = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	public const string SymbolsForGroup = "@";
+	public const char PointOfOrigin = '#';
 
 	public readonly int[] ChevronAngles = { 40, 80, 120, 240, 280, 320, 0, 160, 200 };
 
 	public const int AutoCloseTimerDuration = 5;
 
-	/// <summary>
-	/// Generates a random address.
-	/// </summary>
-	/// <param name="length">how many symbols should the address have.</param>
-	/// <returns>Gate Adress.</returns>
-	public static string GenerateRandomAddress( int length = 7 )
-	{
-		if ( length < 7 || length > 9 ) return "";
 
-		StringBuilder symbolsCopy = new( SymbolsNoOrigins );
+	/// <summary>
+	/// Generates a random 2 symbol Gate Group.
+	/// </summary>
+	/// <returns>Gate Group.</returns>
+	public static string GenerateGateGroup()
+	{
+		StringBuilder symbolsCopy = new( SymbolsForAddress + SymbolsForGroup );
+
+		string generatedGroup = "";
+		for ( int i = 0; i < 2; i++ ) // pick random symbols without repeating
+		{
+			var randomIndex = new Random().Int( 0, symbolsCopy.Length - 1 );
+			generatedGroup += symbolsCopy[randomIndex];
+
+			symbolsCopy = symbolsCopy.Remove( randomIndex, 1 );
+		}
+
+		return generatedGroup;
+	}
+
+	/// <summary>
+	/// Generates a random 6 symbol Gate Address, excluding characters from a Gate Group.
+	/// </summary>
+	/// <returns>Gate Adress.</returns>
+	public static string GenerateGateAddress( string excludeGroup )
+	{
+		StringBuilder symbolsCopy = new( SymbolsForAddress );
+
+		foreach ( var c in excludeGroup )  // remove group chars from symbols
+		{
+			if ( symbolsCopy.ToString().Contains( c ) )	symbolsCopy = symbolsCopy.Remove( symbolsCopy.ToString().IndexOf( c ), 1 );
+		}
 
 		string generatedAddress = "";
-		for ( int i = 1; i < length; i++ ) // pick random symbols without repeating
+		for ( int i = 0; i < 6; i++ ) // pick random symbols without repeating
 		{
 			var randomIndex = new Random().Int( 0, symbolsCopy.Length - 1 );
 			generatedAddress += symbolsCopy[randomIndex];
 
 			symbolsCopy = symbolsCopy.Remove( randomIndex, 1 );
 		}
-		generatedAddress += '#'; // add a point of origin
+
 		return generatedAddress;
 	}
 
+	public static string GetFullGateAddress(Stargate gate, bool only8chev = false)
+	{
+		if ( !only8chev ) return gate.GateAddress + gate.GateGroup + PointOfOrigin;
+
+		return gate.GateAddress + gate.GateGroup[0] + PointOfOrigin;
+	}
+
 	/// <summary>
-	/// Checks if the format of the input string is that of a valid Stargate address.
+	/// Checks if the format of the input string is that of a valid full Stargate Address (Address + Group + Point of Origin).
 	/// </summary>
 	/// <param name="address">The gate address represented in the string.</param>
 	/// <returns>True or False</returns>
-	public static bool IsValidAddress( string address ) // a valid address has 7, 8, or 9 VALID characters and has no repeating symbols
+	public static bool IsValidFullAddress( string address ) // a valid address has an address, a group and a point of origin, with no repeating symbols
 	{
-		if ( address.Length < 7 || address.Length > 9 ) return false; // only 7, 8 or 9 symbol addresses 
+		if ( address.Length < 7 || address.Length > 9 ) return false; // only 7, 8 or 9 symbol addresses
+
 		foreach ( char sym in address )
 		{
 			if ( !Symbols.Contains( sym ) ) return false; // only valid symbols
 			if ( address.Count( c => c == sym ) > 1 ) return false; // only one occurence
 		}
+
+		if ( !address.EndsWith( PointOfOrigin ) ) return false; // must end with point of origin
+
 		return true;
 	}
 
 	/// <summary>
-	/// Returns the gate if it finds it by string address.
+	/// Checks if the format of the input string is that of a valid Stargate Address (6 non-repeating valid symbols).
 	/// </summary>
 	/// <param name="address">The gate address represented in the string.</param>
+	/// <returns>True or False</returns>
+	public static bool IsValidAddressOnly( string address )
+	{
+		if ( address.Length != 6 ) return false; // only 7, 8 or 9 symbol addresses
+
+		foreach ( char sym in address )
+		{
+			if ( !SymbolsForAddress.Contains( sym ) ) return false; // only valid symbols
+			if ( address.Count( c => c == sym ) > 1 ) return false; // only one occurence
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// Checks if the format of the input string is that of a valid Stargate Group.
+	/// </summary>
+	/// <param name="group">The gate group represented in the string.</param>
+	/// <returns>True or False</returns>
+	public static bool IsValidGroup( string group ) // a valid address has an address, a group and a point of origin, with no repeating symbols
+	{
+		if ( group.Length != 2 ) return false; // only 2 symbol groups
+
+		var validSyms = SymbolsForAddress + SymbolsForGroup;
+
+		foreach ( char sym in group )
+		{
+			if ( !validSyms.Contains( sym ) ) return false; // only valid symbols
+			if ( group.Count( c => c == sym ) > 1 ) return false; // only one occurence
+		}
+		return true;
+	}
+
+	public static bool IsUniverseGate(Stargate gate)
+	{
+		if ( !gate.IsValid() ) return false;
+		return gate.EngineEntityName == "ent_stargate_universe";
+	}
+
+	public static Stargate FindDestinationGateByDialingAddress(Stargate gate, string address)
+	{
+		var addrLen = address.Length;
+		var otherAddress = address.Substring( 0, 6 );
+		var otherGroup = (addrLen == 9) ? address.Substring( 6, 2 ) : (addrLen == 8) ? address.Substring( 6, 1 ) : "";
+
+		Stargate target = null;
+
+		if ( addrLen == 9 ) // 9 chevron connection - universe connection
+		{
+			if ( otherGroup != gate.GateGroup ) target = FindByFullAddress( address );
+			if ( target.IsValid() )
+			{
+				// cant have 9 chevron connection between 2 universe or 2 non-universe gates
+				if ( !IsUniverseGate( gate ) && !IsUniverseGate( target ) ) target = null;
+				if ( IsUniverseGate( gate ) && IsUniverseGate( target ) ) target = null;
+			}
+		}
+		else if ( addrLen == 8 ) // 8 chevron connection - different group
+		{
+			if ( otherGroup[0] != gate.GateGroup[0] ) target = FindByAddress8Chev( address );
+			if ( IsUniverseGate( target ) ) target = null; // make it invalid if for some reason we got a universe gate
+		}
+		else // classic 7 chevron connection - must have same group
+		{
+			target = FindByAddressOnly( address );
+			if ( target.IsValid() && target.GateGroup != gate.GateGroup ) target = null; // if found gate does not have same group, its not valid
+		}
+
+		return target;
+	}
+
+	/// <summary>
+	/// Returns the gate if it finds it by a specified full address.
+	/// </summary>
+	/// <param name="address">The full gate address represented in the string.</param>
 	/// <returns>A gate that matches the parameter.</returns>
-	public static Stargate FindByAddress( string address )
+	public static Stargate FindByFullAddress( string address )
 	{
 		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
 		{
-			if ( gate.GateAddress.Equals( address ) ) return gate;
+			if ( GetFullGateAddress(gate) == address ) return gate;
 		}
 		return null;
+	}
+
+	/// <summary>
+	/// Returns the gate if it finds it by a specified address.
+	/// </summary>
+	/// <param name="address">The gate address represented in the string.</param>
+	/// <returns>A gate that matches the parameter.</returns>
+	public static Stargate FindByAddressOnly( string address )
+	{
+		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
+		{
+			if ( gate.GateAddress + PointOfOrigin == address ) return gate;
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Returns the gate if it finds it by a specified address.
+	/// </summary>
+	/// <param name="address">The gate address represented in the string.</param>
+	/// <returns>A gate that matches the parameter.</returns>
+	public static Stargate FindByAddress8Chev( string address )
+	{
+		foreach ( Stargate gate in Entity.All.OfType<Stargate>() )
+		{
+			if ( gate.GateAddress + gate.GateGroup[0] + PointOfOrigin == address ) return gate;
+		}
+		return null;
+	}
+
+	public static string GetSelfAddressBasedOnOtherAddress(Stargate gate, string otherAddress)
+	{
+		if (otherAddress.Length == 7)
+		{
+			return gate.GateAddress + PointOfOrigin;
+		}
+		else if (otherAddress.Length == 8)
+		{
+			return gate.GateAddress + gate.GateGroup[0] + PointOfOrigin;
+		}
+		else if (otherAddress.Length == 9)
+		{
+			return GetFullGateAddress( gate );
+		}
+
+		return "";
+	}
+
+	public static string GetOtherGateAddressForMenu( Stargate gate, Stargate otherGate )
+	{
+		var finalAddress = "";
+
+		if ( !IsUniverseGate(gate) && !IsUniverseGate(otherGate) ) // none of them are universe gates
+		{
+			if ( gate.GateGroup == otherGate.GateGroup ) // if groups are equal, return address
+			{
+				finalAddress = otherGate.GateAddress + PointOfOrigin;
+			}
+			else // if groups arent equal, return addres with first group symbol
+			{
+				finalAddress = otherGate.GateAddress + otherGate.GateGroup[0] + PointOfOrigin;
+			}
+		}
+		else // one or both are universe gates
+		{
+
+			if ( IsUniverseGate( gate ) && IsUniverseGate( otherGate ) ) // both are universe gates
+			{
+				if ( gate.GateGroup == otherGate.GateGroup ) // they have same gate group
+				{
+					finalAddress = otherGate.GateAddress + PointOfOrigin;
+				}
+				else
+				{
+					finalAddress = otherGate.GateAddress + PointOfOrigin;
+				}
+			}
+			else // only one is universe gate
+			{
+				finalAddress = GetFullGateAddress( otherGate );
+			}
+		}
+
+		return finalAddress;
 	}
 
 	/// <summary>

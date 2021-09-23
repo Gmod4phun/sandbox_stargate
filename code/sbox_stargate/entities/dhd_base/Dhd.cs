@@ -237,7 +237,7 @@ public abstract partial class Dhd : Prop
 
 				PlayButtonPressAnim( button );
 
-				var target = Stargate.FindByAddress( sequence );
+				var target = Stargate.FindByFullAddress( sequence );
 				if ( target.IsValid() && target != Gate && target.IsStargateReadyForInboundDHD() && Gate.CanStargateOpen() )
 				{
 					Stargate.PlaySound( this, "dhd_dial" );
