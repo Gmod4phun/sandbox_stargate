@@ -1,6 +1,6 @@
 ﻿namespace Sandbox.Tools
 {
-	[Library( "tool_dhd_spawner", Title = "DHD", Description = "Used to control a Stargate", Group = "construction" )]
+	[Library( "tool_dhd_spawner", Title = "DHD", Description = "Used to control a Stargate.\n\nMOUSE1 - Spawn DHD\nMOUSE2 - Update DHD", Group = "construction" )]
 	public partial class DhdSpawnerTool : BaseTool
 	{
 		PreviewEntity previewModel;
@@ -80,6 +80,25 @@
 					dhd.Rotation = new Angles( 15, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
 
 					dhd.Owner = Owner;
+				}
+				else if ( Input.Pressed( InputButton.Attack2 ) )
+				{
+					var startPos = Owner.EyePos;
+					var dir = Owner.EyeRot.Forward;
+
+					var tr = Trace.Ray( startPos, startPos + dir * MaxTraceDistance )
+						.Ignore( Owner )
+						.Run();
+
+					if ( !tr.Hit || !tr.Entity.IsValid() )
+						return;
+
+					if (tr.Entity is Dhd dhd)
+					{
+						CreateHitEffects( tr.EndPos );
+
+						dhd.Gate = Stargate.FindNearestGate( dhd );
+					}
 				}
 
 			}

@@ -6,7 +6,7 @@ public abstract partial class Dhd : Prop
 {
 	[Net]
 	[Property(Name = "Gate", Group = "Stargate")]
-	public Stargate Gate { get; protected set; }
+	public Stargate Gate { get; set; }
 
 	protected readonly string ButtonSymbols = "ABCDEFGHI0123456789STUVWXYZ@JKLMNO#PQR";
 
