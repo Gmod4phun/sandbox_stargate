@@ -4,7 +4,7 @@
 	{
 		sounds = 
 		[
-			"sounds/sbox_stargate/stargate/atlantis/gate_atlantis_roll.vsnd",
+			"sounds/sbox_stargate/stargate/atlantis/chevron_atlantis_incoming_longer.vsnd",
 		]
 		UI = false
 		Volume = 0.5

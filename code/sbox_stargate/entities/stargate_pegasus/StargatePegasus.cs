@@ -21,6 +21,7 @@ public partial class StargatePegasus : Stargate
 			{ "gate_roll_slow", "gate_atlantis_roll_slow" },
 			{ "chevron", "chevron_atlantis_roll" },
 			{ "chevron_inbound", "chevron_atlantis_roll_incoming" },
+			{ "chevron_inbound_longer", "chevron_atlantis_roll_incoming_longer" },
 			{ "chevron_lock", "chevron_atlantis_lock" },
 			{ "chevron_lock_inbound", "chevron_atlantis_lock_incoming" },
 			{ "chevron_dhd", "chevron_atlantis" },
@@ -190,11 +191,11 @@ public partial class StargatePegasus : Stargate
 
 	// CHEVRON ANIMS & SOUNDS
 
-	public void ChevronActivate( Chevron chev, float delay = 0, bool turnon = true, bool chevLock = false )
+	public void ChevronActivate( Chevron chev, float delay = 0, bool turnon = true, bool chevLock = false, bool longer = false )
 	{
 		if ( chev.IsValid() )
 		{
-			Stargate.PlaySound( chev, GetSound( "chevron" + (chevLock ? "_lock" : "") + (Inbound ? "_inbound" : "") ), delay );
+			Stargate.PlaySound( chev, GetSound( "chevron" + (chevLock ? "_lock" : "") + (Inbound ? "_inbound" : "") + ( longer ? "_longer" : "" ) ), delay );
 			if (turnon) chev.TurnOn( delay );
 		}
 	}
@@ -204,6 +205,15 @@ public partial class StargatePegasus : Stargate
 		if ( chev.IsValid() )
 		{
 			chev.TurnOff( delay );
+		}
+	}
+
+	public void ChevronActivateDHD( Chevron chev, float delay = 0, bool turnon = true )
+	{
+		if ( chev.IsValid() )
+		{
+			Stargate.PlaySound( chev, GetSound( "chevron_dhd" ), delay );
+			if ( turnon ) chev.TurnOn( delay );
 		}
 	}
 
@@ -314,7 +324,7 @@ public partial class StargatePegasus : Stargate
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
-			Ring.RollSymbolsInbound(5f, 0.8f, numChevs );
+			Ring.RollSymbolsInbound(5f, 0.75f, numChevs );
 		}
 		catch ( Exception )
 		{
@@ -545,7 +555,7 @@ public partial class StargatePegasus : Stargate
 		var chev = GetChevronBasedOnAddressLength(DialingAddress.Length, 9 );
 		EncodedChevronsOrdered.Add( chev );
 
-		ChevronActivate( chev, 0.15f, true );
+		ChevronActivateDHD( chev, 0.15f, true );
 	}
 
 	public override void DoChevronLock( char sym ) // only the top chevron locks, always
@@ -558,7 +568,7 @@ public partial class StargatePegasus : Stargate
 		var gate = FindDestinationGateByDialingAddress( this, DialingAddress );
 		var valid = (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD());
 
-		ChevronActivate( chev, 0.15f, true );
+		ChevronActivateDHD( chev, 0.15f, true );
 	}
 
 	public override void DoChevronUnlock( char sym )

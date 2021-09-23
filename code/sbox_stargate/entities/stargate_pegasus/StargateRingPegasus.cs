@@ -31,8 +31,7 @@ public partial class StargateRingPegasus : ModelEntity
 
 		CreateSymbolParts();
 
-		//RollSymbolsDialSlow();
-		//RollSymbolsInbound();
+		//RollSymbolsDialFast(9);
 	}
 
 	public void AddSymbolPart(string name)
@@ -128,7 +127,7 @@ public partial class StargateRingPegasus : ModelEntity
 
 			Stargate.PlaySound( Gate, Gate.GetSound( "gate_roll_fast" ) );
 
-			await Task.DelaySeconds( 0.7f );
+			await Task.DelaySeconds( 0.75f );
 
 			var delay = time / 36f;
 			var chevDelay = delay / 2f;
@@ -145,7 +144,7 @@ public partial class StargateRingPegasus : ModelEntity
 
 				if ( i == 3 ) Gate.ChevronActivate( Gate.GetChevron( 1 ), chevDelay, true );
 				if ( i == 7 ) Gate.ChevronActivate( Gate.GetChevron( 2 ), chevDelay, true );
-				if ( i == 11 ) Gate.ChevronActivate( Gate.GetChevron( 3 ), chevDelay, true );
+				if ( i == 11 ) Gate.ChevronActivate( Gate.GetChevron( 3 ), chevDelay, true, false, chevCount == 7 ); // use longer sound if connection has 7 chevrons
 				if ( chevCount > 7 )
 				{
 					if ( i == 15 ) Gate.ChevronActivate( Gate.GetChevron( 8 ), chevDelay, true );
@@ -200,10 +199,67 @@ public partial class StargateRingPegasus : ModelEntity
 
 	}
 
+	public async void RollSymbolsDialFast( int chevCount )
+	{
+		try
+		{
+			ResetSymbols();
+
+			await RollSymbol( 27, 12 );
+			await Task.DelaySeconds( 0.25f );
+
+			await RollSymbol( 19, 12, true );
+			await Task.DelaySeconds( 0.25f );
+
+			await RollSymbol( 35, 12 );
+			await Task.DelaySeconds( 0.25f );
+
+			await RollSymbol( 35, 12, true );
+			await Task.DelaySeconds( 0.25f );
+
+			await RollSymbol( 15, 12 );
+			await Task.DelaySeconds( 0.25f );
+
+			await RollSymbol( 7, 12, true );
+			await Task.DelaySeconds( 0.25f );
+
+			if (chevCount > 7)
+			{
+				await RollSymbol( 3, 12 );
+				await Task.DelaySeconds( 0.25f );
+
+				if ( chevCount == 8 )
+				{
+					await RollSymbol( 11, 12, true );
+					await Task.DelaySeconds( 0.25f );
+				}
+				else if ( chevCount == 9 )
+				{
+					await RollSymbol( 31, 12, true );
+					await Task.DelaySeconds( 0.25f );
+				}
+			}
+
+			if ( chevCount != 8 )
+			{
+				await RollSymbol( 23, 12 );
+				await Task.DelaySeconds( 0.25f );
+			}
+
+		}
+		catch ( Exception )
+		{
+
+		}
+
+	}
+
 
 	// DEBUG
 	public void DrawSymbols()
 	{
+		if ( !this.IsValid() ) return;
+
 		var deg = 10;
 		var ang = Rotation.Angles();
 		for ( int i = 0; i < 36; i++ )
@@ -220,7 +276,7 @@ public partial class StargateRingPegasus : ModelEntity
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
-		//DrawSymbols();
+		DrawSymbols();
 	}
 
 }
