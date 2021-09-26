@@ -198,6 +198,11 @@ public abstract partial class Stargate : Prop, IUse
 		return ( !Busy && Active );
 	}
 
+	public bool ShouldGateStopDialing()
+	{
+		return ShouldStopDialing;
+	}
+
 	public async void DoStargateOpen()
 	{
 		if ( !CanStargateOpen() ) return;
@@ -285,6 +290,8 @@ public abstract partial class Stargate : Prop, IUse
 	{
 		if ( !CanStargateStopDial() ) return;
 
+		ClearTasks();
+
 		OnStopDialingBegin();
 
 		await Task.DelaySeconds( 1.25f );
@@ -331,6 +338,7 @@ public abstract partial class Stargate : Prop, IUse
 	public async virtual Task DoStargateReset()
 	{
 		ResetGateVariablesToIdle();
+		ClearTasks();
 	}
 
 	public virtual void EstablishWormholeTo(Stargate target)

@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 public partial class Stargate : Prop, IUse
@@ -23,6 +24,32 @@ public partial class Stargate : Prop, IUse
 		CLOSING
 	}
 
+	public struct TimedTask
+	{
+		public TimedTask( float time, Action action )
+		{
+			taskTime = time;
+			taskAction = action;
+			taskFinished = false;
+		}
+
+		public void Execute()
+		{
+			taskAction();
+			taskFinished = true;
+		}
+		public bool IsFinished()
+		{
+			return taskFinished;
+		}
+
+		public float taskTime { get; set; }
+		public Action taskAction { get; set; }
+		public bool taskFinished { get; set; }
+	}
+
+	private List<TimedTask> StargateActions = new();
+
 	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@"; // we wont use * and ? for now, since they arent on the DHD
 	public const string SymbolsForAddress = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	public const string SymbolsForGroup = "@";
@@ -32,6 +59,45 @@ public partial class Stargate : Prop, IUse
 
 	public const int AutoCloseTimerDuration = 5;
 
+	// WIP tasks testing
+
+	public void AddTask(float time, Action task)
+	{
+		if ( !IsServer ) return;
+		StargateActions.Add( new TimedTask(time, task) );
+		Log.Info( "A task has been added" );
+	}
+
+	public void ClearTasks()
+	{
+		if ( !IsServer ) return;
+		StargateActions.Clear();
+		Log.Info( "All tasks have been cleared" );
+	}
+
+	[Event.Tick.Server]
+	private void TaskThink()
+	{
+		if (StargateActions.Count > 0)
+		{
+			for ( var i = StargateActions.Count - 1; i >= 0; i-- )
+			{
+				var task = StargateActions[i];
+
+				if ( Time.Now >= task.taskTime )
+				{
+					if ( !task.IsFinished() )
+					{
+						task.Execute();
+						StargateActions.RemoveAt( i );
+						Log.Info( "A task has been executed and removed from the list" );
+					}
+
+					//if ( task.IsFinished() ) StargateActions.RemoveAt( i );
+				}
+			}
+		}
+	}
 
 	/// <summary>
 	/// Generates a random 2 symbol Gate Group.

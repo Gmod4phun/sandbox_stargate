@@ -102,7 +102,6 @@ public partial class Chevron : AnimEntity
 	{
 		ChevronAnim( "lock", delay );
 		Stargate.PlaySound( this, Gate.GetSound( "chevron_open" ), delay );
-		Log.Info("chev open anim and sound");
 		SetOpen( true, delay );
 	}
 

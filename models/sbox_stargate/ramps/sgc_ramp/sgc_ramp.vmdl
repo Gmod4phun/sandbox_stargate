@@ -77,10 +77,10 @@
 						align_origin_z_type = "None"
 						filename = "models/sbox_stargate/ramps/sgc_ramp/src/sgc_ramp_physics.smd"
 						import_scale = 1.0
-						faceMergeAngle = 10.0
-						maxHullVertices = 0
+						faceMergeAngle = 80.0
+						maxHullVertices = 64
 						import_mode = "HullPerElement"
-						optimization_algorithm = "IFR"
+						optimization_algorithm = "Exact"
 						import_filter = 
 						{
 							exclude_by_default = false
