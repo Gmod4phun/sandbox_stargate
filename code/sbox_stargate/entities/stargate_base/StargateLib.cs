@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 public partial class Stargate : Prop, IUse
 {
 	public enum DialType
@@ -24,31 +25,37 @@ public partial class Stargate : Prop, IUse
 		CLOSING
 	}
 
+	public enum TimedTaskCategory
+	{
+		GENERIC,
+		DIALING
+	}
+
+	// Timed Tasks
 	public struct TimedTask
 	{
-		public TimedTask( float time, Action action )
+		public TimedTask( float time, Action action, TimedTaskCategory category )
 		{
-			taskTime = time;
-			taskAction = action;
-			taskFinished = false;
+			TaskTime = time;
+			TaskAction = action;
+			TaskCategory = category;
+			TaskFinished = false;
 		}
 
 		public void Execute()
 		{
-			taskAction();
-			taskFinished = true;
-		}
-		public bool IsFinished()
-		{
-			return taskFinished;
+			TaskAction();
+			TaskFinished = true;
 		}
 
-		public float taskTime { get; set; }
-		public Action taskAction { get; set; }
-		public bool taskFinished { get; set; }
+		public TimedTaskCategory TaskCategory { get; }
+		public float TaskTime { get; }
+		private Action TaskAction { get; }
+		public bool TaskFinished { get; private set; }
 	}
 
 	private List<TimedTask> StargateActions = new();
+
 
 	public const string Symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@"; // we wont use * and ? for now, since they arent on the DHD
 	public const string SymbolsForAddress = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -59,45 +66,52 @@ public partial class Stargate : Prop, IUse
 
 	public const int AutoCloseTimerDuration = 5;
 
+
 	// WIP tasks testing
 
-	public void AddTask(float time, Action task)
+	public void AddTask(float time, Action task, TimedTaskCategory category)
 	{
 		if ( !IsServer ) return;
-		StargateActions.Add( new TimedTask(time, task) );
-		Log.Info( "A task has been added" );
+		StargateActions.Add( new TimedTask(time, task, category) );
 	}
 
 	public void ClearTasks()
 	{
 		if ( !IsServer ) return;
 		StargateActions.Clear();
-		Log.Info( "All tasks have been cleared" );
+	}
+
+	public void ClearTasksByCategory(TimedTaskCategory category)
+	{
+		if ( !IsServer ) return;
+		var rem = StargateActions.RemoveAll( task => task.TaskCategory == category );
+		Log.Info( $"Removed {rem} tasks of type {category} from stack for Entity: {NetworkIdent}" );
 	}
 
 	[Event.Tick.Server]
-	private void TaskThink()
+	private void TaskThink() // dont mind the retarded checks, it prevents ArgumentOutOfRangeException if actions get deleted while the loop runs, probably thread related stuff
 	{
 		if (StargateActions.Count > 0)
 		{
 			for ( var i = StargateActions.Count - 1; i >= 0; i-- )
 			{
-				var task = StargateActions[i];
-
-				if ( Time.Now >= task.taskTime )
+				if ( StargateActions.Count > i )
 				{
-					if ( !task.IsFinished() )
+					var task = StargateActions[i];
+					if ( Time.Now >= task.TaskTime )
 					{
-						task.Execute();
-						StargateActions.RemoveAt( i );
-						Log.Info( "A task has been executed and removed from the list" );
+						if ( !task.TaskFinished )
+						{
+							task.Execute();
+							if ( StargateActions.Count > i ) StargateActions.RemoveAt( i );
+						}
 					}
-
-					//if ( task.IsFinished() ) StargateActions.RemoveAt( i );
 				}
 			}
 		}
 	}
+
+	// Utility funcs
 
 	/// <summary>
 	/// Generates a random 2 symbol Gate Group.

@@ -42,7 +42,7 @@ public abstract partial class Stargate : Prop, IUse
 	[Net]
 	public bool GatePrivate { get; set; } = false;
 	[Net]
-	public bool GateLocal { get; set; } = true;
+	public bool GateLocal { get; set; } = false;
 
 	public bool Busy { get; set; } = false; // this is pretty much used anytime the gate is busy to do anything (usually during animations/transitions)
 	public bool Inbound { get; set; } = false;
@@ -168,7 +168,8 @@ public abstract partial class Stargate : Prop, IUse
 
 		if ( IsServer && OtherGate.IsValid() )
 		{
-			OtherGate.DoStargateClose();
+			if (OtherGate.Inbound && !OtherGate.Dialing) OtherGate.StopDialing();
+			if ( OtherGate.Open ) OtherGate.DoStargateClose();
 		}
 
 		base.OnDestroy();
@@ -273,13 +274,22 @@ public abstract partial class Stargate : Prop, IUse
 		}
 	}
 
+	// begin dial
 	public virtual void BeginDialFast(string address) { }
 	public virtual void BeginDialSlow(string address) { }
 	public virtual void BeginDialInstant( string address ) { } // instant gate open, with kawoosh
 	public virtual void BeginDialNox( string address ) { } // instant gate open without kawoosh - asgard/ancient/nox style 
 
-	public virtual void BeginInboundFast( int numChevs ) { }
-	public virtual void BeginInboundSlow( int numChevs ) { } // this can be used with Instant dial, too
+	// begin inbound
+	public virtual void BeginInboundFast( int numChevs )
+	{
+		if ( Inbound && !Dialing ) StopDialing();
+	}
+
+	public virtual void BeginInboundSlow( int numChevs ) // this can be used with Instant dial, too
+	{
+		if ( Inbound && !Dialing ) StopDialing();
+	}
 
 
 	// DHD DIAL
@@ -289,8 +299,6 @@ public abstract partial class Stargate : Prop, IUse
 	public async void StopDialing()
 	{
 		if ( !CanStargateStopDial() ) return;
-
-		ClearTasks();
 
 		OnStopDialingBegin();
 
@@ -304,9 +312,13 @@ public abstract partial class Stargate : Prop, IUse
 		Busy = true;
 		ShouldStopDialing = true; // can be used in ring/gate logic to to stop ring/gate rotation
 
-		if ( OtherGate.IsValid() && OtherGate.Inbound && !OtherGate.ShouldStopDialing )
+		ClearTasksByCategory( TimedTaskCategory.DIALING );
+
+		if ( OtherGate.IsValid() )
 		{
-			OtherGate.StopDialing();
+			OtherGate.ClearTasksByCategory( TimedTaskCategory.DIALING );
+
+			if ( OtherGate.Inbound && !OtherGate.ShouldStopDialing ) OtherGate.StopDialing();
 		}
 	}
 
@@ -335,7 +347,7 @@ public abstract partial class Stargate : Prop, IUse
 		ResetGateVariablesToIdle();
 	}
 
-	public async virtual Task DoStargateReset()
+	public virtual void DoStargateReset()
 	{
 		ResetGateVariablesToIdle();
 		ClearTasks();

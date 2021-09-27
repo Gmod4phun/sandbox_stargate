@@ -168,12 +168,12 @@ public partial class StargateMilkyWay : Stargate
 		ChevronAnimUnlockAll();
 	}
 
-	public async override Task DoStargateReset()
+	public async override void DoStargateReset()
 	{
 		if ( Dialing )
 		{
 			ShouldStopDialing = true;
-			await Task.DelaySeconds( 0.2f ); // give the ring logic a chance to catch up (checks at 0.1 second intervals)
+			await Task.DelaySeconds( Global.TickInterval * 4 ); // give the ring logic a chance to catch up
 		}
 
 		base.DoStargateReset();
@@ -374,7 +374,7 @@ public partial class StargateMilkyWay : Stargate
 
 		try
 		{
-			if ( Dialing ) await DoStargateReset();
+			if ( Dialing ) DoStargateReset();
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
@@ -390,13 +390,7 @@ public partial class StargateMilkyWay : Stargate
 
 			for ( var i = 1; i < numChevs; i++ )
 			{
-				if ( !OtherGate.IsValid() )
-				{
-					StopDialing();
-					return;
-				}
-
-				if ( ShouldStopDialing ) return; // check if we should stop dialing or not
+				if ( ShouldStopDialing && ActiveChevrons > 0 ) return; // check if we should stop dialing or not
 
 				var chev = GetChevronBasedOnAddressLength( i, numChevs );
 				if ( chev.IsValid() )
@@ -553,7 +547,7 @@ public partial class StargateMilkyWay : Stargate
 
 		try
 		{
-			if ( Dialing ) await DoStargateReset();
+			if ( Dialing ) DoStargateReset();
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
@@ -666,7 +660,7 @@ public partial class StargateMilkyWay : Stargate
 
 		try
 		{
-			if ( Dialing ) await DoStargateReset();
+			if ( Dialing ) DoStargateReset();
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;

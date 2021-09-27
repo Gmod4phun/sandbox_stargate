@@ -125,46 +125,6 @@ public partial class StargatePegasus : Stargate
 		return GetChevron( 7 );
 	}
 
-	public Chevron GetChevronClockwise( int num, int len = 7 )
-	{
-		if ( num <= 3 ) return GetChevron( num );
-		if (num == 4)
-		{
-			if ( len == 7 ) return GetChevron( 4 );
-			if ( len == 8 ) return GetChevron( 8 );
-			if ( len == 9 ) return GetChevron( 8 );
-		}
-		if ( num == 5 )
-		{
-			if ( len == 7 ) return GetChevron( 5 );
-			if ( len == 8 ) return GetChevron( 9 );
-			if ( len == 9 ) return GetChevron( 9 );
-		}
-		if ( num == 6 )
-		{
-			if ( len == 7 ) return GetChevron( 6 );
-			if ( len == 8 ) return GetChevron( 4 );
-			if ( len == 9 ) return GetChevron( 4 );
-		}
-		if ( num == 7 )
-		{
-			if ( len == 7 ) return GetChevron( 7 );
-			if ( len == 8 ) return GetChevron( 5 );
-			if ( len == 9 ) return GetChevron( 5 );
-		}
-		if ( num == 8 )
-		{
-			if ( len == 8 ) return GetChevron( 6 );
-			if ( len == 9 ) return GetChevron( 6 );
-		}
-		if ( num == 9 )
-		{
-			if ( len == 9 ) return GetChevron( 7 );
-		}
-
-		return null;
-	}
-
 	// DIALING
 
 	public async void SetChevronsGlowState( bool state, float delay = 0)
@@ -179,6 +139,7 @@ public partial class StargatePegasus : Stargate
 		base.OnStopDialingBegin();
 
 		PlaySound( this, GetSound( "dial_fail" ) );
+		Ring?.StopRollSound();
 	}
 
 	public override void OnStopDialingFinish()
@@ -186,7 +147,7 @@ public partial class StargatePegasus : Stargate
 		base.OnStopDialingFinish();
 
 		SetChevronsGlowState( false );
-		Ring?.DoResetSymbols();
+		Ring?.ResetSymbols();
 	}
 
 	public override void OnStargateBeginOpen()
@@ -213,21 +174,18 @@ public partial class StargatePegasus : Stargate
 		base.OnStargateClosed();
 
 		SetChevronsGlowState( false );
-		Ring?.DoResetSymbols();
+		Ring?.ResetSymbols();
 	}
 
-	public async override Task DoStargateReset()
+	public override void DoStargateReset()
 	{
-		if ( Dialing )
-		{
-			ShouldStopDialing = true;
-			await Task.DelaySeconds( 0.2f ); // give the ring logic a chance to catch up (checks at 0.1 second intervals)
-		}
+		if ( Dialing ) ShouldStopDialing = true;
 
 		base.DoStargateReset();
 
 		SetChevronsGlowState( false );
-		Ring?.DoResetSymbols();
+		Ring?.ResetSymbols();
+		Ring?.StopRollSound();
 	}
 
 
@@ -267,7 +225,7 @@ public partial class StargatePegasus : Stargate
 	// INDIVIDUAL DIAL TYPES
 
 	// FAST DIAL
-	public async override void BeginDialFast(string address)
+	public override void BeginDialFast(string address)
 	{
 		if ( !CanStargateStartDial() ) return;
 
@@ -277,8 +235,6 @@ public partial class StargatePegasus : Stargate
 			CurDialType = DialType.FAST;
 
 			if ( !IsValidFullAddress( address ) ) { StopDialing(); return; }
-
-			var startTime = Time.Now;
 
 			var target = FindDestinationGateByDialingAddress( this, address );
 			var wasTargetReadyOnStart = false; // if target gate was not available on dial start, dont bother doing anything at the end
@@ -291,31 +247,30 @@ public partial class StargatePegasus : Stargate
 				OtherGate.OtherGate = this;
 			}
 
+			var startTime = Time.Now;
 			var addrLen = address.Length;
 
-			PlaySound( this, GetSound( "gate_roll_fast" ) );
+			bool gateValidCheck() { return wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd(); }
 
-			await Task.DelaySeconds( 0.05f );
+			Ring.RollSymbolsDialFast( addrLen, gateValidCheck );
 
-			Ring.DoRollSymbolsDialFast( addrLen, wasTargetReadyOnStart );
+			async void openOrStop() {
 
-			await Task.DelaySeconds( 7 );
+				if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
 
-			if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
-
-			if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) // if valid, open both gates
-			{
-				var endTime = Time.Now - startTime;
-
-				Log.Info( $"Dial finished, time = {endTime}" );
-
-				EstablishWormholeTo( target );
+				if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) // if valid, open both gates
+				{
+					EstablishWormholeTo( target );
+				}
+				else
+				{
+					await Task.DelaySeconds( 0.25f ); // otherwise wait a bit, fail and stop dialing
+					StopDialing();
+				}
 			}
-			else
-			{
-				await Task.DelaySeconds( 0.25f ); // otherwise wait a bit, fail and stop dialing
-				StopDialing();
-			}
+
+			AddTask( startTime + 7, openOrStop, TimedTaskCategory.DIALING );
+
 		}
 		catch ( Exception )
 		{
@@ -324,20 +279,20 @@ public partial class StargatePegasus : Stargate
 	}
 
 	// FAST INBOUND
-	public async override void BeginInboundFast( int numChevs )
+	public override void BeginInboundFast( int numChevs )
 	{
 		if ( !IsStargateReadyForInboundFast() ) return;
 
 		try
 		{
-			if ( Dialing ) await DoStargateReset();
+			if ( Dialing ) DoStargateReset();
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
 			PlaySound( this, GetSound("gate_roll_fast"), 0.35f );
 
-			Ring.DoRollSymbolsInbound( 5.5f, 1f, numChevs );
+			Ring.RollSymbolsInbound( 5.5f, 1f, numChevs );
 		}
 		catch ( Exception )
 		{
@@ -360,42 +315,57 @@ public partial class StargatePegasus : Stargate
 				StopDialing();
 				return;
 			}
-
-			var readyForOpen = false;
-
+			
+			var startTime = Time.Now;
 			var addrLen = address.Length;
-
-			Ring.DoRollSymbolsDialSlow(address.Length);
-
-			var dialTime = (addrLen == 9) ? 29 : ((addrLen == 8) ? 25 : 21);
-			await Task.DelaySeconds( dialTime );
-
-			if ( ShouldStopDialing || !Dialing )
-			{
-				ResetGateVariablesToIdle();
-				return;
-			}
 
 			Stargate target = FindDestinationGateByDialingAddress( this, address );
 
-			if ( target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() )
+			bool gateValidCheck() { return target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd(); }
+
+			Ring.RollSymbolsDialSlow(address.Length, gateValidCheck);
+
+			var dialTime = (addrLen == 9) ? 40f : ((addrLen == 8) ? 32f : 26f);
+			
+			void startInboundAnim()
 			{
-				target.BeginInboundSlow( address.Length );
-				readyForOpen = true;
+				Stargate target = FindDestinationGateByDialingAddress( this, address );
+				if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFast() )
+				{
+					target.BeginInboundFast( address.Length );
+					OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
+					OtherGate.OtherGate = this;
+				}
 			}
 
-			await Task.DelaySeconds( 0.8f );
+			AddTask( startTime + dialTime - 7f, startInboundAnim, TimedTaskCategory.DIALING );
 
-			Busy = false;
+			void openOrStop()
+			{
+				Ring.StopRollSound();
 
-			if ( target.IsValid() && target != this && readyForOpen )
-			{
-				EstablishWormholeTo( target );
+				if ( ShouldStopDialing || !Dialing )
+				{
+					ResetGateVariablesToIdle();
+					return;
+				}
+
+				//var readyForOpen = false;
+				//if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) readyForOpen = true;
+
+				Busy = false;
+
+				if ( gateValidCheck() )
+				{
+					EstablishWormholeTo( target );
+				}
+				else
+				{
+					StopDialing();
+				}
 			}
-			else
-			{
-				StopDialing();
-			}
+
+			AddTask( startTime + dialTime, openOrStop, TimedTaskCategory.DIALING );
 		}
 		catch ( Exception )
 		{
@@ -410,7 +380,7 @@ public partial class StargatePegasus : Stargate
 
 		try
 		{
-			if ( Dialing ) await DoStargateReset();
+			if ( Dialing ) DoStargateReset();
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
@@ -422,7 +392,7 @@ public partial class StargatePegasus : Stargate
 			}
 
 			PlaySound( this, GetSound( "chevron_lock_inbound" ) );
-			Ring.DoLightupSymbols();
+			Ring.LightupSymbols();
 
 			ActiveChevrons = numChevs;
 		}
@@ -512,7 +482,7 @@ public partial class StargatePegasus : Stargate
 
 		try
 		{
-			if ( Dialing ) await DoStargateReset();
+			if ( Dialing ) DoStargateReset();
 
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
