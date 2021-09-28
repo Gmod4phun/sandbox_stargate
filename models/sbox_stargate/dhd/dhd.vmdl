@@ -73,6 +73,7 @@
 				[
 					{
 						_class = "DefaultMaterialGroup"
+						name = "sg1"
 						remaps = 
 						[
 							{
@@ -110,6 +111,25 @@
 						]
 						use_global_default = false
 						global_default_material = ""
+					},
+					{
+						_class = "MaterialGroup"
+						name = "sga"
+						remaps = 
+						[
+							{
+								from = "models/sbox_stargate/dhd/dhd_bottom.vmat"
+								to = "models/sbox_stargate/dhd/dhd_bottom_sga.vmat"
+							},
+							{
+								from = "models/sbox_stargate/dhd/dhd_mid.vmat"
+								to = "models/sbox_stargate/dhd/dhd_mid_sga.vmat"
+							},
+							{
+								from = "models/sbox_stargate/dhd/dhd_top.vmat"
+								to = "models/sbox_stargate/dhd/dhd_top_sga.vmat"
+							},
+						]
 					},
 				]
 			},

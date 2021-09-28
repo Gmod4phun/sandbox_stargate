@@ -4,8 +4,27 @@ using Sandbox;
 
 public abstract partial class Dhd : Prop
 {
+	public struct DhdData
+	{
+		public DhdData( int skinOff, int skinOn, string pressSnd, string dialSnd )
+		{
+			ButtonSkinOff = skinOff;
+			ButtonSkinOn = skinOn;
+			ButtonPressSound = pressSnd;
+			DialPressSound = dialSnd;
+		}
+
+		public int ButtonSkinOff { get; }
+		public int ButtonSkinOn { get; }
+		public string ButtonPressSound { get; }
+		public string DialPressSound { get; }
+	}
+
+	//[Net]
+	public DhdData Data { get; set; } = new( 0, 1, "dhd_sg1_press", "dhd_dial" );
+
 	[Net]
-	[Property(Name = "Gate", Group = "Stargate")]
+	[Property( Name = "Gate", Group = "Stargate" )]
 	public Stargate Gate { get; set; }
 
 	protected readonly string ButtonSymbols = "ABCDEFGHI0123456789STUVWXYZ@JKLMNO#PQR";
@@ -17,6 +36,10 @@ public abstract partial class Dhd : Prop
 	public float pressDelay = 0.5f;
 
 	public List<string> PressedActions = new();
+
+	[Net]
+	public List<int> ButtonSkins { get; set; } = new List<int> { 0, 1 };
+
 
 	public override void Spawn()
 	{
@@ -84,6 +107,7 @@ public abstract partial class Dhd : Prop
 
 		button.Action = action;
 		button.Trigger = buttonTrigger;
+		button.DHD = buttonTrigger.DHD;
 		buttonTrigger.Button = button;
 
 		Buttons.Add( action, button );
@@ -240,7 +264,7 @@ public abstract partial class Dhd : Prop
 				var target = Stargate.FindDestinationGateByDialingAddress( Gate, sequence );
 				if ( target.IsValid() && target != Gate && target.IsStargateReadyForInboundDHD() && Gate.CanStargateOpen() )
 				{
-					Stargate.PlaySound( this, "dhd_dial" );
+					Stargate.PlaySound( this, Data.DialPressSound );
 
 					Gate.CurGateState = Stargate.GateState.IDLE; // temporarily make it idle so it can 'begin' dialing
 					Gate.BeginOpenByDHD( sequence );
@@ -294,7 +318,7 @@ public abstract partial class Dhd : Prop
 
 				PressedActions.Add( action );
 				PlayButtonPressAnim( button );
-				Stargate.PlaySound(this, "dhd_sg1_press");
+				Stargate.PlaySound(this, Data.ButtonPressSound);
 
 				Gate.TimeSinceDHDAction = 0;
 			}

@@ -88,12 +88,18 @@ partial class SandboxGame : Game
 		if ( attribute.Group != null && attribute.Group.Contains("Stargate")) // spawn offsets for Stargate stuff
 		{
 			var type = ent.GetType();
-			var property = type.GetProperty( "SpawnOffset" );
-			if (property != null)
+			var property_spawnoffset = type.GetProperty( "SpawnOffset" );
+			if (property_spawnoffset != null) ent.Position += (Vector3) property_spawnoffset.GetValue( ent );
+
+			
+			var property_spawnoffset_ang = type.GetProperty( "SpawnOffsetAng" );
+			if ( property_spawnoffset_ang != null )
 			{
-				var offset = (Vector3) property.GetValue( ent );
-				ent.Position += offset;
+				var ang = (Angles) property_spawnoffset_ang.GetValue( ent );
+				var newRot = (ent.Rotation.Angles() + ang).ToRotation();
+				ent.Rotation = newRot;
 			}
+			
 		}
 
 		if (ent is Stargate gate) // gate ramps

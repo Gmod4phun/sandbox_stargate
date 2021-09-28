@@ -373,6 +373,44 @@
 							},
 						]
 					},
+					{
+						_class = "MaterialGroup"
+						name = "off_sga"
+						remaps = 
+						[
+							{
+								from = "models/sbox_stargate/dhd/dhd_dialorb_sg1_off.vmat"
+								to = "models/sbox_stargate/dhd/dhd_dialorb_sga_off.vmat"
+							},
+							{
+								from = "models/sbox_stargate/dhd/dhd_buttons_sg1_off.vmat"
+								to = "models/sbox_stargate/dhd/dhd_buttons_sga_off.vmat"
+							},
+							{
+								from = "models/sbox_stargate/dhd/dhd_top.vmat"
+								to = "models/sbox_stargate/dhd/dhd_top_sga.vmat"
+							},
+						]
+					},
+					{
+						_class = "MaterialGroup"
+						name = "on_sga"
+						remaps = 
+						[
+							{
+								from = "models/sbox_stargate/dhd/dhd_dialorb_sg1_off.vmat"
+								to = "models/sbox_stargate/dhd/dhd_dialorb_sga_on.vmat"
+							},
+							{
+								from = "models/sbox_stargate/dhd/dhd_buttons_sg1_off.vmat"
+								to = "models/sbox_stargate/dhd/dhd_buttons_sga_on.vmat"
+							},
+							{
+								from = "models/sbox_stargate/dhd/dhd_top.vmat"
+								to = "models/sbox_stargate/dhd/dhd_top_sga.vmat"
+							},
+						]
+					},
 				]
 			},
 			{

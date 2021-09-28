@@ -254,11 +254,9 @@ public partial class StargatePegasus : Stargate
 
 			Ring.RollSymbolsDialFast( addrLen, gateValidCheck );
 
-			async void openOrStop() {
-
-				if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
-
-				if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) // if valid, open both gates
+			async void openOrStop()
+			{
+				if ( gateValidCheck() ) // if valid, open both gates
 				{
 					EstablishWormholeTo( target );
 				}
@@ -350,11 +348,9 @@ public partial class StargatePegasus : Stargate
 					return;
 				}
 
-				//var readyForOpen = false;
-				//if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) readyForOpen = true;
-
 				Busy = false;
 
+				/*
 				if ( gateValidCheck() )
 				{
 					EstablishWormholeTo( target );
@@ -363,6 +359,9 @@ public partial class StargatePegasus : Stargate
 				{
 					StopDialing();
 				}
+				*/
+
+				if ( gateValidCheck() )	EstablishWormholeTo( target ); else StopDialing();
 			}
 
 			AddTask( startTime + dialTime, openOrStop, TimedTaskCategory.DIALING );

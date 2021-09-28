@@ -4,6 +4,8 @@ public partial class DhdButton : AnimEntity
 {
 	[Net]
 	public string Action { get; set; } = "";
+	[Net]
+	public Dhd DHD { get; set; } = null;
 	public DhdButtonTrigger Trigger;
 
 	[Net]
@@ -18,6 +20,9 @@ public partial class DhdButton : AnimEntity
 	[Event.Frame]
 	public void ButtonGlowLogic()
 	{
-		SetMaterialGroup( On ? 1 : 0 );
+		if (DHD.IsValid())
+		{
+			SetMaterialGroup( On ? DHD.Data.ButtonSkinOn : DHD.Data.ButtonSkinOff );
+		}
 	}
 }
