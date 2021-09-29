@@ -407,6 +407,7 @@ public partial class Rings : AnimEntity, IUse
 			var newPos = tempBody2.Transform.PointToWorld( localPos );
 
 			e.Position = newPos;
+			e.ResetInterpolation();
 		}
 
 		foreach ( Entity e in fromDest )
@@ -415,6 +416,7 @@ public partial class Rings : AnimEntity, IUse
 			var newPos = tempBody.Transform.PointToWorld( localPos );
 
 			e.Position = newPos;
+			e.ResetInterpolation();
 		}
 
 		tempBody.Remove();
