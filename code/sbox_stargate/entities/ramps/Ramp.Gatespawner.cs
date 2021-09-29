@@ -10,20 +10,20 @@ public partial class Ramp : IGateSpawner
 {
 	public class RampJsonModel : JsonModel
 	{
-		public int RampAssetID { get; set; }
+		public string RampAssetPath { get; set; }
 	}
 	public void FromJson( JsonElement data )
 	{
 		Position = Vector3.Parse( data.GetProperty( "Position" ).ToString() );
 		Rotation = Rotation.Parse( data.GetProperty( "Rotation" ).ToString() );
-		RampAsset = Resource.FromId<RampAsset>( data.GetProperty( "RampAssetID" ).GetInt32() );
+		RampAsset = Resource.FromPath<RampAsset>( data.GetProperty( "RampAssetPath" ).ToString() );
 	}
 
 	public object ToJson()
 	{
 		return new RampJsonModel()
 		{
-			RampAssetID = RampAsset.ResourceId,
+			RampAssetPath = RampAsset.Path,
 			Position = Position,
 			Rotation = Rotation
 		};
