@@ -1,11 +1,14 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using Sandbox;
+using System.Linq;
 using System.Text;
+using Sandbox;
 
 public partial class Rings : AnimEntity, IUse
 {
+
+	public static readonly float MAX_RING_RANGE = 1024f;
+
 
 	[Net]
 	public string Address { get; protected set; }
@@ -22,15 +25,19 @@ public partial class Rings : AnimEntity, IUse
 
 	public bool Busy { get; protected set; }
 
-	protected bool IsUpsideDown {
-		get {
-			return Rotation.Up.Dot(new Vector3(0, 0, -1)) > 1 / Math.Sqrt(2);
+	protected bool IsUpsideDown
+	{
+		get
+		{
+			return Rotation.Up.Dot( new Vector3( 0, 0, -1 ) ) > 1 / Math.Sqrt( 2 );
 		}
 	}
 
-	public bool HasAllRingsReachedPosition {
-		get {
-			return ChildRings.ToArray().All(x => x.Ready);
+	public bool HasAllRingsReachedPosition
+	{
+		get
+		{
+			return ChildRings.ToArray().All( x => x.Ready );
 		}
 	}
 
@@ -38,7 +45,8 @@ public partial class Rings : AnimEntity, IUse
 	// public const string Symbols = "0123456789";
 	public const string Symbols = "12345";
 
-	public static bool IsAddressValid( string address ) {
+	public static bool IsAddressValid( string address )
+	{
 
 		foreach ( char sym in address )
 		{
@@ -46,7 +54,7 @@ public partial class Rings : AnimEntity, IUse
 			if ( address.Count( c => c == sym ) > 1 ) return false; // only one occurence
 		}
 
-		if (Entity.All.OfType<Rings>().Where( x => x.Address == address ).Any()) return false;
+		if ( Entity.All.OfType<Rings>().Where( x => x.Address == address ).Any() ) return false;
 
 		return true;
 	}
@@ -67,26 +75,29 @@ public partial class Rings : AnimEntity, IUse
 		}
 
 		if ( checkValidity && !IsAddressValid( generatedAddress ) )
-			return GenerateRandomAddress(length, checkValidity);
+			return GenerateRandomAddress( length, checkValidity );
 
 		return generatedAddress;
 	}
 
-	public static Rings GetClosestRing( Vector3 position, Rings[] exclude = null, float maxDistance = -1f ) {
+	public static Rings GetClosestRing( Vector3 position, Rings[] exclude = null, float maxDistance = -1f )
+	{
 
 		var allRings = Entity.All.OfType<Rings>();
 
 		Rings final = null;
 		float dist = float.MaxValue;
 
-		foreach ( Rings r in allRings ) {
-			if (exclude is not null && exclude.Contains(r))
+		foreach ( Rings r in allRings )
+		{
+			if ( exclude is not null && exclude.Contains( r ) )
 				continue;
 
-			var currDistance = position.Distance(r.Position);
-			if (maxDistance != -1 && currDistance > maxDistance)
+			var currDistance = position.Distance( r.Position );
+			if ( maxDistance != -1 && currDistance > maxDistance )
 				continue;
-			if (currDistance < dist) {
+			if ( currDistance < dist )
+			{
 				final = r;
 				dist = currDistance;
 			}
@@ -96,11 +107,13 @@ public partial class Rings : AnimEntity, IUse
 
 	}
 
-	public Rings GetClosestRing() {
+	public Rings GetClosestRing()
+	{
 		return Rings.GetClosestRing( Position, new Rings[] { this } );
 	}
 
-	public override void Spawn() {
+	public override void Spawn()
+	{
 		Tags.Add( "no_rings_teleport" );
 
 		this.Address = GenerateRandomAddress();
@@ -118,45 +131,50 @@ public partial class Rings : AnimEntity, IUse
 	}
 
 	[ServerCmd]
-	public void DialClosest() {
+	public void DialClosest()
+	{
 		if ( IsClient )
 			return;
 		Rings ring = GetClosestRing();
-		if (ring is not null && ring.IsValid())
-			DialRing(ring);
+		if ( ring is not null && ring.IsValid() )
+			DialRing( ring );
 	}
 
 	[ServerCmd]
-	public void DialAddress( string address ) {
-		if (IsClient) return;
+	public void DialAddress( string address )
+	{
+		if ( IsClient ) return;
 
-		var other = Entity.All.OfType<Rings>().Where(x => x.Address == address).FirstOrDefault();
-		if (other is not null && other.IsValid())
-			DialRing(other);
+		var other = Entity.All.OfType<Rings>().Where( x => x.Address == address ).FirstOrDefault();
+		if ( other is not null && other.IsValid() )
+			DialRing( other );
 	}
 
 	[ServerCmd]
-	public void DialRing( Rings ring ) {
-		if (IsClient) return;
-		if (Busy) return;
-		if (ring == this) return;
+	public void DialRing( Rings ring )
+	{
+		if ( IsClient ) return;
+		if ( Busy ) return;
+		if ( ring == this ) return;
 
 		Busy = true;
-		if (ring.IsValid() && !ring.Busy) {
+		if ( ring.IsValid() && !ring.Busy )
+		{
 			ring.Busy = true;
 			DestinationRings = ring;
 			ring.DestinationRings = this;
 
-			DeployRings(true);
+			DeployRings( true );
 		}
 		else
 			Busy = false;
 	}
 
-	public virtual void OnRingReturn() {
+	public virtual void OnRingReturn()
+	{
 		returnedRings++;
 
-		if (returnedRings < AmountOfRings)
+		if ( returnedRings < AmountOfRings )
 			return;
 
 		returnedRings = 0;
@@ -167,74 +185,91 @@ public partial class Rings : AnimEntity, IUse
 		RingsDeployed = false;
 	}
 
-	public Particles PlayTeleportEffect() {
+	public Particles PlayTeleportEffect()
+	{
 		var particlePos = Vector3.Zero;
 		var particleVelocity = Vector3.Zero;
-		var destEndPosZ = Math.Floor(DestinationRings.Transform.PointToWorld(DestinationRings.EndPos).z);
-		var selfEndPosZ = Math.Floor(Transform.PointToWorld(EndPos).z);
-		if (IsUpsideDown) {
-			if (destEndPosZ >= selfEndPosZ) {
-				particlePos = Transform.PointToWorld(ChildRings[^1].LocalPosition);
+		var destEndPosZ = Math.Floor( DestinationRings.Transform.PointToWorld( DestinationRings.EndPos ).z );
+		var selfEndPosZ = Math.Floor( Transform.PointToWorld( EndPos ).z );
+		if ( IsUpsideDown )
+		{
+			if ( destEndPosZ >= selfEndPosZ )
+			{
+				particlePos = Transform.PointToWorld( ChildRings[^1].LocalPosition );
 				particleVelocity = Rotation.Down * -110;
-			} else if (destEndPosZ < selfEndPosZ) {
-				particlePos = Transform.PointToWorld(ChildRings[0].LocalPosition);
+			}
+			else if ( destEndPosZ < selfEndPosZ )
+			{
+				particlePos = Transform.PointToWorld( ChildRings[0].LocalPosition );
 				// particlePos = Position;
 				particleVelocity = Rotation.Up * -110;
 			}
-		} else {
-			if (destEndPosZ <= selfEndPosZ) {
-				particlePos = Transform.PointToWorld(EndPos) - Rotation.Down * 50;
+		}
+		else
+		{
+			if ( destEndPosZ <= selfEndPosZ )
+			{
+				particlePos = Transform.PointToWorld( EndPos ) - Rotation.Down * 50;
 				particleVelocity = Rotation.Up * -110;
-			} else if (destEndPosZ > selfEndPosZ) {
+			}
+			else if ( destEndPosZ > selfEndPosZ )
+			{
 				// particlePos = Transform.PointToWorld(EndPos) + Rotation.Down * 50;
 				particlePos = Position;
 				particleVelocity = Rotation.Up * 110;
 			}
 		}
 		var a = Rotation.Angles();
-		
-		var particle = Particles.Create("particles/sbox_stargate/rings_transporter.vpcf", particlePos);
-		particle.SetPosition(1, particleVelocity);
-		particle.SetPosition(2, new Vector3(a.roll, a.pitch, a.yaw));
-		particle.SetPosition(3, new Vector3(Scale, 0, 0));
+
+		var particle = Particles.Create( "particles/sbox_stargate/rings_transporter.vpcf", particlePos );
+		particle.SetPosition( 1, particleVelocity );
+		particle.SetPosition( 2, new Vector3( a.roll, a.pitch, a.yaw ) );
+		particle.SetPosition( 3, new Vector3( Scale, 0, 0 ) );
 
 		return particle;
 	}
 
-	protected virtual async void HideBase() {
+	protected virtual async void HideBase()
+	{
 		CurrentSequence.Name = "down";
 
-		await Task.DelaySeconds(CurrentSequence.Duration);
+		await Task.DelaySeconds( CurrentSequence.Duration );
 
-		RenderColor = RenderColor.WithAlpha(0);
+		RenderColor = RenderColor.WithAlpha( 0 );
 	}
 
-	protected virtual void ShowBase() {
-		RenderColor = RenderColor.WithAlpha(1);
+	protected virtual void ShowBase()
+	{
+		RenderColor = RenderColor.WithAlpha( 1 );
 		CurrentSequence.Name = "up";
 	}
 
-	public bool IsAbleToExpand() {
-		TraceResult tr = Trace.Ray(Position + Rotation.Up * 10, Position + Rotation.Up * 150)
+	public bool IsAbleToExpand()
+	{
+		TraceResult tr = Trace.Ray( Position + Rotation.Up * 10, Position + Rotation.Up * 150 )
 			.Run();
 
 		// Object too close, impossible to deploy rings
-		if (tr.Hit && tr.Distance < 100)
+		if ( tr.Hit && tr.Distance < 100 )
 			return false;
 
 		return true;
 	}
 
-	public  async virtual void DeployRings(bool withTeleport = false) {
+	public async virtual void DeployRings( bool withTeleport = false )
+	{
 
 		Busy = true;
 
 		// Not enough space
-		if (!IsAbleToExpand() || (DestinationRings.IsValid() && !DestinationRings.IsAbleToExpand())) {
+		if ( !IsAbleToExpand() || (DestinationRings.IsValid() && !DestinationRings.IsAbleToExpand()) )
+		{
 			Busy = false;
 			DestinationRings.Busy = false;
 			return;
-		} else if (DestinationRings.IsValid() && withTeleport) {
+		}
+		else if ( DestinationRings.IsValid() && withTeleport )
+		{
 			DestinationRings.DeployRings();
 		}
 
@@ -243,55 +278,58 @@ public partial class Rings : AnimEntity, IUse
 
 		// Make the base entity static to prevent droping under the map ...
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
-		PlaySound("ring_transporter2");
+		PlaySound( "ring_transporter2" );
 
 		// Playing the animation
 		HideBase();
-		
+
 		// Disable base collisions
 		EnableAllCollisions = false;
 
 		// Avoid making a calculation 2 times foreach ring
 		var isUpDown = IsUpsideDown;
 
-		var tr = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
+		var tr = Trace.Sweep( PhysicsBody, Transform.WithPosition( Position + Rotation.Up * 110 ), Transform.WithPosition( Position + Rotation.Up * MAX_RING_RANGE ) )
+			.Ignore( this )
 			.Run();
 
 		var hitGround = false;
-		if (isUpDown && tr.Hit && tr.Distance < 999 && tr.Distance > 10)
+		if ( isUpDown && tr.Hit )
 			hitGround = true;
 
-		for (int i = 0; i < 5; i++) {
+		for ( int i = 0; i < 5; i++ )
+		{
 
-			var endPos = hitGround ? tr.EndPos - (Rotation.Up * 110) + (Rotation.Up * 20) * ( i + 1 ) : Position + (Rotation.Up * 20) * (i + 1);
+			var endPos = hitGround ? tr.EndPos - (Rotation.Up * 110) + (Rotation.Up * 20) * (i + 1) : Position + (Rotation.Up * 20) * (i + 1);
 			var endPos2 = hitGround ? tr.EndPos - Rotation.Up * 50 : Position + (Rotation.Up * 50);
-			EndPos = Transform.PointToLocal(endPos2);
+			EndPos = Transform.PointToLocal( endPos2 );
 
 			RingRing r = new();
 
 			r.RingParent = this;
-			r.SetParent(this);
+			r.SetParent( this );
 			r.isUpsideDown = isUpDown;
 			r.Position = Position;
 			r.Rotation = Rotation;
-			if (r.isUpsideDown)	r.Rotation = Rotation.RotateAroundAxis(Vector3.Left, 180f);
+			if ( r.isUpsideDown ) r.Rotation = Rotation.RotateAroundAxis( Vector3.Left, 180f );
 			r.Scale = Scale;
 			r.Transmit = TransmitType.Always;
-			
+
 			r.desiredPos = Transform.PointToLocal( endPos );
 
-			ChildRings.Add(r);
+			ChildRings.Add( r );
 		}
 
-		int[] times = {2000, 500, 500, 500, isUpDown ? 100 : 200 };
+		int[] times = { 2000, 500, 500, 500, isUpDown ? 100 : 200 };
 
 		var reversed = ChildRings;
 		reversed.Reverse();
 
 		var y = 0;
-		foreach (RingRing r in reversed) {
+		foreach ( RingRing r in reversed )
+		{
 
-			await Task.Delay(times[y]);
+			await Task.Delay( times[y] );
 
 			if ( !this.IsValid() )
 				return;
@@ -306,13 +344,15 @@ public partial class Rings : AnimEntity, IUse
 
 		RingsDeployed = true;
 
-		if (withTeleport)
+		if ( withTeleport )
 			DoTeleport();
 	}
 
-	public async virtual void DoTeleport() {
+	public async virtual void DoTeleport()
+	{
 
-		if (!DestinationRings.IsValid()) {
+		if ( !DestinationRings.IsValid() )
+		{
 			RetractRings();
 			return;
 		}
@@ -320,32 +360,35 @@ public partial class Rings : AnimEntity, IUse
 		List<Entity> toDest = new();
 		List<Entity> fromDest = new();
 
-		while (!HasAllRingsReachedPosition || (DestinationRings.IsValid() && !DestinationRings.HasAllRingsReachedPosition))
-			await Task.Delay(10);
+		while ( !HasAllRingsReachedPosition || (DestinationRings.IsValid() && !DestinationRings.HasAllRingsReachedPosition) )
+			await Task.Delay( 10 );
 
 		var testPos = Transform.PointToWorld( EndPos );
-		var toTp = Entity.All.Where(x => x.Position.Distance(testPos) <= 80);
+		var toTp = Entity.All.Where( x => x.Position.Distance( testPos ) <= 80 );
 
-		foreach (Entity p in toTp) {
+		foreach ( Entity p in toTp )
+		{
 
-			if (p.Tags.Has( "no_rings_teleport" ))
+			if ( p.Tags.Has( "no_rings_teleport" ) )
 				continue;
 
-			toDest.Add(p);
+			toDest.Add( p );
 
 		}
 
-		if (DestinationRings.IsValid()) {
+		if ( DestinationRings.IsValid() )
+		{
 
 			var testPos2 = DestinationRings.Transform.PointToWorld( DestinationRings.EndPos );
-			var fromTp = Entity.All.Where(x => x.Position.Distance(testPos2) <= 80 && !x.Parent.IsValid());
+			var fromTp = Entity.All.Where( x => x.Position.Distance( testPos2 ) <= 80 && !x.Parent.IsValid() );
 
-			foreach (Entity p in fromTp) {
+			foreach ( Entity p in fromTp )
+			{
 
-				if (p.Tags.Has( "no_rings_teleport" ))
+				if ( p.Tags.Has( "no_rings_teleport" ) )
 					continue;
 
-				fromDest.Add(p);
+				fromDest.Add( p );
 			}
 		}
 
@@ -353,19 +396,21 @@ public partial class Rings : AnimEntity, IUse
 		var particle2 = DestinationRings.PlayTeleportEffect();
 
 
-		var worldEndPos = Transform.PointToWorld(EndPos);
+		var worldEndPos = Transform.PointToWorld( EndPos );
 		var tempBody = new PhysicsBody();
 		tempBody.Position = worldEndPos;
 		var tempBody2 = new PhysicsBody();
-		tempBody2.Position = DestinationRings.Transform.PointToWorld(DestinationRings.EndPos);
-		foreach (Entity e in toDest) {
+		tempBody2.Position = DestinationRings.Transform.PointToWorld( DestinationRings.EndPos );
+		foreach ( Entity e in toDest )
+		{
 			var localPos = tempBody.Transform.PointToLocal( e.Position );
 			var newPos = tempBody2.Transform.PointToWorld( localPos );
 
 			e.Position = newPos;
 		}
 
-		foreach (Entity e in fromDest) {
+		foreach ( Entity e in fromDest )
+		{
 			var localPos = tempBody2.Transform.PointToLocal( e.Position );
 			var newPos = tempBody.Transform.PointToWorld( localPos );
 
@@ -375,12 +420,12 @@ public partial class Rings : AnimEntity, IUse
 		tempBody.Remove();
 		tempBody2.Remove();
 
-		await Task.Delay(500);
+		await Task.Delay( 500 );
 
 		particle.Destroy();
 		particle2.Destroy();
 
-		await Task.Delay(500);
+		await Task.Delay( 500 );
 
 		RetractRings();
 		DestinationRings.RetractRings();
@@ -388,18 +433,20 @@ public partial class Rings : AnimEntity, IUse
 		EndPos = Vector3.Zero;
 	}
 
-	public async virtual void RetractRings() {
+	public async virtual void RetractRings()
+	{
 
-		PlaySound("ring_transporter3");
+		PlaySound( "ring_transporter3" );
 
-		int[] times = {400, 200, 300, 500, 200 };
+		int[] times = { 400, 200, 300, 500, 200 };
 
 		var tRings = ChildRings;
 		tRings.Reverse();
 
 		var i = 0;
-		foreach (RingRing r in tRings) {
-			await Task.Delay(times[i]);
+		foreach ( RingRing r in tRings )
+		{
+			await Task.Delay( times[i] );
 
 			r.desiredPos = LocalPosition.z;
 
@@ -412,43 +459,23 @@ public partial class Rings : AnimEntity, IUse
 	}
 
 	[Event.Frame]
-	public void OnFrame() {
-		DebugOverlay.Text(Position, $"Address: {this.Address}", Color.White);
+	public void OnFrame()
+	{
+		DebugOverlay.Text( Position, $"Address: {this.Address}", Color.White );
 
 		// return;
 
-		if (!IsUpsideDown)
+		if ( !IsUpsideDown )
 			return;
 
-		var mins = GetModel().Bounds.Mins;
-		mins.x = 60;
-		mins.y = 60;
-		var b = new BBox(mins, GetModel().Bounds.Maxs);
-
-		var tr = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
-			.Run();
-		// var tr2 = Trace.Ray(Position + Rotation.Up * 110, Position + Rotation.Up * 1024)
-		// 	.Size(GetModel().Bounds)
-		// 	.Run();
-		DebugOverlay.TraceResult(tr);
-		DebugOverlay.Text(tr.EndPos - Rotation.Up * 30, tr.Distance.ToString(), Color.Magenta);
-		// DebugOverlay.TraceResult(tr2);
-		DebugOverlay.Line((Position + Rotation.Left * b.Maxs) + Rotation.Up, (Position + Rotation.Left * b.Maxs) + Rotation.Up * 1024, Color.Blue);
-		DebugOverlay.Line((Position + Rotation.Right * b.Maxs) + Rotation.Up, (Position + Rotation.Right * b.Maxs) + Rotation.Up * 1024, Color.Blue);
-		DebugOverlay.Line((Position + Rotation.Forward * b.Maxs) + Rotation.Up, (Position + Rotation.Forward * b.Maxs) + Rotation.Up * 1024, Color.Blue);
-		DebugOverlay.Line((Position + Rotation.Backward * b.Maxs) + Rotation.Up, (Position + Rotation.Backward * b.Maxs) + Rotation.Up * 1024, Color.Blue);
-
-		DebugOverlay.Line((Position + Rotation.Left * b.Mins) + Rotation.Up, (Position + Rotation.Left * b.Mins) + Rotation.Up * 1024, Color.Blue);
-		DebugOverlay.Line((Position + Rotation.Right * b.Mins) + Rotation.Up, (Position + Rotation.Right * b.Mins) + Rotation.Up * 1024, Color.Blue);
-		DebugOverlay.Line((Position + Rotation.Forward * b.Mins) + Rotation.Up, (Position + Rotation.Forward * b.Mins) + Rotation.Up * 1024, Color.Blue);
-		DebugOverlay.Line((Position + Rotation.Backward * b.Mins) + Rotation.Up, (Position + Rotation.Backward * b.Mins) + Rotation.Up * 1024, Color.Blue);
-
-		DebugOverlay.Circle(tr.EndPos + Vector3.OneZ * 2, Angles.Zero.WithPitch(90).ToRotation(), 60, Color.Yellow);
-		DebugOverlay.Circle(tr.EndPos + Vector3.OneZ, Angles.Zero.WithPitch(90).ToRotation(), 80, Color.Red);
+		var tr = Trace.Sweep( PhysicsBody, Transform.WithPosition( Position + Rotation.Up * 110 ), Transform.WithPosition( Position + Rotation.Up * 1024 ) ).Ignore( this ).Run();
+		DebugOverlay.TraceResult( tr );
+		DebugOverlay.Text( tr.EndPos - Rotation.Up * 30, tr.Distance.ToString(), Color.Magenta );
 	}
 
-	protected override void OnDestroy() {
-		if (DestinationRings.IsValid())
+	protected override void OnDestroy()
+	{
+		if ( DestinationRings.IsValid() )
 			DestinationRings.RetractRings();
 	}
 
