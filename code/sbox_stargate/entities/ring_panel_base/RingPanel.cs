@@ -18,15 +18,15 @@ public partial class RingPanel : ModelEntity
 		return Buttons.GetValueOrDefault( action );
 	}
 
+	public void SetButtonState( RingPanelButton b, bool glowing )
+	{
+		if ( b.IsValid() ) b.On = glowing;
+	}
+
 	public void SetButtonState( string action, bool glowing )
 	{
 		var b = GetButtonByAction( action );
 		SetButtonState( b, glowing );
-	}
-
-	public void SetButtonState( RingPanelButton b, bool glowing )
-	{
-		if ( b.IsValid() ) b.On = glowing;
 	}
 
 	protected async void ToggleButton( string action )
