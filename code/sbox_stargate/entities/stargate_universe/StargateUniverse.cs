@@ -10,6 +10,7 @@ public partial class StargateUniverse : Stargate
 {
 	public StargateRingUniverse Ring;
 	public List<Chevron> EncodedChevronsOrdered = new ();
+	public Chevron Chevron;
 
 	public StargateUniverse()
 	{
@@ -40,6 +41,7 @@ public partial class StargateUniverse : Stargate
 		SetModel( "models/sbox_stargate/gate_universe/gate_universe.vmdl" );
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
+		EnableDrawing = false; // dont draw the base ent, the gate will be a part of the 'ring'
 
 		CreateRing();
 		CreateAllChevrons();
@@ -66,14 +68,19 @@ public partial class StargateUniverse : Stargate
 		Ring.Transmit = TransmitType.Always;
 	}
 
+	public async Task<bool> RotateRingToSymbol( char sym, int angOffset = 0 )
+	{
+		return await Ring.RotateRingToSymbolAsync( sym, angOffset );
+	}
+
 	// CHEVRONS
 	public void CreateAllChevrons()
 	{
 		var chev = new Chevron();
 		chev.SetModel( "models/sbox_stargate/gate_universe/chevrons_universe.vmdl" );
-		chev.Position = Position;
-		chev.Rotation = Rotation;
-		chev.SetParent( this );
+		chev.Position = Ring.Position;
+		chev.Rotation = Ring.Rotation;
+		chev.SetParent( Ring );
 		chev.Transmit = TransmitType.Always;
 		chev.Gate = this;
 
@@ -85,33 +92,7 @@ public partial class StargateUniverse : Stargate
 
 		chev.UsesDynamicLight = false;
 
-		Chevrons.Add( chev );
-	}
-
-	public Chevron GetChevron( int num )
-	{
-		return ( num <= Chevrons.Count ) ? Chevrons[num - 1] : null;
-	}
-
-	public Chevron GetChevronBasedOnAddressLength(int num, int len = 7)
-	{
-		if ( len == 8 )
-		{
-			if ( num == 7 ) return GetChevron( 8 );
-			else if ( num == 8 ) return GetChevron( 7 );
-		}
-		else if ( len == 9 )
-		{
-			if ( num == 7 ) return GetChevron( 8 );
-			else if ( num == 8 ) return GetChevron( 9 );
-			else if ( num == 9 ) return GetChevron( 7 );
-		}
-		return GetChevron( num );
-	}
-
-	public Chevron GetTopChevron()
-	{
-		return GetChevron( 7 );
+		Chevron = chev;
 	}
 
 	// DIALING
@@ -120,7 +101,7 @@ public partial class StargateUniverse : Stargate
 	{
 		if (delay > 0) await Task.DelaySeconds( delay );
 
-		foreach ( Chevron chev in Chevrons ) chev.On = state;
+		Chevron.On = state;
 	}
 
 	public override void OnStopDialingBegin()
@@ -128,7 +109,6 @@ public partial class StargateUniverse : Stargate
 		base.OnStopDialingBegin();
 
 		PlaySound( this, GetSound( "dial_fail" ) );
-		Ring?.StopRollSound();
 	}
 
 	public override void OnStopDialingFinish()
@@ -174,47 +154,18 @@ public partial class StargateUniverse : Stargate
 
 		SetChevronsGlowState( false );
 		Ring?.ResetSymbols();
-		Ring?.StopRollSound();
 	}
 
 
-	// CHEVRON ANIMS & SOUNDS
-
-	public void ChevronActivate( Chevron chev, float delay = 0, bool turnon = true, bool chevLock = false, bool longer = false, bool shorter = false )
+	public void DoPreRoll()
 	{
-		if ( chev.IsValid() )
-		{
-			Stargate.PlaySound( chev, GetSound( "chevron" + (chevLock ? "_lock" : "") + (Inbound ? "_inbound" : "") + ( longer ? "_longer" : "" ) + (shorter ? "_shorter" : "") ), delay );
-			if (turnon) chev.TurnOn( delay );
-		}
-	}
-
-	public void ChevronDeactivate( Chevron chev, float delay = 0 )
-	{
-		if ( chev.IsValid() )
-		{
-			chev.TurnOff( delay );
-		}
-	}
-
-	public void ChevronActivateDHD( Chevron chev, float delay = 0, bool turnon = true )
-	{
-		if ( chev.IsValid() )
-		{
-			Stargate.PlaySound( chev, GetSound( "chevron_dhd" ), delay );
-			if ( turnon ) chev.TurnOn( delay );
-		}
-	}
-
-	public void ChevronLightup( Chevron chev, float delay = 0 )
-	{
-		if ( chev.IsValid() ) chev.TurnOn( delay );
+		SetChevronsGlowState( true, 0.2f );
 	}
 
 	// INDIVIDUAL DIAL TYPES
 
 	// FAST DIAL
-	public override void BeginDialFast(string address)
+	public async override void BeginDialFast( string address )
 	{
 		if ( !CanStargateStartDial() ) return;
 
@@ -225,39 +176,111 @@ public partial class StargateUniverse : Stargate
 
 			if ( !IsValidFullAddress( address ) ) { StopDialing(); return; }
 
-			var target = FindDestinationGateByDialingAddress( this, address );
+			Stargate target = FindDestinationGateByDialingAddress( this, address );
 			var wasTargetReadyOnStart = false; // if target gate was not available on dial start, dont bother doing anything at the end
 
 			if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFast() )
 			{
 				wasTargetReadyOnStart = true;
-				target.BeginInboundFast( address.Length );
+
+				target.BeginInboundFast( GetSelfAddressBasedOnOtherAddress( this, address ).Length );
+
 				OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
 				OtherGate.OtherGate = this;
 			}
 
-			var startTime = Time.Now;
+			Ring.SpinUp(); // start rotating ring
+
 			var addrLen = address.Length;
 
-			bool gateValidCheck() { return wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd(); }
+			// duration of the dial until the gate starts opening - let's stick to 7 seconds for total (just like GMod stargates)
+			// default values are for 7 chevron sequence
+			var chevronsStartDelay = (addrLen == 9) ? 0.60f : ((addrLen == 8) ? 0.70f : 0.70f);
+			var chevronsLoopDuration = (addrLen == 9) ? 4.40f : ((addrLen == 8) ? 4.25f : 3.90f);
+			var chevronBeforeLastDelay = (addrLen == 9) ? 0.75f : ((addrLen == 8) ? 0.80f : 1.05f);
+			var chevronAfterLastDelay = (addrLen == 9) ? 1.25f : ((addrLen == 8) ? 1.25f : 1.35f);
+			var chevronDelay = chevronsLoopDuration / (addrLen - 1);
 
-			Ring.RollSymbolsDialFast( addrLen, gateValidCheck );
+			await Task.DelaySeconds( chevronsStartDelay ); // wait 0.5 sec and start locking chevrons
 
-			async void openOrStop()
+			// lets encode each chevron but the last
+			for ( var i = 1; i < addrLen; i++ )
 			{
-				if ( gateValidCheck() ) // if valid, open both gates
+				if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
+
+				//var chev = GetChevronBasedOnAddressLength( i, addrLen );
+				//if ( chev.IsValid() )
+				//{
+				//	if ( MovieDialingType )
+				//	{
+				//		ChevronAnimLock( chev, 0, ChevronLightup );
+				//	}
+				//	else
+				//	{
+				//		ChevronActivate( chev, 0, ChevronLightup );
+				//	}
+
+				//	ActiveChevrons++;
+				//}
+
+				Ring.SetSymbolState( address[i-1], true );
+
+				if ( i == addrLen - 1 ) Ring.SpinDown(); // stop rotating ring when the last looped chevron locks
+
+				await Task.DelaySeconds( chevronDelay );
+			}
+
+			if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
+
+			await Task.DelaySeconds( chevronBeforeLastDelay ); // wait before locking the last chevron
+
+			if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
+
+			Busy = true; // gate has to lock last chevron, lets go busy so we cant stop the dialing at this point
+
+			/*
+			var topChev = GetChevron( 7 ); // lock last (top) chevron
+			if ( topChev.IsValid() )
+			{
+				if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() )
 				{
-					EstablishWormholeTo( target );
+					if ( ChevronLightup ) topChev.TurnOn( 0.25f );
+				}
+
+				if ( MovieDialingType )
+				{
+					ChevronAnimLock( topChev, 0.2f );
 				}
 				else
 				{
-					await Task.DelaySeconds( 0.25f ); // otherwise wait a bit, fail and stop dialing
-					StopDialing();
+					ChevronAnimLock( topChev, 0.2f );
+					ChevronAnimUnlock( topChev, 1f );
 				}
+
+				ActiveChevrons++;
+			}
+			*/
+
+			if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() )
+			{
+				Ring.SetSymbolState( address[addrLen], true );
 			}
 
-			AddTask( startTime + 7, openOrStop, TimedTaskCategory.DIALING );
+			await Task.DelaySeconds( chevronAfterLastDelay ); // wait after the last chevron, then open the gate or fail dial (if gate became invalid/was busy)
 
+			if ( ShouldStopDialing ) { StopDialing(); return; } // check if we should stop dialing
+
+			Busy = false;
+
+			if ( wasTargetReadyOnStart && target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd() ) // if valid, open both gates
+			{
+				EstablishWormholeTo( target );
+			}
+			else
+			{
+				await Task.DelaySeconds( 0.25f ); // otherwise wait a bit, fail and stop dialing
+				StopDialing();
+			}
 		}
 		catch ( Exception )
 		{
@@ -266,7 +289,7 @@ public partial class StargateUniverse : Stargate
 	}
 
 	// FAST INBOUND
-	public override void BeginInboundFast( int numChevs )
+	public async override void BeginInboundFast( int numChevs )
 	{
 		if ( !IsStargateReadyForInboundFast() ) return;
 
@@ -277,15 +300,64 @@ public partial class StargateUniverse : Stargate
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
-			PlaySound( this, GetSound("gate_roll_fast"), 0.35f );
+			// duration of the dial until the gate starts opening - let's stick to 7 seconds for total (just like GMod stargates)
+			// default values are for 7 chevron sequence
+			var chevronsStartDelay = (numChevs == 9) ? 0.25f : ((numChevs == 8) ? 0.40f : 0.50f);
+			var chevronsLoopDuration = (numChevs == 9) ? 6.75f : ((numChevs == 8) ? 6.60f : 6.75f);
+			var chevronBeforeLastDelay = (numChevs == 9) ? 0.50f : ((numChevs == 8) ? 0.60f : 0.50f);
+			var chevronDelay = chevronsLoopDuration / (numChevs);
 
-			Ring.RollSymbolsInbound( 5.5f, 1f, numChevs );
+			await Task.DelaySeconds( chevronsStartDelay ); // wait 0.5 sec and start locking chevrons
+
+			for ( var i = 1; i < numChevs; i++ )
+			{
+				if ( ShouldStopDialing && ActiveChevrons > 0 ) return; // check if we should stop dialing or not
+
+				/*
+				var chev = GetChevronBasedOnAddressLength( i, numChevs );
+				if ( chev.IsValid() )
+				{
+					if ( MovieDialingType )
+					{
+						ChevronAnimLock( chev, 0, ChevronLightup );
+					}
+					else
+					{
+						ChevronActivate( chev, 0, ChevronLightup );
+					}
+
+					ActiveChevrons++;
+				}
+				*/
+
+				await Task.DelaySeconds( chevronDelay ); // each chevron delay
+			}
+
+			await Task.DelaySeconds( chevronBeforeLastDelay - 0.4f ); // wait before locking the last chevron
+
+			/*
+			var topChev = GetChevron( 7 );
+			if ( topChev.IsValid() )
+			{
+				if ( MovieDialingType )
+				{
+					ChevronAnimLock( topChev, 0, ChevronLightup );
+				}
+				else
+				{
+					ChevronActivate( topChev, 0, ChevronLightup );
+				}
+
+				ActiveChevrons++;
+			}
+			*/
 		}
 		catch ( Exception )
 		{
 			if ( this.IsValid() ) StopDialing();
 		}
 	}
+
 
 	// SLOW DIAL
 	public async override void BeginDialSlow( string address )
@@ -302,34 +374,36 @@ public partial class StargateUniverse : Stargate
 				StopDialing();
 				return;
 			}
-			
-			var startTime = Time.Now;
-			var addrLen = address.Length;
 
-			Stargate target = FindDestinationGateByDialingAddress( this, address );
+			Stargate target = null;
 
-			bool gateValidCheck() { return target.IsValid() && target != this && target.IsStargateReadyForInboundFastEnd(); }
+			DoPreRoll();
 
-			Ring.RollSymbolsDialSlow(address.Length, gateValidCheck);
+			await Task.DelaySeconds(1.25f);
 
-			var dialTime = (addrLen == 9) ? 40f : ((addrLen == 8) ? 32f : 26f);
-			
-			void startInboundAnim()
+			var readyForOpen = false;
+			foreach ( var sym in address )
 			{
-				Stargate target = FindDestinationGateByDialingAddress( this, address );
-				if ( target.IsValid() && target != this && target.IsStargateReadyForInboundFast() )
+				var chevNum = address.IndexOf( sym ) + 1;
+				var isLastChev = (chevNum == address.Length);
+
+				// try to encode each symbol
+				var success = await RotateRingToSymbol( sym ); // wait for ring to rotate to the target symbol
+				if ( !success || ShouldStopDialing )
 				{
-					target.BeginInboundFast( address.Length );
-					OtherGate = target; // this is needed so that the gate can stop dialing if we cancel the dial
-					OtherGate.OtherGate = this;
+					ResetGateVariablesToIdle();
+					return;
 				}
-			}
 
-			AddTask( startTime + dialTime - 7f, startInboundAnim, TimedTaskCategory.DIALING );
+				await Task.DelaySeconds( 0.25f ); // wait a bit
 
-			void openOrStop()
-			{
-				Ring.StopRollSound();
+				if ( isLastChev ) target = FindDestinationGateByDialingAddress( this, address ); // if its last chevron, try to find the target gate
+
+				// go do chevron stuff
+
+				Ring.SetSymbolState( sym, true );
+
+				await Task.DelaySeconds( 0.5f );
 
 				if ( ShouldStopDialing || !Dialing )
 				{
@@ -337,23 +411,29 @@ public partial class StargateUniverse : Stargate
 					return;
 				}
 
-				Busy = false;
-
-				/*
-				if ( gateValidCheck() )
+				if ( isLastChev && target.IsValid() && target != this && target.IsStargateReadyForInboundInstantSlow() )
 				{
-					EstablishWormholeTo( target );
+					target.BeginInboundSlow( address.Length );
+					readyForOpen = true;
 				}
-				else
-				{
-					StopDialing();
-				}
-				*/
 
-				if ( gateValidCheck() )	EstablishWormholeTo( target ); else StopDialing();
+				await Task.DelaySeconds( 0.5f ); // wait a bit
+
+				chevNum++;
 			}
 
-			AddTask( startTime + dialTime, openOrStop, TimedTaskCategory.DIALING );
+			// prepare for open or fail
+
+			Busy = false;
+
+			if ( target.IsValid() && target != this && readyForOpen )
+			{
+				EstablishWormholeTo( target );
+			}
+			else
+			{
+				StopDialing();
+			}
 		}
 		catch ( Exception )
 		{
@@ -373,14 +453,7 @@ public partial class StargateUniverse : Stargate
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
-			for ( var i = 1; i <= numChevs; i++ )
-			{
-				var chev = GetChevronBasedOnAddressLength( i, numChevs );
-				ChevronLightup( chev );
-			}
-
-			PlaySound( this, GetSound( "chevron_lock_inbound" ) );
-			Ring.LightupSymbols();
+			// turn on chevs here
 
 			ActiveChevrons = numChevs;
 		}
@@ -414,11 +487,7 @@ public partial class StargateUniverse : Stargate
 
 			otherGate.BeginInboundSlow( address.Length );
 
-			for ( var i = 1; i <= address.Length; i++ )
-			{
-				var chev = GetChevronBasedOnAddressLength( i, address.Length );
-				ChevronActivate( chev );
-			}
+			// turn on chevs here
 
 			await Task.DelaySeconds( 0.5f );
 
@@ -475,11 +544,8 @@ public partial class StargateUniverse : Stargate
 			CurGateState = GateState.ACTIVE;
 			Inbound = true;
 
-			for ( var i = 1; i <= numChevs; i++ )
-			{
-				var chev = GetChevronBasedOnAddressLength( i, numChevs );
-				ChevronActivate( chev, 0, true );
-			}
+			// turn on chevs here
+
 		}
 		catch ( Exception )
 		{
@@ -488,27 +554,27 @@ public partial class StargateUniverse : Stargate
 	}
 
 	// CHEVRON STUFF - DHD DIALING
-	public override void DoChevronEncode(char sym)
+	public override void DoChevronEncode( char sym )
 	{
 		base.DoChevronEncode( sym );
 
-		var chev = GetChevronBasedOnAddressLength(DialingAddress.Length, 9 );
-		EncodedChevronsOrdered.Add( chev );
+		//var chev = GetChevronBasedOnAddressLength( DialingAddress.Length, 9 );
+		//EncodedChevronsOrdered.Add( chev );
 
-		ChevronActivateDHD( chev, 0.15f, true );
+		// turn on chevs and symbol here
+
 	}
 
 	public override void DoChevronLock( char sym ) // only the top chevron locks, always
 	{
 		base.DoChevronLock( sym );
 
-		var chev = GetTopChevron();
-		EncodedChevronsOrdered.Add( chev );
+		//var chev = GetTopChevron();
+		//EncodedChevronsOrdered.Add( chev );
 
-		var gate = FindDestinationGateByDialingAddress( this, DialingAddress );
-		var valid = (gate != this && gate.IsValid() && gate.IsStargateReadyForInboundDHD());
+		// turn on chevs and symbol here
 
-		ChevronActivateDHD( chev, 0.15f, true );
+		
 	}
 
 	public override void DoChevronUnlock( char sym )
@@ -518,7 +584,8 @@ public partial class StargateUniverse : Stargate
 		var chev = EncodedChevronsOrdered.Last();
 		EncodedChevronsOrdered.Remove( chev );
 
-		ChevronDeactivate( chev );
+		// turn on chevs and symbol here
+
 	}
 
 }

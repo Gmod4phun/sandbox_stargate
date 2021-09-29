@@ -12,7 +12,7 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	[Net]
 	public Stargate Gate { get; set; } = null;
 
-	public string RingSymbols { get; private set; } = "?0JKNTR3MBZX*H69IGPL#@QFS1E4AU85OCW72YVD";
+	public string RingSymbols { get; set; } = "?0JKNTR3MBZX*H69IGPL#@QFS1E4AU85OCW72YVD";
 
 	[Net]
 	public float RingAngle { get; private set; } = 0.0f;
@@ -23,9 +23,9 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	public float TargetRingAngle { get; private set; } = 0.0f;
 
 	private float RingCurSpeed = 0f;
-	private float RingMaxSpeed = 50f;
-	private float RingAccelStep = 1f;
-	private float RingDeccelStep = 0.75f;
+	protected float RingMaxSpeed = 50f;
+	protected float RingAccelStep = 1f;
+	protected float RingDeccelStep = 0.75f;
 
 	private int RingDirection = 1;
 	private bool ShouldAcc = false;
@@ -40,8 +40,8 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	public string StartSoundName = "gate_roll_long";
 	public string StopSoundName = "gate_sg1_ring_stop";
 
-	private Sound? StartSoundInstance;
-	private Sound? StopSoundInstance;
+	protected Sound? StartSoundInstance;
+	protected Sound? StopSoundInstance;
 
 	public bool StopSoundOnSpinDown = false; // play the stopsound on spindown, or on spin stop
 
@@ -73,16 +73,16 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	}
 
 	// symbol pos/ang
-	public float GetSymbolPosition( char sym ) // gets the symbols position on the ring
+	public virtual float GetSymbolPosition( char sym ) // gets the symbols position on the ring
 	{
 		sym = sym.ToString().ToUpper()[0];
 		return RingSymbols.Contains( sym ) ? RingSymbols.IndexOf( sym ) : -1;
 	}
 
-	public float GetSymbolAngle( char sym ) // gets the symbols angle on the ring
+	public virtual float GetSymbolAngle( char sym ) // gets the symbols angle on the ring
 	{
 		sym = sym.ToString().ToUpper()[0];
-		return GetSymbolPosition( sym ) * 9;
+		return GetSymbolPosition( sym ) * (360 / RingSymbols.Length);
 	}
 
 	// sounds
@@ -148,20 +148,20 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	}
 
 	// rotate to angle/symbol
-	public void RotateRingTo( float targetAng ) // starts rotating the ring and stops (hopefully) at the specified angle
+	public virtual void RotateRingTo( float targetAng ) // starts rotating the ring and stops (hopefully) at the specified angle
 	{
 		TargetRingAngle = targetAng;
 		ShouldStopAtAngle = true;
 		SpinUp();
 	}
 
-	public void RotateRingToSymbol( char sym, int angOffset = 0 )
+	public virtual void RotateRingToSymbol( char sym, int angOffset = 0 )
 	{
 		if ( RingSymbols.Contains( sym ) ) RotateRingTo( GetDesiredRingAngleForSymbol( sym, angOffset ) );
 	}
 
 	// helper calcs
-	public float GetDesiredRingAngleForSymbol( char sym, int angOffset = 0 )
+	public virtual float GetDesiredRingAngleForSymbol( char sym, int angOffset = 0 )
 	{
 		if ( sym is '#' && EarthPointOfOrigin ) sym = '?';
 
@@ -172,7 +172,8 @@ public partial class StargateRingMilkyWay : PlatformEntity
 		if ( symPos == -1 ) return RingAngle;
 
 		// if its a valid symbol, lets calc the required angle
-		var symAng = symPos * 9; // there are 40 symbols, each 9 degrees apart
+		//var symAng = symPos * 9; // there are 40 symbols, each 9 degrees apart
+		var symAng = GetSymbolAngle( sym );
 
 		// clockwise and counterclockwise symbol angles relative to 0 (the top chevron)
 		var D_CW = -symAng - RingAngle - angOffset; // offset, if we want it to be relative to another chevron (for movie stargate dialing)
@@ -204,6 +205,7 @@ public partial class StargateRingMilkyWay : PlatformEntity
 		while (IsMoving)
 		{
 			await Task.DelaySeconds( Global.TickInterval ); // wait here, too, otherwise game hangs :)
+			if ( !this.IsValid() ) return false;
 
 			if ( Gate.ShouldStopDialing )
 			{
@@ -320,6 +322,6 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
-		//DrawSymbols();
+		DrawSymbols();
 	}
 }
