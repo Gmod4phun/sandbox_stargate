@@ -3,13 +3,8 @@
   "Entities": [
     {
       "EntityName": "ent_dhd_milkyway",
-      "Position": "-1317.12,2906.848,-0.9997",
-      "Rotation": "0.1189179,0.05381149,-0.9032695,0.4087383"
-    },
-    {
-      "EntityName": "ent_dhd_milkyway",
       "Position": "1750.458,2090.236,-90.1592",
-      "Rotation": "-0.09679266,0.08756889,0.7352122,0.6651509"
+      "Rotation": "-0.0967927,0.08756888,0.7352122,0.6651509"
     },
     {
       "EntityName": "ent_dhd_milkyway",
@@ -19,41 +14,16 @@
     {
       "MovieDialingType": false,
       "ChevronLightup": true,
-      "Name": "No Way",
-      "Address": "NOWAY1",
-      "Group": "M@",
-      "Local": true,
-      "Private": false,
-      "AutoClose": true,
-      "EntityName": "ent_stargate_milkyway",
-      "Position": "-1505.784,3020.586,90.0003",
-      "Rotation": "0,-0,-0.7120265,0.7021527"
-    },
-    {
-      "MovieDialingType": false,
-      "ChevronLightup": true,
       "Name": "Garden",
       "Address": "GARDEN",
       "Group": "M@",
-      "Local": true,
       "Private": false,
       "AutoClose": true,
+      "Local": true,
+      "OnRamp": false,
       "EntityName": "ent_stargate_milkyway",
       "Position": "1902.504,1959.156,1.977",
       "Rotation": "0,0,0.5660809,0.8243497"
-    },
-    {
-      "MovieDialingType": false,
-      "ChevronLightup": true,
-      "Name": "Waterway",
-      "Address": "WATER1",
-      "Group": "P@",
-      "Local": true,
-      "Private": false,
-      "AutoClose": true,
-      "EntityName": "ent_stargate_pegasus",
-      "Position": "1016.254,-3922.026,-50.0003",
-      "Rotation": "0,0,0.721733,0.6921716"
     },
     {
       "MovieDialingType": true,
@@ -61,18 +31,19 @@
       "Name": "Hangar",
       "Address": "HANGR1",
       "Group": "M@",
-      "Local": false,
       "Private": false,
       "AutoClose": true,
+      "Local": false,
+      "OnRamp": false,
       "EntityName": "ent_stargate_movie",
       "Position": "-3680.159,94.6243,146",
-      "Rotation": "0,-0,-0.9323282,0.3616132"
+      "Rotation": "0,-0,-0.9323282,0.361613"
     },
     {
       "Address": "3145",
       "EntityName": "ent_rings_ancient",
-      "Position": "-62.46484,-3330.856,210.5347",
-      "Rotation": "0.7013159,-0.7128505,0.000002919269,0.00003649855"
+      "Position": "-60.28769,-3328.872,159.9496",
+      "Rotation": "0.6928403,-0.721091,0.000002487612,0.00003653051"
     },
     {
       "EntityName": "ent_rings_panel_ancient",
@@ -100,6 +71,47 @@
       "EntityName": "ent_rings_panel_ancient",
       "Position": "3598.969,-1520.743,-19.98301",
       "Rotation": "0,0,0.9999466,0.01033017"
+    },
+    {
+      "EntityName": "ent_stargate_brick_ramp",
+      "Position": "-1502.111,2959.028,163.9883",
+      "Rotation": "0.00000747062,0.000002231256,-0.707108,0.7071055"
+    },
+    {
+      "MovieDialingType": false,
+      "ChevronLightup": true,
+      "Name": "No Way",
+      "Address": "NOWAY1",
+      "Group": "M@",
+      "Private": false,
+      "AutoClose": true,
+      "Local": false,
+      "OnRamp": true,
+      "EntityName": "ent_stargate_milkyway",
+      "Position": "-1502.112,2959.028,153.9883",
+      "Rotation": "0.000007470619,0.000002231257,-0.707108,0.7071055"
+    },
+    {
+      "EntityName": "ent_dhd_milkyway",
+      "Position": "-1321.983,2787.92,0.03140259",
+      "Rotation": "0.06297838,0.1143277,-0.4783682,0.8684047"
+    },
+    {
+      "EntityName": "ent_stargate_brick_ramp",
+      "Position": "1033.845,-3822.568,19.98826",
+      "Rotation": "-0.0000005104531,-0.000001380297,0.7071071,0.7071065"
+    },
+    {
+      "Name": "Waterway",
+      "Address": "WATER1",
+      "Group": "P@",
+      "Private": false,
+      "AutoClose": true,
+      "Local": true,
+      "OnRamp": true,
+      "EntityName": "ent_stargate_pegasus",
+      "Position": "1033.845,-3822.568,9.98826",
+      "Rotation": "-0.0000005104532,-0.000001380297,0.7071071,0.7071065"
     }
   ]
 }
