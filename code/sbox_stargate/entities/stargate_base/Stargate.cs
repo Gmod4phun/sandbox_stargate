@@ -66,7 +66,7 @@ public abstract partial class Stargate : Prop, IUse
 	public TimeSince TimeSinceDHDAction = 0f;
 	public float DhdDialShutdownTime = 20f;
 
-	public IStargateRamp Ramp = null;
+	public Ramp Ramp = null;
 
 	// SOUNDS
 	public virtual string GetSound( string key )
@@ -164,7 +164,7 @@ public abstract partial class Stargate : Prop, IUse
   
 	protected override void OnDestroy()
 	{
-		if ( Ramp != null ) Ramp.Gate.Remove( this );
+		if ( Ramp != null ) Ramp.Gates.Remove( this );
 
 		if ( IsServer && OtherGate.IsValid() )
 		{

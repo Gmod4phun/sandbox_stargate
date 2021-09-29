@@ -475,7 +475,7 @@ public partial class Stargate : Prop, IUse
 				gate.Position = rampEnt.Transform.PointToWorld( ramp.StargatePositionOffset[offsetIndex] );
 				gate.Rotation = rampEnt.Transform.RotationToWorld( ramp.StargateRotationOffset[offsetIndex].ToRotation() );
 				gate.SetParent( rampEnt );
-				gate.Ramp = ramp;
+				//gate.Ramp = ramp;
 
 				ramp.Gate.Add( gate );
 

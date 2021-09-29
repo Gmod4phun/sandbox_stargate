@@ -1,0 +1,18 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	data = 
+	{
+		title = "Brick Ramp"
+		model = resource:"models/sbox_stargate/ramps/brick/brick.vmdl"
+		spawnoffset = [ 0.0, 0.0, 200.0 ]
+		gateoffsets = 
+		[
+			{
+				forcekeep = true
+			},
+		]
+		dhdoffsets = [  ]
+		ringoffsets = [  ]
+		controllerentityclass = ""
+	}
+}
