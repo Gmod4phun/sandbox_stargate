@@ -408,6 +408,16 @@
 ]
 
 //
+// BrickRamp
+//
+@PointClass base(BaseProperties_sandbox_stargate) = ent_stargate_brick_ramp : ""
+[
+	enable_shadows(boolean) [ group="Render Properties" ] : "Shadow Casting" : 1 : "Whether this entity should cast shadows or not"
+
+	input SetColor(string) : "Sets the color of this entity. Format is '255 255 255 255'."
+]
+
+//
 // SGCRamp
 //
 @PointClass base(BaseProperties_sandbox_stargate) = ent_sgc_ramp : ""

@@ -3,7 +3,7 @@ using Sandbox;
 
 public partial class RingPanel : ModelEntity
 {
-	public Dictionary<string, RingPanelButton> Buttons { get; protected set; } = new ();
+	public Dictionary<string, RingPanelButton> Buttons { get; protected set; } = new();
 
 	protected string ComposedAddress { get; private set; } = "";
 	protected TimeSince TimeSinceButtonPressed = 0;
@@ -18,18 +18,19 @@ public partial class RingPanel : ModelEntity
 		return Buttons.GetValueOrDefault( action );
 	}
 
-	public void SetButtonState( string action, bool glowing )
-	{
-		var b = GetButtonByAction( action );
-		if ( b.IsValid() ) b.On = glowing;
-	}
-
 	public void SetButtonState( RingPanelButton b, bool glowing )
 	{
 		if ( b.IsValid() ) b.On = glowing;
 	}
 
-	protected async void ToggleButton(string action) {
+	public void SetButtonState( string action, bool glowing )
+	{
+		var b = GetButtonByAction( action );
+		SetButtonState( b, glowing );
+	}
+
+	protected async void ToggleButton( string action )
+	{
 		SetButtonState( action, true );
 		PlaySound( action is not "DIAL" ? ButtonsSounds[1] : ButtonsSounds[0] );
 
@@ -47,12 +48,12 @@ public partial class RingPanel : ModelEntity
 	{
 		if ( TimeSinceButtonPressed < ButtonPressDelay ) return;
 
-		if (ValidButtonActions.Contains(action) || action is "DIAL")
+		if ( ValidButtonActions.Contains( action ) || action is "DIAL" )
 		{
 			if ( action is "DIAL" ) // we pressed dial button
 			{
 				Rings ringPlatform = Rings.GetClosestRing( Position, null, 500f );
-				if (ringPlatform.IsValid())
+				if ( ringPlatform.IsValid() )
 				{
 					if ( ComposedAddress.Length is 0 )
 					{
