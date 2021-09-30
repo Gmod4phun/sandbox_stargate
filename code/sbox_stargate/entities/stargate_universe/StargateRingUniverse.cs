@@ -16,14 +16,16 @@ public partial class StargateRingUniverse : StargateRingMilkyWay
 		EarthPointOfOrigin = false;
 		StopSoundOnSpinDown = false;
 
-		StartSoundName = "gate_roll_long";
-		StopSoundName = "gate_sg1_ring_stop";
+		StartSoundName = "gate_universe_roll_long";
+		StopSoundName = "gate_universe_roll_stop";
 
 		RingSymbols = " ZB9J QNLMFVKO6 DCWY #R@S 8APU T7H5X4IG0 12E3";
 
 		RingMaxSpeed = 75f;
 		RingAccelStep = 1f;
 		RingDeccelStep = 1f;
+		RingAngToRotate = 270f;
+		RingTargetAngleOffset = 1f;
 	}
 
 	public override void Spawn()
@@ -66,6 +68,11 @@ public partial class StargateRingUniverse : StargateRingMilkyWay
 		}
 
 		base.OnDestroy();
+	}
+
+	public override float GetSymbolAngle( char sym )
+	{
+		return sym == ' ' ? 0 : base.GetSymbolAngle( sym );
 	}
 
 	public int GetSymbolNumber(char sym)

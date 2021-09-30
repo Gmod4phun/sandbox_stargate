@@ -85,7 +85,6 @@ public partial class Stargate : Prop, IUse
 	{
 		if ( !IsServer ) return;
 		var rem = StargateActions.RemoveAll( task => task.TaskCategory == category );
-		Log.Info( $"Removed {rem} tasks of type {category} from stack for Entity: {NetworkIdent}" );
 	}
 
 	[Event.Tick.Server]
@@ -225,7 +224,7 @@ public partial class Stargate : Prop, IUse
 	public static bool IsUniverseGate(Stargate gate)
 	{
 		if ( !gate.IsValid() ) return false;
-		return gate.EngineEntityName == "ent_stargate_universe";
+		return gate is StargateUniverse;
 	}
 
 	public static Stargate FindDestinationGateByDialingAddress(Stargate gate, string address)

@@ -26,6 +26,8 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	protected float RingMaxSpeed = 50f;
 	protected float RingAccelStep = 1f;
 	protected float RingDeccelStep = 0.75f;
+	protected float RingAngToRotate = 170f;
+	protected float RingTargetAngleOffset = 0.5f;
 
 	private int RingDirection = 1;
 	private bool ShouldAcc = false;
@@ -185,7 +187,7 @@ public partial class StargateRingMilkyWay : PlatformEntity
 		// angle differences are setup, choose based on the direction of ring rotation
 		// if the required angle to too small, spin it around once
 		var angToRotate = (RingDirection == -1) ? D_CCW : D_CW;
-		if ( angToRotate < 170f ) angToRotate += 360f;
+		if ( angToRotate < RingAngToRotate ) angToRotate += 360f;
 
 		// set the final angle to the current angle + the angle needed to rotate, also considering ring direction
 		var finalAng = RingAngle + (angToRotate * RingDirection);
@@ -254,7 +256,7 @@ public partial class StargateRingMilkyWay : PlatformEntity
 			{
 				RingCurSpeed = RingMaxSpeed;
 				ShouldAcc = false;
-				StoppedAccelAngle = MathF.Abs( RingAngle - StartedAccelAngle ) + 0.5f;
+				StoppedAccelAngle = MathF.Abs( RingAngle - StartedAccelAngle ) + RingTargetAngleOffset;
 				CurStopAtAngle = TargetRingAngle - (StoppedAccelAngle * RingDirection * (RingAccelStep / RingDeccelStep));
 			}
 		}
@@ -322,6 +324,6 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
-		DrawSymbols();
+		//DrawSymbols();
 	}
 }

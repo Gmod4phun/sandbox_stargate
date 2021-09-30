@@ -323,7 +323,7 @@ public partial class StargatePegasus : Stargate
 
 			Ring.RollSymbolsDialSlow(address.Length, gateValidCheck);
 
-			var dialTime = (addrLen == 9) ? 40f : ((addrLen == 8) ? 32f : 26f);
+			var dialTime = (addrLen == 9) ? 36f : ((addrLen == 8) ? 32f : 26f);
 			
 			void startInboundAnim()
 			{
