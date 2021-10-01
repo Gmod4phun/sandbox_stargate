@@ -25,6 +25,8 @@ public partial class StargateUniverse : Stargate
 			{ "chevron_dhd", "gate_universe_symbol_encode" },
 			{ "dial_fail", "gate_universe_dial_fail" }
 		};
+
+		EventHorizonSkinGroup = 1;
 	}
 
 	// SPAWN

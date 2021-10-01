@@ -38,13 +38,16 @@ public partial class EventHorizon : AnimEntity
 
 	float lastSoundTime = 0f;
 
+	[Net]
+	public int EventHorizonSkinGroup { get; set; } = 0;
+
 	public override void Spawn()
 	{
 		base.Spawn();
 		Transmit = TransmitType.Always;
 
 		SetModel( "models/sbox_stargate/event_horizon/event_horizon.vmdl" );
-		SetMaterialGroup( 1 );
+		SkinEstablish();
 		SetupPhysicsFromModel( PhysicsMotionType.Static, true );
 		PhysicsBody.BodyType = PhysicsBodyType.Static;
 		EnableShadowCasting = false;
@@ -52,6 +55,9 @@ public partial class EventHorizon : AnimEntity
 		EnableAllCollisions = false;
 		EnableTouch = true;
 	}
+
+	public virtual void SkinEventHorizon() { SetMaterialGroup( EventHorizonSkinGroup ); }
+	public void SkinEstablish() { SetMaterialGroup( 2 ); }
 
 	// SERVER CONTROL
 
@@ -115,7 +121,7 @@ public partial class EventHorizon : AnimEntity
 		shouldBeOn = true;
 		shouldBeOff = false;
 
-		SetMaterialGroup( 1 );
+		SkinEstablish();
 	}
 
 	[ClientRpc]
@@ -126,7 +132,7 @@ public partial class EventHorizon : AnimEntity
 		shouldCollapse = true;
 		shouldEstablish = false;
 
-		SetMaterialGroup( 0 );
+		SkinEventHorizon();
 	}
 
 	public void ClientAnimLogic()
@@ -141,7 +147,7 @@ public partial class EventHorizon : AnimEntity
 				isOn = true;
 				shouldEstablish = true;
 				curBrightness = maxBrightness;
-				SetMaterialGroup( 0 );
+				SkinEventHorizon();
 
 				//Particles.Create( "particles/water_squirt.vpcf", this, "center", true ); // only test, kawoosh particle will be made at some point
 			}
@@ -171,7 +177,7 @@ public partial class EventHorizon : AnimEntity
 				isCollapsed = true;
 				shouldBeOff = true;
 				curBrightness = minBrightness;
-				SetMaterialGroup( 1 );
+				SkinEstablish();
 			}
 		}
 	}

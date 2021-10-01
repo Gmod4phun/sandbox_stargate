@@ -11,6 +11,7 @@
 				[
 					{
 						_class = "DefaultMaterialGroup"
+						name = "classic"
 						remaps = 
 						[
 							{
@@ -20,6 +21,17 @@
 						]
 						use_global_default = false
 						global_default_material = ""
+					},
+					{
+						_class = "MaterialGroup"
+						name = "universe"
+						remaps = 
+						[
+							{
+								from = "models/sbox_stargate/event_horizon/event_horizon_new.vmat"
+								to = "models/sbox_stargate/event_horizon/event_horizon_universe.vmat"
+							},
+						]
 					},
 					{
 						_class = "MaterialGroup"

@@ -14,6 +14,7 @@ public abstract partial class Stargate : Prop, IUse
 	public List<Chevron> Chevrons = new();
 
 	public EventHorizon EventHorizon;
+	public int EventHorizonSkinGroup = 0;
 	public StargateIris Iris;
 	public Stargate OtherGate;
 
@@ -116,6 +117,7 @@ public abstract partial class Stargate : Prop, IUse
 		EventHorizon.Scale = Scale;
 		EventHorizon.SetParent( this );
 		EventHorizon.Gate = this;
+		EventHorizon.EventHorizonSkinGroup = EventHorizonSkinGroup;
 	}
 
 	public void DeleteEventHorizon()
