@@ -18,7 +18,9 @@ public partial class StargateMovie : StargateMilkyWay
 			{ "chevron_open", "chevron_movie_open" },
 			{ "chevron_close", "chevron_movie_close" },
 			{ "dial_fail", "dial_fail_sg1" },
-			{ "dial_fail_noclose", "gate_sg1_dial_fail_noclose" }
+			{ "dial_fail_noclose", "gate_sg1_dial_fail_noclose" },
+			{ "dial_begin_9chev", "gate_universe_9chev_dial_begin" },
+			{ "dial_fail_9chev", "gate_universe_9chev_dial_fail" }
 		};
 
 		MovieDialingType = true;

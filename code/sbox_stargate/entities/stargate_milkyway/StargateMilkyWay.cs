@@ -22,7 +22,9 @@ public partial class StargateMilkyWay : Stargate
 			{ "chevron_open", "chevron_sg1_open" },
 			{ "chevron_close", "chevron_sg1_close" },
 			{ "dial_fail", "dial_fail_sg1" },
-			{ "dial_fail_noclose", "gate_sg1_dial_fail_noclose" }
+			{ "dial_fail_noclose", "gate_sg1_dial_fail_noclose" },
+			{ "dial_begin_9chev", "gate_universe_9chev_dial_begin" },
+			{ "dial_fail_9chev", "gate_universe_9chev_dial_fail" }
 		};
 	}
 
@@ -450,6 +452,12 @@ public partial class StargateMilkyWay : Stargate
 				return;
 			}
 
+			if (address.Length == 9)
+			{
+				PlaySound( this, GetSound("dial_begin_9chev"), 0.2f );
+				await Task.DelaySeconds( 1f ); // wait a bit
+			}
+
 			Stargate target = null;
 
 			var readyForOpen = false;
@@ -459,7 +467,9 @@ public partial class StargateMilkyWay : Stargate
 				var isLastChev = (chevNum == address.Length);
 
 				// try to encode each symbol
-				var offset = MovieDialingType ? -ChevronAngles[chevNum - 1] : 0;
+				var movieOffset = -ChevronAngles[Chevrons.IndexOf( GetChevronBasedOnAddressLength( chevNum, address.Length ) )];
+
+				var offset = MovieDialingType ? movieOffset : 0;
 				var success = await RotateRingToSymbol( sym, offset ); // wait for ring to rotate to the target symbol
 				if ( !success || ShouldStopDialing )
 				{
@@ -532,6 +542,7 @@ public partial class StargateMilkyWay : Stargate
 			else
 			{
 				StopDialing();
+				if ( address.Length == 9 ) PlaySound( this, GetSound( "dial_fail_9chev" ), 0.5f );
 			}
 		}
 		catch ( Exception )
