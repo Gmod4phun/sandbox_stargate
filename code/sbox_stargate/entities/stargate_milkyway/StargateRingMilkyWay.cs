@@ -324,6 +324,6 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	[Event.Frame]
 	public void RingSymbolsDebug()
 	{
-		//DrawSymbols();
+		DrawSymbols();
 	}
 }
