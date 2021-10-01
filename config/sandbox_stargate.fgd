@@ -36,9 +36,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_balloon : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -62,9 +62,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_bouncyball : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -88,9 +88,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = directional_gravity : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -114,9 +114,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_drone : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -174,9 +174,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = noise_test : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -200,9 +200,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_thruster : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -226,9 +226,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_wheel : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -312,9 +312,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_car : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -358,9 +358,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_dhd_milkyway : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	gate(string) { group = "Stargate" } : "Gate" :  : ""
@@ -385,9 +385,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_dhd_pegasus : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	gate(string) { group = "Stargate" } : "Gate" :  : ""
@@ -472,9 +472,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_stargate_milkyway : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -498,9 +498,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_stargate_movie : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -524,9 +524,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_stargate_pegasus : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =
@@ -550,9 +550,9 @@
 //
 @PointClass base(BaseProperties_sandbox_stargate) model() = ent_stargate_universe : ""
 [
-	model(resource:vmdl) { report = true }: "World Model" : "" : "The model this entity should use."
-	skin(materialgroup) { group="Rendering" } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
-	bodygroups(bodygroupchoices) { group="Rendering" } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
+	model(resource:vmdl) { report = true hide_when_solid = true }: "World Model" : "" : "The model this entity should use."
+	skin(materialgroup) { group = "Rendering" hide_when_solid = true } : "Skin" : "default" : "Some models have multiple versions of their textures, called skins." 
+	bodygroups(bodygroupchoices) { group = "Rendering" hide_when_solid = true } : "Body Groups" : "" : "Some models have multiple variations of certain items, such as characters having different hair styles, etc."
 	rendercolor(color255) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
 	renderamt(integer) [ group="Rendering" ] : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
 	collisiongroupoverride(choices) : "Collision Group Override" : -1 : "" =

@@ -65,7 +65,7 @@
 				[
 					{
 						_class = "PhysicsHullFile"
-						name = "sgc_ramp_physics"
+						name = "sgc_ramp_phys_new"
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_prop = "default"
@@ -75,10 +75,10 @@
 						align_origin_x_type = "None"
 						align_origin_y_type = "None"
 						align_origin_z_type = "None"
-						filename = "models/sbox_stargate/ramps/sgc_ramp/src/sgc_ramp_physics.smd"
+						filename = "models/sbox_stargate/ramps/sgc_ramp/src/sgc_ramp_phys_new.smd"
 						import_scale = 1.0
-						faceMergeAngle = 80.0
-						maxHullVertices = 64
+						faceMergeAngle = 5.0
+						maxHullVertices = 0
 						import_mode = "HullPerElement"
 						optimization_algorithm = "Exact"
 						import_filter = 
