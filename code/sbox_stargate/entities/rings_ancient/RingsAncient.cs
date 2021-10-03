@@ -1,6 +1,6 @@
 using Sandbox;
 
-[Library( "ent_rings_ancient", Title = "Rings (Ancient)", Spawnable = true, Group = "Stargate.Stargate" )]
+[Library( "ent_rings_ancient", Title = "Rings (Ancient)", Spawnable = true, Group = "Stargate.Rings" )]
 public partial class RingsAncient : Rings {
 	public override void Spawn()
 	{
