@@ -44,8 +44,6 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 		SetModel( RampAsset.Model );
 		Position += RampAsset.SpawnOffset;
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
-		foreach ( var offset in GateOffsets )
-			Log.Info( offset.Position );
 	}
 
 	public override void Spawn()

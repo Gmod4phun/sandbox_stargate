@@ -4,11 +4,12 @@
 	{
 		title = "Brick Ramp"
 		model = resource:"models/sbox_stargate/ramps/brick/brick.vmdl"
-		spawnoffset = [ 0.0, 0.0, 200.0 ]
+		spawnoffset = [ 0.0, 0.0, 160.0 ]
 		gateoffsets = 
 		[
 			{
 				forcekeep = true
+				position = [ 0.0, 0.0, -10.0 ]
 			},
 		]
 		dhdoffsets = [  ]

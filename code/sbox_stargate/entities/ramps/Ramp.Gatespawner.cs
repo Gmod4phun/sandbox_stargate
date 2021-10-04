@@ -17,6 +17,10 @@ public partial class Ramp : IGateSpawner
 		Position = Vector3.Parse( data.GetProperty( "Position" ).ToString() );
 		Rotation = Rotation.Parse( data.GetProperty( "Rotation" ).ToString() );
 		RampAsset = Resource.FromPath<RampAsset>( data.GetProperty( "RampAssetPath" ).ToString() );
+
+		SetModel( RampAsset.Model );
+		Position += RampAsset.SpawnOffset;
+		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 	}
 
 	public object ToJson()
@@ -24,6 +28,7 @@ public partial class Ramp : IGateSpawner
 		return new RampJsonModel()
 		{
 			RampAssetPath = RampAsset.Path,
+			EntityName = ClassInfo.Name,
 			Position = Position,
 			Rotation = Rotation
 		};
