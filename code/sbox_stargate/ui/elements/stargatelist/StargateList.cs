@@ -16,6 +16,7 @@ public partial class StargateList : Panel, ILeftSpawnMenuTab
 
 	private string[] categories = {
 		"Stargate",
+		"Rings",
 		"Weapons",
 		"Other"
 	};

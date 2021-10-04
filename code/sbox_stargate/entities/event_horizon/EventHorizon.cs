@@ -63,7 +63,7 @@ public partial class EventHorizon : AnimEntity
 
 	public async void Establish()
 	{
-		EstablishClientAnim(); // clientside animation stuff
+		EstablishClientAnim(To.Everyone); // clientside animation stuff
 
 		await Task.DelaySeconds( 1.5f );
 		if ( !this.IsValid() ) return;
@@ -73,7 +73,7 @@ public partial class EventHorizon : AnimEntity
 
 	public async void Collapse()
 	{
-		CollapseClientAnim(); // clientside animation stuff
+		CollapseClientAnim(To.Everyone); // clientside animation stuff
 
 		await Task.DelaySeconds( 1f );
 		if ( !this.IsValid() ) return;

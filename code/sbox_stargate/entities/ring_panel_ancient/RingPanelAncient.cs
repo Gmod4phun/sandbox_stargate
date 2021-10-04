@@ -1,6 +1,6 @@
 using Sandbox;
 
-[Library( "ent_rings_panel_ancient", Title = "Rings Panel (Ancient)", Spawnable = true, Group = "Stargate.Stargate" )]
+[Library( "ent_rings_panel_ancient", Title = "Rings Panel (Ancient)", Spawnable = true, Group = "Stargate.Rings" )]
 public partial class RingPanelAncient : RingPanel {
 
 	protected override string[] ButtonsSounds { get; } = { "ancient_button1", "ancient_button2" };
