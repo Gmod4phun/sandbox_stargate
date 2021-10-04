@@ -141,6 +141,7 @@ public partial class StargateMilkyWay : Stargate
 		base.OnStopDialingFinish();
 
 		SetChevronsGlowState( false );
+		ChevronAnimUnlockAll();
 	}
 
 	public override void OnStargateBeginOpen()
