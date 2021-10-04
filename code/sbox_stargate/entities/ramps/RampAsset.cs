@@ -37,6 +37,8 @@ public partial class RampAsset : Asset
 	[Property]
 	public string ControllerEntityClass { get; set; }
 
+	public bool HasController => !string.IsNullOrEmpty( ControllerEntityClass );
+
 
 	protected override void PostLoad()
 	{
