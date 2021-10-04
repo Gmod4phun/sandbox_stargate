@@ -20,6 +20,7 @@ public partial class Ramp : IGateSpawner
 
 		SetModel( RampAsset.Model );
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
+		PhysicsBody.MotionEnabled = false;
 	}
 
 	public object ToJson()
