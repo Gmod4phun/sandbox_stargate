@@ -19,7 +19,7 @@
       "Group": "M@",
       "Private": false,
       "AutoClose": true,
-      "Local": true,
+      "Local": false,
       "OnRamp": false,
       "EntityName": "ent_stargate_milkyway",
       "Position": "1902.504,1959.156,1.977",
@@ -73,7 +73,8 @@
       "Rotation": "0,0,0.9999466,0.01033017"
     },
     {
-      "EntityName": "ent_stargate_brick_ramp",
+      "RampAssetPath": "data/brick_ramp.sg_ramp",
+      "EntityName": "stargate_ramp",
       "Position": "-1502.111,2959.028,163.9883",
       "Rotation": "0.00000747062,0.000002231256,-0.707108,0.7071055"
     },
@@ -94,10 +95,11 @@
     {
       "EntityName": "ent_dhd_milkyway",
       "Position": "-1321.983,2787.92,0.03140259",
-      "Rotation": "0.06297838,0.1143277,-0.4783682,0.8684047"
+      "Rotation": "0.06297837,0.1143277,-0.4783682,0.8684047"
     },
     {
-      "EntityName": "ent_stargate_brick_ramp",
+      "RampAssetPath": "data/brick_ramp.sg_ramp",
+      "EntityName": "stargate_ramp",
       "Position": "1033.845,-3822.568,19.98826",
       "Rotation": "-0.0000005104531,-0.000001380297,0.7071071,0.7071065"
     },
@@ -107,11 +109,16 @@
       "Group": "P@",
       "Private": false,
       "AutoClose": true,
-      "Local": true,
+      "Local": false,
       "OnRamp": true,
       "EntityName": "ent_stargate_pegasus",
       "Position": "1033.845,-3822.568,9.98826",
       "Rotation": "-0.0000005104532,-0.000001380297,0.7071071,0.7071065"
+    },
+    {
+      "EntityName": "ent_dhd_pegasus",
+      "Position": "866.2261,-3572.103,-143.969",
+      "Rotation": "-0.09187635,0.09271377,0.6978697,0.7042305"
     }
   ]
 }
