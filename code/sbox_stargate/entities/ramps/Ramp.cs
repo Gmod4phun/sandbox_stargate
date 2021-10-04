@@ -67,4 +67,28 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 			Gates.Add( g );
 		}
 	}
+
+	public static Ramp GetClosest( Vector3 position, float max = -1f )
+	{
+		var ramps = All.OfType<Ramp>().Where( x => x.HasFreeGateSlots );
+
+		if ( !ramps.Any() ) return null;
+
+		float dist = -1f;
+		Ramp ramp = null;
+		foreach ( Ramp r in ramps )
+		{
+			var currDistance = position.Distance( r.Position );
+			if ( max != -1f && currDistance > max )
+				continue;
+
+			if ( dist == -1f || currDistance < dist )
+			{
+				dist = currDistance;
+				ramp = r;
+			}
+		}
+
+		return ramp;
+	}
 }
