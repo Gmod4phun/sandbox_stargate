@@ -19,7 +19,6 @@ public partial class Ramp : IGateSpawner
 		RampAsset = Resource.FromPath<RampAsset>( data.GetProperty( "RampAssetPath" ).ToString() );
 
 		SetModel( RampAsset.Model );
-		Position += RampAsset.SpawnOffset;
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
 	}
 
