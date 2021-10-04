@@ -19,6 +19,7 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 	[Net] public List<Rings> Rings { get; private set; } = new();
 	[Net] public List<Dhd> DHDs { get; private set; } = new();
 
+	#region Offset arrays and status accessors
 	public RampOffset[] GateOffsets => RampAsset.GateOffsets;
 	public int MaxGates => RampAsset.GateOffsets.Length;
 	public bool HasFreeGateSlots => Gates.Count < MaxGates;
@@ -34,13 +35,20 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 	public int MaxDHDs => RampAsset.DHDOffsets.Length;
 	public bool HasFreeDHDSlots => DHDs.Count < MaxDHDs;
 	public int NextFreeDHDSlot => DHDs.Count;
+	#endregion
 
+	[Net, Predicted] public RampController Controller { get; private set; }
 
 	public void SpawnFunction( Entity owner, TraceResult tr, string data )
 	{
 		if ( data == null )
 			return;
 		RampAsset = Resource.FromPath<RampAsset>( data );
+		if ( RampAsset.HasController )
+		{
+			Controller = Library.Create<RampController>( RampAsset.ControllerEntityClass );
+			Controller.Enabled = true;
+		}
 		SetModel( RampAsset.Model );
 		Position += RampAsset.SpawnOffset;
 		SetupPhysicsFromModel( PhysicsMotionType.Dynamic, true );
