@@ -25,6 +25,13 @@ public partial class Stargate : Prop, IUse
 		CLOSING
 	}
 
+	public enum GlyphType
+	{
+		MILKYWAY,
+		PEGASUS,
+		UNIVERSE
+	}
+
 	public enum TimedTaskCategory
 	{
 		GENERIC,

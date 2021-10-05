@@ -26,6 +26,8 @@ public partial class StargateUniverse : Stargate
 			{ "dial_fail", "gate_universe_dial_fail" }
 		};
 
+		GateGlyphType = GlyphType.UNIVERSE;
+
 		EventHorizonSkinGroup = 1;
 	}
 

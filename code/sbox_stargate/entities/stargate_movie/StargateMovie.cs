@@ -23,6 +23,9 @@ public partial class StargateMovie : StargateMilkyWay
 			{ "dial_fail_9chev", "gate_universe_9chev_dial_fail" }
 		};
 
+		GateGlyphType = GlyphType.MILKYWAY;
+		EarthPointOfOrigin = true;
+
 		MovieDialingType = true;
 		ChevronLightup = false;
 	}
@@ -39,7 +42,6 @@ public partial class StargateMovie : StargateMilkyWay
 		Ring.StopSoundOnSpinDown = true;
 
 		Ring.SetBodyGroup( 0, 1 );
-		Ring.EarthPointOfOrigin = true;
 	}
 
 	// CHEVRONS

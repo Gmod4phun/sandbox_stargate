@@ -195,6 +195,18 @@ public class StargateMenuV2 : Panel {
 		return table;
 	}
 
+	public string GetGlyphsFontForGate( Stargate gate )
+	{
+		var glyphs = gate.GateGlyphType;
+		var name = "concept";
+
+		if ( glyphs == GlyphType.MILKYWAY ) name = gate.EarthPointOfOrigin ? "concept" : "sg1";
+		else if ( glyphs == GlyphType.PEGASUS ) name = "sga";
+		else if ( glyphs == GlyphType.UNIVERSE ) name = "sgu";
+
+		return $"stargate-font {name}";
+	}
+
 	public void FillGates() {
 		Table table = GetTable();
 		// table.Rows.DeleteChildren(true);
@@ -209,7 +221,7 @@ public class StargateMenuV2 : Panel {
 
 			var address = GetOtherGateAddressForMenu( Gate, gate );
 
-			var td = panel.Add.Panel( "td stargate-font concept" );
+			var td = panel.Add.Panel( $"td {GetGlyphsFontForGate( Gate )}" );
 			td.AddChild<Label>().Text = address;
 
 			td = panel.Add.Panel( "td" );

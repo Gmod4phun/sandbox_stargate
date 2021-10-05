@@ -26,6 +26,8 @@ public partial class StargateMilkyWay : Stargate
 			{ "dial_begin_9chev", "gate_universe_9chev_dial_begin" },
 			{ "dial_fail_9chev", "gate_universe_9chev_dial_fail" }
 		};
+
+		GateGlyphType = GlyphType.MILKYWAY;
 	}
 
 	// SPAWN

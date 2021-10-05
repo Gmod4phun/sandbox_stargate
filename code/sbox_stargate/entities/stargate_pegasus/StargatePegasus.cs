@@ -28,6 +28,8 @@ public partial class StargatePegasus : Stargate
 			{ "chevron_dhd", "chevron_atlantis" },
 			{ "dial_fail", "dial_fail_atlantis" }
 		};
+
+		GateGlyphType = GlyphType.PEGASUS;
 	}
 
 	// SPAWN
