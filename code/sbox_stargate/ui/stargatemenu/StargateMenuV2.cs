@@ -200,7 +200,7 @@ public class StargateMenuV2 : Panel {
 		var glyphs = gate.GateGlyphType;
 		var name = "concept";
 
-		if ( glyphs == GlyphType.MILKYWAY ) name = gate.EarthPointOfOrigin ? "concept" : "sg1";
+		if ( glyphs == GlyphType.MILKYWAY ) name = "sg1";
 		else if ( glyphs == GlyphType.PEGASUS ) name = "sga";
 		else if ( glyphs == GlyphType.UNIVERSE ) name = "sgu";
 
@@ -220,9 +220,11 @@ public class StargateMenuV2 : Panel {
 			panel.AllowChildSelection = true;
 
 			var address = GetOtherGateAddressForMenu( Gate, gate );
+			var glyphAddress = address;
+			if ( Gate.GateGlyphType == GlyphType.MILKYWAY && Gate.EarthPointOfOrigin ) glyphAddress = glyphAddress.Replace( '#', '?' );
 
 			var td = panel.Add.Panel( $"td {GetGlyphsFontForGate( Gate )}" );
-			td.AddChild<Label>().Text = address;
+			td.AddChild<Label>().Text = glyphAddress;
 
 			td = panel.Add.Panel( "td" );
 			td.AddChild<Label>().Text = address;
