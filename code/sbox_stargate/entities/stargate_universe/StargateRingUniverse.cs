@@ -19,7 +19,7 @@ public partial class StargateRingUniverse : StargateRingMilkyWay
 		StartSoundName = "gate_universe_roll_long";
 		StopSoundName = "gate_universe_roll_stop";
 
-		RingSymbols = " ZB9J QNLMFVKO6 DCWY #R@S 8APU T7H5X4IG0 12E3";
+		RingSymbols = " ZB9J QNLM@VKO6 DCWY #RTS 8APU F7H5X4IG0 12E3";
 
 		RingMaxSpeed = 75f;
 		RingAccelStep = 1f;
@@ -81,7 +81,7 @@ public partial class StargateRingUniverse : StargateRingMilkyWay
 
 		var syms = new StringBuilder( RingSymbols );
 		syms = syms.Replace( " ", "" );
-		syms = syms.Replace( "F", "" );
+		syms = syms.Replace( "@", "" );
 		syms = syms.Replace( "X", "" );
 
 		return syms.ToString().IndexOf( sym );
