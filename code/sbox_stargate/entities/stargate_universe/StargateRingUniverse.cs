@@ -13,7 +13,6 @@ public partial class StargateRingUniverse : StargateRingMilkyWay
 
 	public StargateRingUniverse()
 	{
-		EarthPointOfOrigin = false;
 		StopSoundOnSpinDown = false;
 
 		StartSoundName = "gate_universe_roll_long";
