@@ -183,6 +183,12 @@ public abstract partial class Stargate : Prop, IUse
 
 	// DIALING -- please don't touch any of these, dialing is heavy WIP
 
+	public void MakeBusy( float duration )
+	{
+		Busy = true;
+		AddTask( Time.Now + duration, () => Busy = false, TimedTaskCategory.SET_BUSY );
+	}
+
 	public bool CanStargateOpen()
 	{
 		return ( !Busy && !Opening && !Open && !Closing );

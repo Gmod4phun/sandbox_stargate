@@ -35,7 +35,9 @@ public partial class Stargate : Prop, IUse
 	public enum TimedTaskCategory
 	{
 		GENERIC,
-		DIALING
+		DIALING,
+		SYMBOL_ROLL_PEGASUS_DHD,
+		SET_BUSY
 	}
 
 	// Timed Tasks
