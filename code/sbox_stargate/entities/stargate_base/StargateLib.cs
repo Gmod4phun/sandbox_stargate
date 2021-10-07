@@ -252,6 +252,8 @@ public partial class Stargate : Prop, IUse
 				// cant have 9 chevron connection between 2 universe or 2 non-universe gates
 				if ( !IsUniverseGate( gate ) && !IsUniverseGate( target ) ) target = null;
 				if ( IsUniverseGate( gate ) && IsUniverseGate( target ) ) target = null;
+
+				if ( gate.GateLocal || target.GateLocal ) target = null;
 			}
 		}
 		else if ( addrLen == 8 ) // 8 chevron connection - different group
@@ -266,9 +268,13 @@ public partial class Stargate : Prop, IUse
 		else // classic 7 chevron connection - must have same group, unless both are universe, they always use 7 symbols
 		{
 			target = FindByAddressOnly( address );
-			if ( !IsUniverseGate( gate ) && !IsUniverseGate( target ) )
+			if ( !IsUniverseGate( gate ) && !IsUniverseGate( target ) ) // both arent universe gates
 			{
 				if ( target.IsValid() && target.GateGroup != gate.GateGroup ) target = null; // if found gate does not have same group, its not valid
+			}
+			else if ( (IsUniverseGate( gate ) != IsUniverseGate( target )) ) // only one of them is universe gate and the other is not
+			{
+				target = null;
 			}
 		}
 

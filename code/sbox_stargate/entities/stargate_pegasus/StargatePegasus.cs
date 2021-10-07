@@ -523,13 +523,6 @@ public partial class StargatePegasus : Stargate
 		MakeBusy( rollTime );
 	}
 
-	public int GetChevronOrderOnGateFromChevronIndex(int index)
-	{
-		if ( index <= 3 ) return index;
-		if ( index >= 4 && index <= 7 ) return index + 2;
-		return index - 4;
-	}
-
 	public override void DoChevronUnlock( char sym )
 	{
 		base.DoChevronUnlock( sym );

@@ -377,6 +377,12 @@ public abstract partial class Stargate : Prop, IUse
 	}
 
 	// CHEVRON
+	public int GetChevronOrderOnGateFromChevronIndex( int index )
+	{
+		if ( index <= 3 ) return index;
+		if ( index >= 4 && index <= 7 ) return index + 2;
+		return index - 4;
+	}
 
 	public virtual void DoChevronEncode(char sym)
 	{
