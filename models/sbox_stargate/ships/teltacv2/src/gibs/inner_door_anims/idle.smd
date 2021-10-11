@@ -1,0 +1,11 @@
+// Created by Crowbar 0.71
+version 1
+nodes
+  0 "InnerDoorRightBone" -1
+  1 "InnerDoorLeftBone" -1
+end
+skeleton
+  time 0
+    0 15.093750 206.625000 94.687500 0.000000 0.000000 1.567413
+    1 -15.828125 206.625000 94.687500 0.000000 0.000000 1.567413
+end
