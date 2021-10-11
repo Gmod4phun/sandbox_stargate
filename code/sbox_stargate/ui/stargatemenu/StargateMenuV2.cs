@@ -7,35 +7,42 @@ using Sandbox.UI.Tests;
 using static Stargate;
 
 [UseTemplate]
-public class StargateMenuV2 : Panel {
+public class StargateMenuV2 : Panel
+{
 
 	private Stargate Gate;
 	private Dhd DHD;
 
 	private string _gateAddress = "";
-	public string GateAddress {
-		get {
+	public string GateAddress
+	{
+		get
+		{
 			return _gateAddress;
 		}
-		set {
-			if (_gateAddress == value)
+		set
+		{
+			if ( _gateAddress == value )
 				return;
 			_gateAddress = value;
-			if (_gateAddress.Length == 6)
-				Stargate.RequestAddressChange(Gate.NetworkIdent, _gateAddress);
+			if ( _gateAddress.Length == 6 )
+				Stargate.RequestAddressChange( Gate.NetworkIdent, _gateAddress );
 		}
 	}
 
 	private string _gateName = "";
-	public string GateName {
-		get {
+	public string GateName
+	{
+		get
+		{
 			return _gateName;
 		}
-		set {
-			if (_gateName == value)
+		set
+		{
+			if ( _gateName == value )
 				return;
 			_gateName = value;
-			Stargate.RequestNameChange(Gate.NetworkIdent, _gateName);
+			Stargate.RequestNameChange( Gate.NetworkIdent, _gateName );
 		}
 	}
 
@@ -56,12 +63,15 @@ public class StargateMenuV2 : Panel {
 	}
 
 	private bool _isPrivate = false;
-	public bool IsPrivate {
-		get {
+	public bool IsPrivate
+	{
+		get
+		{
 			return _isPrivate;
 		}
-		set {
-			if (_isPrivate == value)
+		set
+		{
+			if ( _isPrivate == value )
 				return;
 
 			_isPrivate = value;
@@ -88,17 +98,20 @@ public class StargateMenuV2 : Panel {
 	}
 
 	private bool _autoClose = false;
-	public bool AutoClose {
-		get {
+	public bool AutoClose
+	{
+		get
+		{
 			return _autoClose;
 		}
-		set {
-			if (_autoClose == value)
+		set
+		{
+			if ( _autoClose == value )
 				return;
 
 			_autoClose = value;
 
-			Stargate.SetAutoClose(Gate.NetworkIdent, _autoClose);
+			Stargate.SetAutoClose( Gate.NetworkIdent, _autoClose );
 		}
 	}
 
@@ -107,10 +120,12 @@ public class StargateMenuV2 : Panel {
 	public string DialAddress { get; set; }
 
 	private string _searchFilter = "";
-	public string SearchFilter {
+	public string SearchFilter
+	{
 		get => _searchFilter;
-		set {
-			if (_searchFilter == value)
+		set
+		{
+			if ( _searchFilter == value )
 				return;
 
 			_searchFilter = value;
@@ -121,12 +136,13 @@ public class StargateMenuV2 : Panel {
 
 	private Titlebar menuBar;
 
-	public StargateMenuV2(Stargate gate, Dhd dhd = null) {
+	public StargateMenuV2( Stargate gate, Dhd dhd = null )
+	{
 
 		StyleSheet.Load( "sbox_stargate/ui/stargatemenu/StargateMenuV2.scss" );
 
 		menuBar = AddChild<Titlebar>();
-		menuBar.SetTitle(true, "Stargate");
+		menuBar.SetTitle( true, "Stargate" );
 		menuBar.SetCloseButton( true, "X", () => CloseMenu() );
 
 		SetGate( gate );
@@ -164,14 +180,16 @@ public class StargateMenuV2 : Panel {
 
 	}
 
-	public void SetGate(Stargate gate) {
+	public void SetGate( Stargate gate )
+	{
 		this.Gate = gate;
 		FillGates();
 		RefreshGateInformation();
 	}
 
-	[Event("stargate.refreshgateinformation")]
-	private void RefreshGateInformation() {
+	[Event( "stargate.refreshgateinformation" )]
+	private void RefreshGateInformation()
+	{
 		GateAddress = Gate.GateAddress;
 		GateName = Gate.GateName;
 		GateGroup = Gate.GateGroup;
@@ -182,11 +200,14 @@ public class StargateMenuV2 : Panel {
 		FillGates();
 	}
 
-	private Table GetTable() {
+	private Table GetTable()
+	{
 		Table table = null;
-		foreach (Panel c in Children) {
+		foreach ( Panel c in Children )
+		{
 			var tables = c.ChildrenOfType<Table>();
-			if ( tables.Any() ) {
+			if ( tables.Any() )
+			{
 				table = tables.First();
 				break;
 			}
@@ -200,19 +221,20 @@ public class StargateMenuV2 : Panel {
 		var glyphs = gate.GateGlyphType;
 		var name = "concept";
 
-		if ( glyphs == GlyphType.MILKYWAY ) name = gate.EarthPointOfOrigin ? "concept" : "sg1";
+		if ( glyphs == GlyphType.MILKYWAY ) name = "sg1";
 		else if ( glyphs == GlyphType.PEGASUS ) name = "sga";
 		else if ( glyphs == GlyphType.UNIVERSE ) name = "sgu";
 
 		return $"stargate-font {name}";
 	}
 
-	public void FillGates() {
+	public void FillGates()
+	{
 		Table table = GetTable();
 		// table.Rows.DeleteChildren(true);
 		table.Rows.Clear();
 		table.Rows.Layout.Columns = 1;
-		table.Rows.Layout.ItemSize = new Vector2(-1, 30);
+		table.Rows.Layout.ItemSize = new Vector2( -1, 40 );
 		table.Rows.OnCreateCell = ( cell, data ) =>
 		{
 			var gate = (Stargate)data;
@@ -220,9 +242,11 @@ public class StargateMenuV2 : Panel {
 			panel.AllowChildSelection = true;
 
 			var address = GetOtherGateAddressForMenu( Gate, gate );
+			var glyphAddress = address;
+			if ( Gate.GateGlyphType == GlyphType.MILKYWAY && Gate.EarthPointOfOrigin ) glyphAddress = glyphAddress.Replace( '#', '?' );
 
 			var td = panel.Add.Panel( $"td {GetGlyphsFontForGate( Gate )}" );
-			td.AddChild<Label>().Text = address;
+			td.AddChild<Label>().Text = glyphAddress;
 
 			td = panel.Add.Panel( "td" );
 			td.AddChild<Label>().Text = address;
@@ -230,24 +254,28 @@ public class StargateMenuV2 : Panel {
 			td = panel.Add.Panel( "td" );
 			td.AddChild<Label>().Text = gate.GateName;
 
-			panel.AddEventListener( "onclick", () => {
+			panel.AddEventListener( "onclick", () =>
+			{
 				DialAddress = address;
-			});
+			} );
 
-			panel.AddEventListener( "ondoubleclick", () => {
+			panel.AddEventListener( "ondoubleclick", () =>
+			{
 				DialAddress = address;
 				OpenGate();
-			});
+			} );
 		};
 
 		// list gates that arent private
-		List<Stargate> gates = Entity.All.OfType<Stargate>().Where(x => x.GateAddress != Gate.GateAddress && !x.GatePrivate).ToList();
+		List<Stargate> gates = Entity.All.OfType<Stargate>().Where( x => x.GateAddress != Gate.GateAddress && !x.GatePrivate ).ToList();
 
-		if (SearchFilter != null && SearchFilter != "") {
-			gates = gates.Where( x => x.GateAddress.Contains(SearchFilter) || (x.GateName != null && x.GateName != "" && x.GateName.Contains(SearchFilter)) ).ToList();
+		if ( SearchFilter != null && SearchFilter != "" )
+		{
+			gates = gates.Where( x => x.GateAddress.Contains( SearchFilter ) || (x.GateName != null && x.GateName != "" && x.GateName.Contains( SearchFilter )) ).ToList();
 		}
 
-		foreach (Stargate gate in gates) {
+		foreach ( Stargate gate in gates )
+		{
 			if ( Gate.GateLocal && Gate.GateGroup != gate.GateGroup ) continue;
 
 			// only show other gate if both gates have same group, or a different group but both are not local
@@ -264,12 +292,14 @@ public class StargateMenuV2 : Panel {
 	//	FillGates( refresh == "true" );
 	//}
 
-	public void OpenGate() {
-		Stargate.RequestDial(FastDial ? DialType.FAST : DialType.SLOW, DialAddress, Gate.NetworkIdent);
+	public void OpenGate()
+	{
+		Stargate.RequestDial( FastDial ? DialType.FAST : DialType.SLOW, DialAddress, Gate.NetworkIdent );
 	}
 
-	public void CloseGate() {
-		Stargate.RequestClose(Gate.NetworkIdent);
+	public void CloseGate()
+	{
+		Stargate.RequestClose( Gate.NetworkIdent );
 	}
 
 }

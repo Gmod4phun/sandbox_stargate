@@ -1,30 +1,23 @@
 .stargate-font {
-
-
     &.sg1 {
-        font-family: sbox_stargate/stargate_sg1;
-        font-size: 15px;
-    }
-
-    &.concept {
-        font-family: sbox_stargate/stargate_concept;
-        font-size: 15px;
+        font-family: sbox_stargate/stargate_sg1_edit;
+        font-size: 19px;
     }
 
     &.sga {
         font-family: sbox_stargate/stargate_atlantis;
-        font-size: 18px;
+        font-size: 23px;
     }
 
     &.sgu {
         font-family: sbox_stargate/stargate_universe;
-        font-size: 44px;
+        font-size: 60px;
     }
 }
 
 stargatemenuv2 {
-    width: 700px;
-    height: 350px;
+    width: 800px;
+    height: 450px;
     background-color: rgba(0, 0, 0, 0.95);
     position: absolute;
     top: 10%;
@@ -63,7 +56,7 @@ stargatemenuv2 {
             height: 20px;
             width: 100px;
             color: black;
-            cursor: pointer;            
+            cursor: pointer;
 
             &.open {
                 background-color: lightgray;
@@ -105,7 +98,7 @@ stargatemenuv2 {
     .options {
         height: 100%;
         width: 30%;
-        margin-right: 5%;
+        margin-right: 2.5%;
         display: flex;
         flex-direction: column;
         padding: 5px;
@@ -117,7 +110,7 @@ stargatemenuv2 {
 
     .dialing {
         height: 100%;
-        width: 65%;
+        width: 67.5%;
 
         display: flex;
         flex-direction: column;
@@ -142,68 +135,68 @@ stargatemenuv2 {
             background-color: lightgray;
             display: flex;
             flex-direction: column-reverse;
-        
+
             .table-head {
                 // position: sticky;
                 top: 0;
                 width: 100%;
-                height: 25px;
+                height: 30px;
                 background-color: lightgray;
                 display: flex;
                 flex-direction: row;
                 border-bottom: 1px solid black;
-        
+
                 .head-column {
                     background-color: gray;
                     color: black;
-                    width: 150px;
-                    height: 22px;
+                    width: 180px;
+                    height: 27px;
                     justify-content: center;
                     align-items: center;
                     font-weight: 800;
                     border-right: 1px solid black;
                     cursor: pointer;
-        
+
                     &:last-child {
                         border: 0;
                     }
-        
+
                     &:hover {
                         background-color: darkgray;
                     }
                 }
             }
-        
+
             .table-rows {
                 width: 100%;
                 height: 100%;
                 overflow: scroll;
-        
+
                 .row {
                     border-bottom: 1px solid black;
                     width: 100%;
-                    height: 30px;
+                    height: 40px;
                     display: flex;
                     flex-direction: row;
-                    flex-grow: 0;
+                    flex-grow: 1;
                     cursor: pointer;
                     font-size: 16px;
-        
+
                     .td {
-                        width: 148.3px;
+                        width: 180.3px;
                         height: 100%;
                         border-right: 1px solid black;
                         align-items: center;
                         justify-content: center;
                         text-align: center;
-        
+
                         &:last-child {
                             border-right: 0;
                         }
                     }
-        
+
                     &:hover {
-                        background-color:rgba(0, 0, 0, 0.1);
+                        background-color: rgba(0, 0, 0, 0.1);
                     }
                 }
             }

@@ -69,6 +69,11 @@ public partial class StargateRingPegasus : ModelEntity
 		return num.UnsignedMod( 36 );
 	}
 
+	public int GetSymbolNumFromChevron(int chevNum)
+	{
+		return GetSymbolNum((4 * chevNum) - 1);
+	}
+
 	public async void SetSymbolState(int num, bool state, float delay = 0)
 	{
 		if (delay > 0)
@@ -118,10 +123,17 @@ public partial class StargateRingPegasus : ModelEntity
 		catch (Exception) { }
 	}
 
-	public void ResetSymbols()
+	public void ResetSymbols(bool clearDialActive = true)
 	{
 		for ( int i = 0; i <= 35; i++ )	SetSymbolState( i, false );
-		DialSequenceActiveSymbols.Clear();
+		if ( clearDialActive ) DialSequenceActiveSymbols.Clear();
+	}
+
+	public void ResetSymbol( int num, bool clearDialActive = true )
+	{
+		Log.Info( $"Reset symbol with index {num}" );
+		SetSymbolState( num, false );
+		if ( clearDialActive ) DialSequenceActiveSymbols.Remove( num );
 	}
 
 	public void LightupSymbols()
@@ -177,6 +189,11 @@ public partial class StargateRingPegasus : ModelEntity
 
 		}
 		catch ( Exception ) { }
+	}
+
+	public void DoSymbolsInboundInstant()
+	{
+		for ( int i = 0; i <= 35; i++ ) SetSymbolState( i, true );
 	}
 
 	// SLOWDIAL
@@ -256,6 +273,28 @@ public partial class StargateRingPegasus : ModelEntity
 				var chevTaskTime = startTime + (symRollTime + delayBetweenSymbols) * (i_copy + 1) - delayBetweenSymbols;
 				Gate.AddTask( chevTaskTime, () => Gate.ChevronActivate( Gate.GetChevronBasedOnAddressLength( i_copy + 1, chevCount ), 0, i_copy == chevCount - 1 ? validCheck() : true, i_copy == chevCount - 1 ), Stargate.TimedTaskCategory.DIALING );
 			}
+		}
+		catch ( Exception ) { }
+	}
+
+	public void RollSymbolDHDFast( int chevCount, Func<bool> validCheck, int chevNum, float symRollTime )
+	{
+		try
+		{
+			var dataSymbols7 = new List<int>() { 27, 19, 35, 35, 15, 7, 23 };
+			var dataSymbols8 = new List<int>() { 27, 19, 35, 35, 15, 7, 3, 11 };
+			var dataSymbols9 = new List<int>() { 27, 19, 35, 35, 15, 7, 3, 31, 23 };
+
+			var data = (chevCount == 9) ? dataSymbols9 : ((chevCount == 8) ? dataSymbols8 : dataSymbols7);
+
+			var isLast = chevNum == chevCount;
+
+			var startTime = Time.Now;
+			var symTaskTime = startTime;
+			Gate.AddTask( symTaskTime, () => RollSymbol( data[chevNum - 1], 12, (chevNum - 1) % 2 == 1, symRollTime ), Stargate.TimedTaskCategory.SYMBOL_ROLL_PEGASUS_DHD );
+
+			var chevTaskTime = startTime + symRollTime;
+			Gate.AddTask( chevTaskTime, () => Gate.ChevronActivateDHD( Gate.GetChevronBasedOnAddressLength( chevNum, chevCount ), 0, isLast ? validCheck() : true ), Stargate.TimedTaskCategory.SYMBOL_ROLL_PEGASUS_DHD );
 		}
 		catch ( Exception ) { }
 	}

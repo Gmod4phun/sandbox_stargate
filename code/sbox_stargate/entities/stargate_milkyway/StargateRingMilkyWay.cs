@@ -47,8 +47,6 @@ public partial class StargateRingMilkyWay : PlatformEntity
 
 	public bool StopSoundOnSpinDown = false; // play the stopsound on spindown, or on spin stop
 
-	public bool EarthPointOfOrigin { get; set; } = false;
-
 	public override void Spawn()
 	{
 		Transmit = TransmitType.Always;
@@ -165,7 +163,7 @@ public partial class StargateRingMilkyWay : PlatformEntity
 	// helper calcs
 	public virtual float GetDesiredRingAngleForSymbol( char sym, int angOffset = 0 )
 	{
-		if ( sym is '#' && EarthPointOfOrigin ) sym = '?';
+		if ( sym is '#' && (Gate.IsValid() && Gate.EarthPointOfOrigin) ) sym = '?';
 
 		// get the symbol's position on the ring
 		var symPos = GetSymbolPosition( sym );
