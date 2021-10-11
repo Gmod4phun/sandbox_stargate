@@ -25,6 +25,8 @@ public partial class Rings : AnimEntity, IUse
 
 	public bool Busy { get; protected set; }
 
+	public Ramp Ramp {  get; set; }
+
 	protected bool IsUpsideDown
 	{
 		get

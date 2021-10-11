@@ -40,6 +40,8 @@ public abstract partial class Dhd : Prop
 	[Net]
 	public List<int> ButtonSkins { get; set; } = new List<int> { 0, 1 };
 
+	public Ramp Ramp { get; set; }
+
 
 	public override void Spawn()
 	{
