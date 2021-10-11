@@ -245,7 +245,7 @@
 					{
 						_class = "Bone"
 						name = "pilot_chair"
-						origin = [ 501.467834, -37.01239, 64.266487 ]
+						origin = [ 503.570618, -37.01239, 58.436417 ]
 						angles = [ 0.0, 0.0, 0.0 ]
 						do_not_discard = true
 					},

@@ -40,6 +40,25 @@
 						import_filter = 
 						{
 							exclude_by_default = false
+							exception_list = 
+							[
+								"gib_chair",
+							]
+						}
+					},
+					{
+						_class = "RenderMeshFile"
+						filename = "models/sbox_stargate/ships/teltacv2/src/teltac_seat.smd"
+						import_translation = [ 0.0, 0.0, 25.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = false
 							exception_list = [  ]
 						}
 					},
@@ -51,7 +70,7 @@
 				[
 					{
 						_class = "PhysicsHullFromRender"
-						parent_bone = "chair"
+						parent_bone = ""
 						surface_prop = "default"
 						collision_prop = "default"
 						faceMergeAngle = 20.0
