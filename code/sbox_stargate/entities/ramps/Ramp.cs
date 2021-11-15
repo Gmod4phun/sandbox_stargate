@@ -16,7 +16,7 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 	[Net] public RampAsset RampAsset { get; private set; }
 
 	[Net] public List<Stargate> Gates { get; private set; } = new();
-	[Net] public List<Rings> Rings { get; private set; } = new();
+	[Net] public List<Rings> TRings { get; private set; } = new();
 	[Net] public List<Dhd> DHDs { get; private set; } = new();
 
 	#region Offset arrays and status accessors
@@ -27,8 +27,8 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 
 	public RampOffset[] RingOffsets => RampAsset.RingOffsets;
 	public int MaxRings => RampAsset.RingOffsets.Length;
-	public bool HasFreeRingSlots => Rings.Count < MaxRings;
-	public int NextFreeRingSlot => Rings.Count;
+	public bool HasFreeRingSlots => TRings.Count < MaxRings;
+	public int NextFreeRingSlot => TRings.Count;
 
 	public RampOffset[] DHDOffsets => RampAsset.DHDOffsets;
 
@@ -61,7 +61,7 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 
 	public void PositionObject( Entity ent )
 	{
-		if (ent is Stargate g )
+		/*if (ent is Stargate g )
 		{
 			if ( !HasFreeGateSlots )
 				return;
@@ -73,7 +73,40 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 			g.Ramp = this;
 
 			Gates.Add( g );
+		}*/
+		RampOffset Slot;
+		switch ( ent )
+		{
+			case Stargate g:
+				if ( !HasFreeGateSlots )
+					return;
+				Slot = GateOffsets[NextFreeGateSlot];
+				g.Ramp = this;
+				Gates.Add( g );
+				break;
+			case Rings r:
+				if ( !HasFreeRingSlots )
+					return;
+				Slot = RingOffsets[NextFreeRingSlot];
+				r.Ramp = this;
+				TRings.Add( r );
+				break;
+			case Dhd d:
+				if ( !HasFreeDHDSlots )
+					return;
+				Slot = DHDOffsets[NextFreeRingSlot];
+				d.Ramp = this;
+				DHDs.Add( d );
+				break;
+			default:
+				return;
 		}
+
+		var rot = Slot.Rotation;
+		ent.Position = Transform.PointToWorld( Slot.Position );
+		ent.Rotation = Transform.RotationToWorld( Rotation.From( new Angles( rot.x, rot.y, rot.z ) ) );
+		ent.SetParent( this );
+
 	}
 
 	public static Ramp GetClosest( Vector3 position, float max = -1f )
