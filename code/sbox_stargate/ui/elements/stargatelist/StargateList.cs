@@ -35,7 +35,8 @@ public partial class StargateList : Panel, ILeftSpawnMenuTab
 			var can = AddChild<VirtualScrollPanel>("canvas");
 
 			can.Layout.AutoColumns = true;
-			can.Layout.ItemSize = new Vector2( 120, 120 );
+			can.Layout.ItemHeight = 120;
+			can.Layout.ItemWidth = 120;
 			can.OnCreateCell = ( cell, data ) =>
 			{
 				var entry = (LibraryAttribute)data;
@@ -43,10 +44,7 @@ public partial class StargateList : Panel, ILeftSpawnMenuTab
 				var btn = cell.Add.Button( entry.Title );
 				btn.AddClass( "icon" );
 				btn.AddEventListener( "onclick", () => ConsoleSystem.Run( "spawn_entity", entry.Name ) );
-				btn.Style.Background = new PanelBackground
-				{
-					Texture = Texture.Load( $"/entity/sbox_stargate/{entry.Name}.png", false )
-				};
+				btn.Style.BackgroundImage = Texture.Load( $"/entity/sbox_stargate/{entry.Name}.png", false );
 			};
 
 			CategoriesCanvas.Add(cat, can);
@@ -67,17 +65,15 @@ public partial class StargateList : Panel, ILeftSpawnMenuTab
 		Add.Label( "Ramps", "category" );
 		Ramps = AddChild<VirtualScrollPanel>( "canvas" );
 		Ramps.Layout.AutoColumns = true;
-		Ramps.Layout.ItemSize = new Vector2( 120, 120 );
+		Ramps.Layout.ItemHeight = 120;
+		Ramps.Layout.ItemWidth = 120;
 		Ramps.OnCreateCell = ( cell, data ) =>
 		{
 			var entry = (RampAsset)data;
 			var btn = cell.Add.Button( entry.Title );
 			btn.AddClass( "icon" );
 			btn.AddEventListener( "onclick", () => ConsoleSystem.Run( "spawn_entity", "stargate_ramp", entry.Path ) );
-			btn.Style.Background = new PanelBackground
-			{
-				Texture = Texture.Load( $"/entity/sbox_stargate/{entry.Name}.png", false )
-			};
+			btn.Style.BackgroundImage = Texture.Load( $"/entity/sbox_stargate/{entry.Name}.png", false );
 		};
 
 		CategoriesCanvas.Add( "Ramps", Ramps );

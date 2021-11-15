@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Sandbox;
 
 public abstract partial class Dhd : Prop
@@ -24,7 +25,7 @@ public abstract partial class Dhd : Prop
 	public DhdData Data { get; set; } = new( 0, 1, "dhd_sg1_press", "dhd_dial" );
 
 	[Net]
-	[Property( Name = "Gate", Group = "Stargate" )]
+	[Property( Name = "Gate"), Category("Stargate")]
 	public Stargate Gate { get; set; }
 
 	protected readonly string ButtonSymbols = "ABCDEFGHI0123456789STUVWXYZ@JKLMNO#PQR";
