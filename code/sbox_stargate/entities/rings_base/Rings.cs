@@ -25,6 +25,8 @@ public partial class Rings : AnimEntity, IUse
 
 	public bool Busy { get; protected set; }
 
+	public Ramp Ramp {  get; set; }
+
 	protected bool IsUpsideDown
 	{
 		get
@@ -477,6 +479,8 @@ public partial class Rings : AnimEntity, IUse
 
 	protected override void OnDestroy()
 	{
+		if ( Ramp != null ) Ramp.TRings.Remove( this );
+
 		if ( DestinationRings.IsValid() )
 			DestinationRings.RetractRings();
 	}

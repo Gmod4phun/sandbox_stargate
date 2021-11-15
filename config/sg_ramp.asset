@@ -1,0 +1,21 @@
+// 
+// RampAsset
+// 
+@struct = RampOffset :
+[
+	position(vector) : "Position" : "0 0 0"
+	rotation(vector) : "Rotation" : "0 0 0"
+	forcekeep(bool) : "Force Keep" : "true"
+]
+
+@BaseClass = sg_ramp : ""
+[
+	title(string) : "Title" :  : ""
+	model(resource:vmdl) : "Model" :  : ""
+	spawnoffset(vector) : "Spawn Offset" :  : ""
+	gateoffsets(array:struct:RampOffset) : "Gate Offsets"
+	dhdoffsets(array:struct:RampOffset) : "DHD Offsets"
+	ringoffsets(array:struct:RampOffset) : "Ring Offsets"
+	controllerentityclass(string) : "Controller Entity Class"
+]
+

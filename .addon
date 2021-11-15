@@ -1,5 +1,4 @@
 {
 	"sharedassets": "*.*",
-	"type": "game",
-	"ident": "gmod4phun.sandbox_stargate"
+	"type": "game"
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Sandbox;
 
 public abstract partial class Dhd : Prop
@@ -24,7 +25,7 @@ public abstract partial class Dhd : Prop
 	public DhdData Data { get; set; } = new( 0, 1, "dhd_sg1_press", "dhd_dial" );
 
 	[Net]
-	[Property( Name = "Gate", Group = "Stargate" )]
+	[Property( Name = "Gate"), Category("Stargate")]
 	public Stargate Gate { get; set; }
 
 	protected readonly string ButtonSymbols = "ABCDEFGHI0123456789STUVWXYZ@JKLMNO#PQR";
@@ -40,6 +41,8 @@ public abstract partial class Dhd : Prop
 	[Net]
 	public List<int> ButtonSkins { get; set; } = new List<int> { 0, 1 };
 
+	public Ramp Ramp { get; set; }
+
 
 	public override void Spawn()
 	{
@@ -48,6 +51,11 @@ public abstract partial class Dhd : Prop
 		PostSpawn();
 	}
 
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+		if ( Ramp != null ) Ramp.DHDs.Remove( this );
+	}
 	public virtual async void PostSpawn()
 	{
 		await GameTask.NextPhysicsFrame();

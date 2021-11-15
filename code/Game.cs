@@ -54,7 +54,7 @@ partial class SandboxGame : Game
 	}
 
 	[ServerCmd( "spawn_entity" )]
-	public static void SpawnEntity( string entName )
+	public static void SpawnEntity( string entName, string data = null )
 	{
 		var owner = ConsoleSystem.Caller.Pawn;
 
@@ -85,6 +85,11 @@ partial class SandboxGame : Game
 		ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw + 180f, 0 ) );
 		ent.Owner = owner;
 
+		if (ent is ISpawnFunction x )
+		{
+			x.SpawnFunction( owner, tr, data );
+		}
+
 		if ( attribute.Group != null && attribute.Group.Contains("Stargate")) // spawn offsets for Stargate stuff
 		{
 			var type = ent.GetType();
@@ -101,13 +106,8 @@ partial class SandboxGame : Game
 			}
 			
 		}
+		if ( tr.Entity is Ramp newRamp ) newRamp.PositionObject( ent );
 
-		if (ent is Stargate gate) // gate ramps
-		{
-			if (tr.Entity is IStargateRamp ramp) Stargate.PutGateOnRamp( gate, ramp );
-		}
-
-		//Log.Info( $"ent: {ent}" );
 	}
 
 	public override void DoPlayerNoclip( Client player )

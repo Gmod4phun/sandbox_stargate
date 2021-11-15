@@ -8,6 +8,10 @@ using System.Linq;
 [Library(Title = "Stargate Addon")]
 public partial class StargateList : Panel, ILeftSpawnMenuTab
 {
+	public static StargateList Current { get; private set; }
+
+	public VirtualScrollPanel Ramps;
+
 	VirtualScrollPanel Canvas;
 
 	private string[] categories = {
@@ -19,6 +23,7 @@ public partial class StargateList : Panel, ILeftSpawnMenuTab
 
 	public StargateList()
 	{
+		Current = this;
 		AddClass( "spawnpage" );
 
 		StyleSheet.Load( "sbox_stargate/ui/elements/stargatelist/stargatelist.scss" );
@@ -30,7 +35,8 @@ public partial class StargateList : Panel, ILeftSpawnMenuTab
 			var can = AddChild<VirtualScrollPanel>("canvas");
 
 			can.Layout.AutoColumns = true;
-			can.Layout.ItemSize = new Vector2( 120, 120 );
+			can.Layout.ItemHeight = 120;
+			can.Layout.ItemWidth = 120;
 			can.OnCreateCell = ( cell, data ) =>
 			{
 				var entry = (LibraryAttribute)data;
@@ -38,10 +44,7 @@ public partial class StargateList : Panel, ILeftSpawnMenuTab
 				var btn = cell.Add.Button( entry.Title );
 				btn.AddClass( "icon" );
 				btn.AddEventListener( "onclick", () => ConsoleSystem.Run( "spawn_entity", entry.Name ) );
-				btn.Style.Background = new PanelBackground
-				{
-					Texture = Texture.Load( $"/entity/sbox_stargate/{entry.Name}.png", false )
-				};
+				btn.Style.BackgroundImage = Texture.Load( $"/entity/sbox_stargate/{entry.Name}.png", false );
 			};
 
 			CategoriesCanvas.Add(cat, can);
@@ -57,8 +60,27 @@ public partial class StargateList : Panel, ILeftSpawnMenuTab
 			} else {
 				CategoriesCanvas["Other"].AddItem( entry );
 			}
+		}
 
-			// Canvas.AddItem( entry );
+		Add.Label( "Ramps", "category" );
+		Ramps = AddChild<VirtualScrollPanel>( "canvas" );
+		Ramps.Layout.AutoColumns = true;
+		Ramps.Layout.ItemHeight = 120;
+		Ramps.Layout.ItemWidth = 120;
+		Ramps.OnCreateCell = ( cell, data ) =>
+		{
+			var entry = (RampAsset)data;
+			var btn = cell.Add.Button( entry.Title );
+			btn.AddClass( "icon" );
+			btn.AddEventListener( "onclick", () => ConsoleSystem.Run( "spawn_entity", "stargate_ramp", entry.Path ) );
+			btn.Style.BackgroundImage = Texture.Load( $"/entity/sbox_stargate/{entry.Name}.png", false );
+		};
+
+		CategoriesCanvas.Add( "Ramps", Ramps );
+
+		foreach ( RampAsset ramp in RampAsset.All )
+		{
+			CategoriesCanvas["Ramps"].AddItem( ramp );
 		}
 	}
 }

@@ -12,8 +12,10 @@ public class StargateMilkyWayJsonModel : StargateJsonModel
 		Rotation = parent.Rotation;
 		Name = parent.Name;
 		Address = parent.Address;
+		Group = parent.Group;
 		Private = parent.Private;
 		AutoClose = parent.AutoClose;
+		Local = parent.Local;
 		OnRamp = parent.OnRamp;
 	}
 
