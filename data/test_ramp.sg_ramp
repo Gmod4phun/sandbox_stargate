@@ -1,0 +1,29 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	data = 
+	{
+		title = "Test Ramp"
+		model = resource:"models/sbox_stargate/ramps/sgu_ramp/sgu_ramp.vmdl"
+		spawnoffset = [ 0.0, 0.0, 0.0 ]
+		gateoffsets = 
+		[
+			{
+				position = [ -108.75, 0.0, 135.0 ]
+			},
+		]
+		dhdoffsets = 
+		[
+			{
+				position = [ 0.0, 0.0, 100.0 ]
+				rotation = [ 0.0, 120.0, 0.0 ]
+			},
+		]
+		ringoffsets = 
+		[
+			{
+				position = [ 0.0, -200.0, 0.0 ]
+			},
+		]
+		controllerentityclass = "SkinChangingRampController"
+	}
+}
