@@ -37,7 +37,7 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 	public int NextFreeDHDSlot => DHDs.Count;
 	#endregion
 
-	[Net, Predicted] public RampController Controller { get; private set; }
+	public RampController Controller { get; private set; }
 
 	public void SpawnFunction( Entity owner, TraceResult tr, string data )
 	{
@@ -47,6 +47,7 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 		if ( RampAsset.HasController )
 		{
 			Controller = Library.Create<RampController>( RampAsset.ControllerEntityClass );
+			Components.Add( Controller );
 			Controller.Enabled = true;
 		}
 		SetModel( RampAsset.Model );
