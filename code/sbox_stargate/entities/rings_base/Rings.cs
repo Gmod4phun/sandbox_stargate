@@ -479,6 +479,8 @@ public partial class Rings : AnimEntity, IUse
 
 	protected override void OnDestroy()
 	{
+		if ( Ramp != null ) Ramp.TRings.Remove( this );
+
 		if ( DestinationRings.IsValid() )
 			DestinationRings.RetractRings();
 	}

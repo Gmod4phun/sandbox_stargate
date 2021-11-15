@@ -95,7 +95,7 @@ public partial class Ramp : ModelEntity, ISpawnFunction
 			case Dhd d:
 				if ( !HasFreeDHDSlots )
 					return;
-				Slot = DHDOffsets[NextFreeRingSlot];
+				Slot = DHDOffsets[NextFreeDHDSlot];
 				d.Ramp = this;
 				DHDs.Add( d );
 				break;

@@ -51,6 +51,11 @@ public abstract partial class Dhd : Prop
 		PostSpawn();
 	}
 
+	protected override void OnDestroy()
+	{
+		base.OnDestroy();
+		if ( Ramp != null ) Ramp.DHDs.Remove( this );
+	}
 	public virtual async void PostSpawn()
 	{
 		await GameTask.NextPhysicsFrame();
