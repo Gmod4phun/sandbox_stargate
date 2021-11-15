@@ -108,12 +108,6 @@ partial class SandboxGame : Game
 		}
 		if ( tr.Entity is Ramp newRamp ) newRamp.PositionObject( ent );
 
-		if (ent is Stargate gate) // gate ramps
-		{
-			if (tr.Entity is IStargateRamp ramp ) Stargate.PutGateOnRamp( gate, ramp );
-		}
-
-		//Log.Info( $"ent: {ent}" );
 	}
 
 	public override void DoPlayerNoclip( Client player )

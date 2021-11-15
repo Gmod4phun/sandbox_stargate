@@ -93,7 +93,8 @@ namespace Sandbox.Tools
 					gate.Rotation = new Angles( 0, Owner.EyeRot.Angles().yaw + 180, 0 ).ToRotation();
 					gate.Owner = Owner;
 
-					if ( tr.Entity is IStargateRamp ramp ) Stargate.PutGateOnRamp( gate, ramp );
+					if ( tr.Entity is Ramp newRamp ) newRamp.PositionObject( gate );
+
 				}
 
 				if ( Input.Pressed( InputButton.Reload ) )
