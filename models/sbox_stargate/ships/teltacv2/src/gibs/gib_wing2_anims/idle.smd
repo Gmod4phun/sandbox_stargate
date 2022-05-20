@@ -1,0 +1,9 @@
+// Created by Crowbar 0.71
+version 1
+nodes
+  0 "DoorWing1" -1
+end
+skeleton
+  time 0
+    0 -228.500000 -96.437500 -156.125000 0.000000 0.000000 -3.141588
+end

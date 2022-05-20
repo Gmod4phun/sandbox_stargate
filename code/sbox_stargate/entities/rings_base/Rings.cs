@@ -277,7 +277,8 @@ public partial class Rings : AnimEntity, IUse
 		ChildRings.Clear();
 
 		// Make the base entity static to prevent droping under the map ...
-		PhysicsBody.BodyType = PhysicsBodyType.Static;
+		if ( !Parent.IsValid() )
+			PhysicsBody.BodyType = PhysicsBodyType.Static;
 		PlaySound( "ring_transporter2" );
 
 		// Playing the animation
@@ -479,6 +480,15 @@ public partial class Rings : AnimEntity, IUse
 	{
 		if ( DestinationRings.IsValid() )
 			DestinationRings.RetractRings();
+	}
+
+	public void SetAddress( string address )
+	{
+		if ( Address == address ) return;
+
+		if ( address == null ) Address = "";
+
+		Address = address;
 	}
 
 }
